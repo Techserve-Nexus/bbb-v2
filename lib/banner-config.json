@@ -1,0 +1,54 @@
+{
+  "logo": {
+    "src": "/logobbb.svg",
+    "alt": "BBB Event Logo",
+    "width": 200,
+    "height": 80
+  },
+  "banners": [
+    {
+      "id": "banner-1",
+      "desktop": {
+        "src": "/banner/laptop/1.svg",
+        "alt": "BBB Event 2025 - Banner 1 Desktop"
+      },
+      "tablet": {
+        "src": "/banner/laptop/1.svg",
+        "alt": "BBB Event 2025 - Banner 1 Tablet"
+      },
+      "mobile": {
+        "src": "/banner/laptop/1.svg",
+        "alt": "BBB Event 2025 - Banner 1 Mobile"
+      },
+      "priority": true
+    },
+    {
+      "id": "banner-2",
+      "desktop": {
+        "src": "/banner/laptop/2.svg",
+        "alt": "BBB Event 2025 - Banner 2 Desktop"
+      },
+      "tablet": {
+        "src": "/banner/laptop/2.svg",
+        "alt": "BBB Event 2025 - Banner 2 Tablet"
+      },
+      "mobile": {
+        "src": "/banner/laptop/2.svg",
+        "alt": "BBB Event 2025 - Banner 2 Mobile"
+      },
+      "priority": false
+    }
+  ],
+  "breakpoints": {
+    "mobile": 640,
+    "tablet": 1024,
+    "desktop": 1280
+  },
+  "settings": {
+    "autoRotate": true,
+    "interval": 5000,
+    "showIndicators": true,
+    "showArrows": true,
+    "transitionDuration": 1000
+  }
+}

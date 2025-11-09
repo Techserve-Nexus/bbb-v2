@@ -1,0 +1,142 @@
+{
+  "organization": {
+    "name": "BBB Chess Championship 2025",
+    "shortName": "BBB",
+    "website": "https://bbbchess.com",
+    "supportEmail": "support@bbbchess.com",
+    "replyToEmail": "noreply@bbbchess.com"
+  },
+  "branding": {
+    "colors": {
+      "primary": "#FF6B35",
+      "primaryDark": "#F7931E",
+      "secondary": "#4A90E2",
+      "success": "#10B981",
+      "error": "#EF4444",
+      "warning": "#F59E0B",
+      "text": "#1F2937",
+      "textLight": "#6B7280",
+      "border": "#E5E7EB",
+      "background": "#F9FAFB"
+    },
+    "logo": {
+      "url": "https://bbbchess.com/logo.png",
+      "alt": "BBB Chess Championship Logo",
+      "width": 150,
+      "height": 60
+    }
+  },
+  "emailTemplates": {
+    "header": {
+      "showLogo": true,
+      "backgroundColor": "linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)",
+      "textColor": "#FFFFFF",
+      "padding": "30px 20px"
+    },
+    "footer": {
+      "showSocialLinks": true,
+      "socialLinks": [
+        {
+          "platform": "Facebook",
+          "url": "https://facebook.com/bbbchess",
+          "icon": "📘"
+        },
+        {
+          "platform": "Twitter",
+          "url": "https://twitter.com/bbbchess",
+          "icon": "🐦"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://instagram.com/bbbchess",
+          "icon": "📸"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://linkedin.com/company/bbbchess",
+          "icon": "💼"
+        }
+      ],
+      "copyrightText": "© 2025 BBB Chess Championship. All rights reserved.",
+      "addressLine1": "BBB Chess Championship Organization",
+      "addressLine2": "Mumbai, Maharashtra, India",
+      "backgroundColor": "#F9FAFB",
+      "textColor": "#6B7280",
+      "padding": "30px 20px"
+    }
+  },
+  "ticketEmail": {
+    "subject": "🎟️ Your Event Ticket - {registrationId}",
+    "replyTo": "support@bbbchess.com",
+    "heading": "Your BBB Chess Championship Ticket",
+    "subheading": "Thank you for registering! Here are your ticket details.",
+    "qrCodeLabel": "Scan this QR code at the venue",
+    "instructions": [
+      {
+        "icon": "📱",
+        "text": "Save this email or take a screenshot of the QR code"
+      },
+      {
+        "icon": "🎫",
+        "text": "Present the QR code at the registration desk"
+      },
+      {
+        "icon": "📧",
+        "text": "Keep your Registration ID handy for reference"
+      },
+      {
+        "icon": "⏰",
+        "text": "Arrive 30 minutes early for a smooth check-in"
+      }
+    ],
+    "ctaButton": {
+      "text": "View Ticket Details",
+      "url": "{appUrl}/ticket/{registrationId}",
+      "color": "#4A90E2"
+    },
+    "helpText": "Need help? Contact us at support@bbbchess.com or visit our website."
+  },
+  "paymentVerifiedEmail": {
+    "approved": {
+      "subject": "✅ Payment Verified - {registrationId}",
+      "replyTo": "support@bbbchess.com",
+      "heading": "Payment Approved!",
+      "subheading": "Your payment has been successfully verified.",
+      "messageColor": "#10B981",
+      "ctaButton": {
+        "text": "Download Your Ticket",
+        "url": "{appUrl}/ticket/{registrationId}",
+        "color": "#10B981"
+      }
+    },
+    "rejected": {
+      "subject": "❌ Payment Verification Failed - {registrationId}",
+      "replyTo": "support@bbbchess.com",
+      "heading": "Payment Verification Failed",
+      "subheading": "We couldn't verify your payment. Please review the details below.",
+      "messageColor": "#EF4444",
+      "ctaButton": {
+        "text": "Update Payment Details",
+        "url": "{appUrl}/register",
+        "color": "#EF4444"
+      }
+    }
+  },
+  "smtp": {
+    "from": {
+      "name": "BBB Chess Championship",
+      "email": "noreply@bbbchess.com"
+    },
+    "replyTo": {
+      "name": "BBB Support Team",
+      "email": "support@bbbchess.com"
+    }
+  },
+  "event": {
+    "name": "BBB Chess Championship 2025",
+    "date": "March 15-17, 2025",
+    "venue": "Grand Convention Center, Mumbai",
+    "contactNumber": "+91-XXXXX-XXXXX",
+    "websiteUrl": "https://bbbchess.com"
+  }
+}
