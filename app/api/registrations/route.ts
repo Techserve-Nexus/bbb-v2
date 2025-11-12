@@ -31,8 +31,8 @@ export async function POST(req: NextRequest) {
     ticketType = ticketType.replace(/\s+/g, "_")
     console.log("Sanitized ticketType:", ticketType)
 
-    // Validate required fields
-    if (!name || !chapterName || !category || !contactNo || !email) {
+    // Validate required fields (chapterName and category are now optional)
+    if (!name || !contactNo || !email) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
