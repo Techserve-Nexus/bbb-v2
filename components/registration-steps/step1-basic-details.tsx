@@ -55,14 +55,16 @@ export default function Step1BasicDetails({ formData, setFormData, errors }: Ste
 
         {/* Category */}
         <div>
-          <label className="block text-sm font-semibold text-foreground mb-2">Category *</label>
+          <label htmlFor="category" className="block text-sm font-semibold text-foreground mb-2">Category*</label>
           <select
+            id="category"
             name="category"
             value={formData.category}
             onChange={handleChange}
             className={`w-full px-4 py-3 rounded-lg border-2 transition-colors bg-background text-foreground ${
               errors.category ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"
             } outline-none`}
+            aria-required="true"
           >
             <option value="">Select a category</option>
             {categories.map((cat) => (

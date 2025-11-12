@@ -21,20 +21,20 @@ export function formatPrice(price: number): string {
 
 export const TICKET_OPTIONS = [
   {
-    tier: "Platinum",
-    price: 3000,
-    features: ["VIP Seating", "Complimentary Meals", "Exclusive Workshop", "Hotel Accommodation"],
+    tier: "Business_Conclave",
+    price: 1000,
+    features: ["Master Class from Industry Experts", "Exclusive CCT", "Complimentary Food", "Business Connects"],
   },
   {
-    tier: "Gold",
-    price: 2000,
-    features: ["Premium Seating", "Lunch & Refreshments", "Workshop Access", "Welcome Kit"],
+    tier: "Chess",
+    price: 500,
+    features: ["Professionally conducted", "Best of three games", "Play with Grand Master", "Special Prizes and Recognition"],
   },
-  {
-    tier: "Silver",
-    price: 1500,
-    features: ["Standard Seating", "Refreshments", "Event Materials", "Digital Resources"],
-  },
+  // {
+  //   tier: "Silver",
+  //   price: 1500,
+  //   features: ["Standard Seating", "Refreshments", "Event Materials", "Digital Resources"],
+  // },
 ]
 
 export const CONCLAVE_GROUPS = [

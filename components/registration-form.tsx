@@ -19,7 +19,7 @@ interface FormData {
   email: string
 
   // Step 2
-  ticketType: "Platinum" | "Gold" | "Silver" | ""
+    ticketType: "Business_Conclave" | "Chess" | ""
 
   // Step 3
   spouseName?: string
@@ -161,6 +161,8 @@ export default function RegistrationForm() {
         paymentScreenshotUrl: formData.paymentMethod === "manual" ? formData.paymentScreenshotUrl : undefined,
       }
 
+      // alert("Submitting your registration. Please wait...")
+
       const response = await fetch("/api/registrations", {
         method: "POST",
         headers: {
@@ -168,7 +170,7 @@ export default function RegistrationForm() {
         },
         body: JSON.stringify(submissionData),
       })
-
+      // alert("Registration submitted. Processing response...")
       const data = await response.json()
 
       if (!response.ok) {
@@ -186,6 +188,7 @@ export default function RegistrationForm() {
         // Manual payment - show success message
         setSubmitSuccess(true)
         localStorage.removeItem("registrationForm")
+        // alert(`Registration successful! Your Registration ID is ${regId}. Please check your email for further instructions.`)
       }
       
       console.log("Registration successful:", data)
@@ -193,6 +196,7 @@ export default function RegistrationForm() {
       console.error("Registration error:", error)
       setSubmitError(error instanceof Error ? error.message : "Failed to submit registration")
       setIsSubmitting(false)
+      // alert(`Registration failed: ${error instanceof Error ? error.message : "Unknown error"}`)
     }
   }
 

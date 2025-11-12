@@ -6,7 +6,7 @@ export interface Registration {
   category: string
   contactNo: string
   email: string
-  ticketType: "Platinum" | "Gold" | "Silver"
+  ticketType: "Business_Conclave" | "Chess"
   paymentMethod?: "razorpay" | "manual"
   paymentStatus: "pending" | "success" | "failed"
   paymentId?: string
@@ -55,7 +55,7 @@ export interface Sponsor {
   name: string
   logo: string
   website: string
-  category: "Platinum" | "Gold" | "Silver"
+  category: "Business_Conclave" | "Chess"
   description: string
   socialLinks?: Record<string, string>
 }
@@ -70,7 +70,7 @@ export interface GalleryItem {
 }
 
 export interface TicketOption {
-  tier: "Platinum" | "Gold" | "Silver"
+  tier: "Business_Conclave" | "Chess"
   price: number
   features: string[]
 }
