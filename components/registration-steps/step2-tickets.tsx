@@ -16,7 +16,7 @@ export default function Step2Tickets({ formData, setFormData, errors }: Step2Pro
 
       {errors.ticketType && <p className="text-red-500 text-sm mb-4">{errors.ticketType}</p>}
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-2xl">
         {TICKET_OPTIONS.map((ticket) => (
           <div
             key={ticket.tier}
@@ -57,8 +57,7 @@ export default function Step2Tickets({ formData, setFormData, errors }: Step2Pro
 
       <div className="mt-8 p-4 bg-muted rounded-lg border border-border">
         <p className="text-sm text-muted-foreground">
-          <strong>Note:</strong> After selection, you'll proceed to payment through Razorpay. A secure payment gateway
-          will handle all transactions.
+          <strong>Note:</strong> After selection, you'll proceed to payment. Receipt shall be shared to the registered email.
         </p>
       </div>
     </div>

@@ -60,7 +60,8 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
         })
 
         if (!response.ok) {
-          throw new Error("Upload failed")
+          const errorData = await response.json()
+          throw new Error(errorData.error || "Upload failed")
         }
 
         const data = await response.json()
@@ -154,10 +155,10 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
             <div className="bg-white p-4 inline-block rounded-lg shadow-md">
               <div className="w-64 h-64 bg-white rounded flex items-center justify-center overflow-hidden">
                 <Image
-                  src="/paymentQR.jpg"
+                  src="/qr_bbb.jpg"
                   alt="Payment QR Code"
-                  width={300}
-                  height={300}
+                  width={600}
+                  height={600}
                   className="object-contain"
                   priority
                 />

@@ -68,6 +68,7 @@ export default function Step3AdditionalDetails({ formData, setFormData }: Step3P
                     value={child.age}
                     onChange={(e) => handleChildChange(index, "age", e.target.value as "<12" | ">12")}
                     className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground transition-colors"
+                    aria-label="Age Group"
                   >
                     <option value="<12">Less than 12 years</option>
                     <option value=">12">More than 12 years</option>
@@ -77,9 +78,8 @@ export default function Step3AdditionalDetails({ formData, setFormData }: Step3P
             ))}
           </div>
         </div>
-
         {/* Participation Options */}
-        <div>
+        {/* <div>
           <h3 className="text-lg font-semibold text-foreground mb-4">Events to Participate In</h3>
           <div className="grid md:grid-cols-2 gap-4">
             {PARTICIPATION_OPTIONS.map((option) => (
@@ -96,10 +96,9 @@ export default function Step3AdditionalDetails({ formData, setFormData }: Step3P
               </label>
             ))}
           </div>
-        </div>
-
+        </div> */}
         {/* Conclave Groups */}
-        <div>
+        {/* <div>
           <h3 className="text-lg font-semibold text-foreground mb-4">Core Conclave Groups (Optional)</h3>
           <div className="grid md:grid-cols-2 gap-4">
             {CONCLAVE_GROUPS.map((group) => (
@@ -116,7 +115,7 @@ export default function Step3AdditionalDetails({ formData, setFormData }: Step3P
               </label>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Summary */}
         <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">

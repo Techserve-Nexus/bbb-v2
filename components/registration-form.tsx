@@ -19,7 +19,7 @@ interface FormData {
   email: string
 
   // Step 2
-  ticketType: "Platinum" | "Gold" | "Silver" | ""
+    ticketType: "Business Conclave" | "Chess" | ""
 
   // Step 3
   spouseName?: string

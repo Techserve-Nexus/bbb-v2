@@ -128,7 +128,6 @@ export default function TicketVerificationPage() {
       </main>
     )
   }
-
   return (
     <main className="min-h-screen bg-background flex flex-col">
       <Navbar />
