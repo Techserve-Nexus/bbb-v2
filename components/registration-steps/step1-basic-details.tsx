@@ -39,7 +39,7 @@ export default function Step1BasicDetails({ formData, setFormData, errors }: Ste
 
         {/* Chapter Name */}
         <div>
-          <label className="block text-sm font-semibold text-foreground mb-2">Chapter Name *</label>
+          <label className="block text-sm font-semibold text-foreground mb-2">Chapter Name (Optional)</label>
           <input
             type="text"
             name="chapterName"
@@ -55,7 +55,7 @@ export default function Step1BasicDetails({ formData, setFormData, errors }: Ste
 
         {/* Category */}
         <div>
-          <label htmlFor="category" className="block text-sm font-semibold text-foreground mb-2">Category*</label>
+          <label htmlFor="category" className="block text-sm font-semibold text-foreground mb-2">Category (Optional)</label>
           <select
             id="category"
             name="category"
@@ -64,7 +64,6 @@ export default function Step1BasicDetails({ formData, setFormData, errors }: Ste
             className={`w-full px-4 py-3 rounded-lg border-2 transition-colors bg-background text-foreground ${
               errors.category ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"
             } outline-none`}
-            aria-required="true"
           >
             <option value="">Select a category</option>
             {categories.map((cat) => (

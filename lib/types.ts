@@ -2,8 +2,8 @@ export interface Registration {
   id: string
   registrationId: string
   name: string
-  chapterName: string
-  category: string
+  chapterName?: string
+  category?: string
   contactNo: string
   email: string
   ticketType: "Business_Conclave" | "Chess"

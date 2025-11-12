@@ -12,8 +12,8 @@ const RegistrationSchema = new Schema<Registration>(
   {
     registrationId: { type: String, required: true, unique: true },
     name: { type: String, required: true },
-    chapterName: { type: String, required: true },
-    category: { type: String, required: true },
+    chapterName: { type: String, required: false },
+    category: { type: String, required: false },
     contactNo: { type: String, required: true },
     email: { type: String, required: true },
     ticketType: { 

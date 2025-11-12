@@ -84,8 +84,7 @@ export default function RegistrationForm() {
     const newErrors: Record<string, string> = {}
 
     if (!formData.name.trim()) newErrors.name = "Name is required"
-    if (!formData.chapterName.trim()) newErrors.chapterName = "Chapter name is required"
-    if (!formData.category) newErrors.category = "Category is required"
+    // chapterName and category are now optional - no validation needed
     if (!formData.contactNo.trim()) newErrors.contactNo = "Contact number is required"
     if (!/^\d{10}$/.test(formData.contactNo.replace(/\D/g, ""))) {
       newErrors.contactNo = "Please enter a valid 10-digit phone number"
