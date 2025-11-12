@@ -12,13 +12,13 @@ export async function POST(req: NextRequest) {
     await connectDB()
     
     const body = await req.json()
-    const { 
+    let { 
       name, 
       chapterName, 
       category, 
       contactNo, 
       email, 
-      ticketType = "Silver",
+      ticketType = "Chess",
       paymentMethod = "manual", // "razorpay" or "manual"
       spouseName,
       children = [],
@@ -26,6 +26,10 @@ export async function POST(req: NextRequest) {
       conclavGroups = [],
       paymentScreenshotUrl,
     } = body
+
+    // Sanitize ticketType - replace spaces with underscores for backward compatibility
+    ticketType = ticketType.replace(/\s+/g, "_")
+    console.log("Sanitized ticketType:", ticketType)
 
     // Validate required fields
     if (!name || !chapterName || !category || !contactNo || !email) {
@@ -38,6 +42,7 @@ export async function POST(req: NextRequest) {
     }
 
     const registrationId = generateRegistrationId()
+    console.log("Generated Registration ID:", registrationId)
 
     const registration = await RegistrationModel.create({
       registrationId,
@@ -56,6 +61,7 @@ export async function POST(req: NextRequest) {
       conclavGroups,
       paymentScreenshotUrl: paymentMethod === "manual" ? paymentScreenshotUrl : undefined,
     })
+    console.log("Created registration:", registration)
 
     // Send registration confirmation email (async, don't wait)
     try {
@@ -88,8 +94,8 @@ export async function POST(req: NextRequest) {
         ? "Registration created. Please complete payment." 
         : "Registration created successfully. Payment pending verification.",
     })
-  } catch (error) {
-    console.error("Error creating registration:", error)
+  } catch (error: any) {
+    console.error("Error creating registration:", error?.message || error )
     return NextResponse.json({ error: "Failed to create registration" }, { status: 500 })
   }
 }

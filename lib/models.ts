@@ -18,7 +18,7 @@ const RegistrationSchema = new Schema<Registration>(
     email: { type: String, required: true },
     ticketType: { 
       type: String, 
-      enum: ["Platinum", "Gold", "Silver"], 
+      enum: ["Business_Conclave", "Chess"], 
       required: true 
     },
     paymentMethod: {
@@ -58,7 +58,7 @@ const SponsorSchema = new Schema<Sponsor>(
     website: { type: String, required: true },
     category: { 
       type: String, 
-      enum: ["Platinum", "Gold", "Silver"], 
+      enum: ["Business_Conclave", "Chess"], 
       required: true 
     },
     description: { type: String, required: true },
