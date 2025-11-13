@@ -19,7 +19,7 @@ interface FormData {
   email: string
 
   // Step 2
-    ticketType: "Business_Conclave" | "Chess" | ""
+  ticketTypes: string[] // Changed to array for multiple selection
 
   // Step 3
   spouseName?: string
@@ -42,7 +42,7 @@ export default function RegistrationForm() {
     category: "",
     contactNo: "",
     email: "",
-    ticketType: "",
+    ticketTypes: [],
     spouseName: "",
     children: [
       { name: "", age: "<12" },
@@ -100,8 +100,8 @@ export default function RegistrationForm() {
 
   const validateStep2 = () => {
     const newErrors: Record<string, string> = {}
-    if (!formData.ticketType) {
-      newErrors.ticketType = "Please select a ticket type"
+    if (!formData.ticketTypes || formData.ticketTypes.length === 0) {
+      newErrors.ticketType = "Please select at least one ticket type"
     }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -151,7 +151,7 @@ export default function RegistrationForm() {
         category: formData.category,
         contactNo: formData.contactNo,
         email: formData.email,
-        ticketType: formData.ticketType,
+        ticketTypes: formData.ticketTypes,
         paymentMethod: formData.paymentMethod,
         spouseName: formData.spouseName || undefined,
         children: formData.children.filter(child => child.name.trim() !== ""),
@@ -182,7 +182,7 @@ export default function RegistrationForm() {
       
       // If Razorpay payment, initiate payment flow
       if (formData.paymentMethod === "razorpay") {
-        await handleRazorpayPayment(regId, data.amount || getTicketAmount(formData.ticketType))
+        await handleRazorpayPayment(regId, data.amount || calculateTotalAmount(formData.ticketTypes))
       } else {
         // Manual payment - show success message
         setSubmitSuccess(true)
@@ -199,13 +199,12 @@ export default function RegistrationForm() {
     }
   }
 
-  const getTicketAmount = (ticketType: string) => {
+  const calculateTotalAmount = (ticketTypes: string[]) => {
     const prices: Record<string, number> = {
-      Platinum: 3999,
-      Gold: 2999,
-      Silver: 1999,
+      Business_Conclave: 1000,
+      Chess: 500,
     }
-    return prices[ticketType] || 1999
+    return ticketTypes.reduce((total, type) => total + (prices[type] || 0), 0)
   }
 
   const handleRazorpayPayment = async (regId: string, amount: number) => {
@@ -239,7 +238,7 @@ export default function RegistrationForm() {
         amount: amount * 100,
         currency: "INR",
         name: "Chess Event 2025",
-        description: `${formData.ticketType} Ticket - ${regId}`,
+        description: `Tickets: ${formData.ticketTypes.join(", ")} - ${regId}`,
         image: "/logo.png", // Add your logo
         prefill: {
           name: formData.name,
@@ -330,7 +329,7 @@ export default function RegistrationForm() {
                 category: "",
                 contactNo: "",
                 email: "",
-                ticketType: "",
+                ticketTypes: [],
                 spouseName: "",
                 children: [
                   { name: "", age: "<12" },
