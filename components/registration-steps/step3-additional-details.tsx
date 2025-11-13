@@ -36,7 +36,7 @@ export default function Step3AdditionalDetails({ formData, setFormData }: Step3P
       <div className="space-y-8">
         {/* Spouse Name */}
         <div>
-          <label className="block text-sm font-semibold text-foreground mb-2">Spouse Name (Optional)</label>
+          <label className="block text-sm font-semibold text-foreground mb-2">Spouse Name </label>
           <input
             type="text"
             value={formData.spouseName || ""}
@@ -48,7 +48,7 @@ export default function Step3AdditionalDetails({ formData, setFormData }: Step3P
 
         {/* Children Details */}
         <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Children Details (Optional)</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-4">Children Details</h3>
           <div className="space-y-4">
             {formData.children.map((child: any, index: number) => (
               <div key={index} className="grid md:grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg border border-border">

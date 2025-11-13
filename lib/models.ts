@@ -7,6 +7,14 @@ const ChildInfoSchema = new Schema<ChildInfo>({
   age: { type: String, enum: ["<12", ">12"], required: true },
 }, { _id: false })
 
+// Person Ticket Schema
+const PersonTicketSchema = new Schema({
+  personType: { type: String, enum: ["self", "spouse", "child"], required: true },
+  name: { type: String, required: true },
+  age: { type: String, enum: ["<12", ">12"] },
+  tickets: [{ type: String }], // Array of ticket types selected for this person
+}, { _id: false })
+
 // Registration Schema
 const RegistrationSchema = new Schema<Registration>(
   {
@@ -16,12 +24,15 @@ const RegistrationSchema = new Schema<Registration>(
     category: { type: String, required: false },
     contactNo: { type: String, required: true },
     email: { type: String, required: true },
+    spouseName: { type: String },
+    children: [ChildInfoSchema],
+    personTickets: [PersonTicketSchema], // New field for per-person ticket selections
     ticketType: { 
       type: String, 
       enum: ["Business_Conclave", "Chess"], 
-      required: false // Made optional as we're using ticketTypes array
+      required: false // Kept for backward compatibility
     },
-    ticketTypes: [{ type: String }], // New array field for multiple ticket selections
+    ticketTypes: [{ type: String }], // Kept for backward compatibility
     paymentMethod: {
       type: String,
       enum: ["razorpay", "manual"],
@@ -32,13 +43,9 @@ const RegistrationSchema = new Schema<Registration>(
       enum: ["pending", "success", "failed"], 
       default: "pending" 
     },
-    paymentId: { type: String }, // References Payment collection _id
+    paymentId: { type: String },
     paymentReference: { type: String },
     paymentScreenshotUrl: { type: String },
-    spouseName: { type: String },
-    children: [ChildInfoSchema],
-    participations: [{ type: String }],
-    conclavGroups: [{ type: String }],
     qrCode: { type: String },
     ticketStatus: {
       type: String,

@@ -15,12 +15,20 @@ export interface Registration {
   paymentScreenshotUrl?: string
   spouseName?: string
   children: ChildInfo[]
+  personTickets?: PersonTicket[] // Per-person ticket selections
   participations: string[]
   conclavGroups: string[]
   qrCode?: string
   ticketStatus?: "under_review" | "active" | "expired" | "used"
   createdAt: Date
   updatedAt: Date
+}
+
+export interface PersonTicket {
+  personType: "self" | "spouse" | "child"
+  name: string
+  age?: "<12" | ">12"
+  tickets: string[]
 }
 
 export interface Payment {
