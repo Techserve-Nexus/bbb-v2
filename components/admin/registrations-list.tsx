@@ -14,6 +14,12 @@ interface Registration {
   chapterName: string
   category: string
   ticketType: string
+  personTickets?: Array<{
+    personType: "self" | "spouse" | "child"
+    name: string
+    age?: string
+    tickets: string[]
+  }>
   paymentMethod?: "razorpay" | "manual"
   paymentStatus: string
   ticketStatus: string
@@ -424,7 +430,30 @@ export default function RegistrationsList() {
                     </td>
                     <td className="px-4 py-3 text-sm">{reg.chapterName}</td>
                     <td className="px-4 py-3">
-                      <span className="text-sm font-medium">{reg.ticketType}</span>
+                      {reg.personTickets && reg.personTickets.length > 0 ? (
+                        <div className="space-y-1 max-w-xs">
+                          <div className="text-sm font-medium">{reg.personTickets.length} Person(s)</div>
+                          <div className="text-xs text-muted-foreground mb-1">
+                            {reg.personTickets.reduce((total, p) => total + p.tickets.length, 0)} Ticket(s) Total
+                          </div>
+                          <div className="space-y-1 text-xs">
+                            {reg.personTickets.map((person, idx) => (
+                              <div key={idx} className="bg-purple-50 px-2 py-1 rounded border border-purple-200">
+                                <div className="font-medium text-gray-700 truncate">{person.name}</div>
+                                <div className="flex flex-wrap gap-1 mt-0.5">
+                                  {person.tickets.map((ticket, tIdx) => (
+                                    <span key={tIdx} className="inline-block px-1.5 py-0.5 bg-purple-200 text-purple-800 rounded text-xs">
+                                      {ticket}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-sm font-medium">{reg.ticketType}</span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(reg.paymentStatus)}`}>
@@ -581,6 +610,37 @@ export default function RegistrationsList() {
                   <p className="font-semibold">{selectedRegistration.chapterName}</p>
                 </div>
               </div>
+
+              {/* Per-Person Tickets in Verification Modal */}
+              {selectedRegistration.personTickets && selectedRegistration.personTickets.length > 0 && (
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-3 font-semibold">Per-Person Tickets</p>
+                  <div className="space-y-2">
+                    {selectedRegistration.personTickets.map((person, index) => (
+                      <div key={index} className="bg-white p-3 rounded border">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-semibold text-sm">{person.name}</span>
+                          <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 rounded capitalize">
+                            {person.personType}
+                          </span>
+                          {person.age && (
+                            <span className="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded">
+                              Age: {person.age}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {person.tickets.map((ticket, ticketIndex) => (
+                            <span key={ticketIndex} className="text-xs px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full">
+                              {ticket}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {selectedRegistration.paymentScreenshotUrl && (
                 <div className="bg-gray-50 p-4 rounded-lg">
@@ -771,17 +831,68 @@ export default function RegistrationsList() {
                 </div>
               )}
 
+              {/* Per-Person Tickets Information */}
+              {detailsRegistration.personTickets && detailsRegistration.personTickets.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <div className="w-1 h-6 bg-purple-600 rounded"></div>
+                    Per-Person Ticket Details
+                  </h3>
+                  <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                    {detailsRegistration.personTickets.map((person, index) => (
+                      <div key={index} className="bg-white p-4 rounded border">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <span className="font-semibold text-gray-900">{person.name}</span>
+                            <span className="ml-2 text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded capitalize">
+                              {person.personType}
+                            </span>
+                            {person.age && (
+                              <span className="ml-2 text-xs px-2 py-1 bg-green-100 text-green-800 rounded">
+                                Age: {person.age}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {person.tickets.map((ticket, ticketIndex) => (
+                            <span key={ticketIndex} className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                              {ticket}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Ticket Information */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <div className="w-1 h-6 bg-purple-600 rounded"></div>
-                  Ticket Information
+                  <div className="w-1 h-6 bg-orange-600 rounded"></div>
+                  Ticket Summary
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-                  <div>
-                    <p className="text-sm text-gray-500">Ticket Type</p>
-                    <p className="font-medium text-gray-900">{detailsRegistration.ticketType}</p>
-                  </div>
+                  {detailsRegistration.personTickets && detailsRegistration.personTickets.length > 0 ? (
+                    <>
+                      <div>
+                        <p className="text-sm text-gray-500">Total Persons</p>
+                        <p className="font-medium text-gray-900">{detailsRegistration.personTickets.length}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Total Tickets</p>
+                        <p className="font-medium text-gray-900">
+                          {detailsRegistration.personTickets.reduce((total, p) => total + p.tickets.length, 0)}
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <div>
+                      <p className="text-sm text-gray-500">Ticket Type</p>
+                      <p className="font-medium text-gray-900">{detailsRegistration.ticketType}</p>
+                    </div>
+                  )}
                   <div>
                     <p className="text-sm text-gray-500">Ticket Status</p>
                     <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(detailsRegistration.ticketStatus)}`}>
@@ -794,7 +905,7 @@ export default function RegistrationsList() {
               {/* Payment Information */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <div className="w-1 h-6 bg-orange-600 rounded"></div>
+                  <div className="w-1 h-6 bg-emerald-600 rounded"></div>
                   Payment Information
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">

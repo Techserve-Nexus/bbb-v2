@@ -38,7 +38,7 @@ export default function Home() {
         <Sponsors />
         <TicketPricing />
         <ParticipantsCounter />
-        <Testimonials />
+        {/* <Testimonials /> */}
         <CallToAction />
         <Footer />
       </main>

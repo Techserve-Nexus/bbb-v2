@@ -17,7 +17,7 @@ export default function TicketPricing() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 gap-8">
           {TICKET_OPTIONS.map((ticket, index) => (
             <div
               key={ticket.tier}

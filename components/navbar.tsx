@@ -29,22 +29,17 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-background shadow-md border-b border-border" : "bg-background"
-      }`}
+      className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? "bg-background shadow-md border-b border-border" : "bg-background"
+        }`}
     >
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-4">
+      <div className="mx-auto px-4 md:px-6 py-2">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <Image
-              src={bannerConfig.logo.src}
-              alt={bannerConfig.logo.alt}
-              width={bannerConfig.logo.width}
-              height={bannerConfig.logo.height}
-              className="h-12 w-auto"
-              priority
-            />
+          <Link
+            href="/"
+            className="h-20 w-20 rounded-full bg-cover bg-center block"
+            style={{ backgroundImage: `url('${bannerConfig.logo.src}')` }}
+          >
           </Link>
 
           {/* Desktop Navigation */}
@@ -54,9 +49,8 @@ export default function Navbar() {
                 key={link.id}
                 href={link.href}
                 onClick={() => setActiveLink(link.id)}
-                className={`relative text-sm font-medium transition-colors ${
-                  activeLink === link.id ? "text-primary" : "text-foreground hover:text-primary"
-                }`}
+                className={`relative text-sm font-medium transition-colors ${activeLink === link.id ? "text-primary" : "text-foreground hover:text-primary"
+                  }`}
               >
                 {link.label}
                 {activeLink === link.id && (
@@ -93,9 +87,8 @@ export default function Navbar() {
                   setActiveLink(link.id)
                   setIsOpen(false)
                 }}
-                className={`block px-4 py-2 rounded-lg transition-colors ${
-                  activeLink === link.id ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"
-                }`}
+                className={`block px-4 py-2 rounded-lg transition-colors ${activeLink === link.id ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"
+                  }`}
               >
                 {link.label}
               </Link>
