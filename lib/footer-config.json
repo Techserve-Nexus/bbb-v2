@@ -1,0 +1,64 @@
+{
+  "brand": {
+    "name": "Chaturanga Manthana 2025 ",
+    "icon": "♔",
+    "tagline": "Where strategic minds meet and excellence is celebrated."
+  },
+  "quickLinks": [
+    {
+      "label": "Home",
+      "href": "/"
+    },
+    {
+      "label": "Sponsors",
+      "href": "/sponsors"
+    },
+    {
+      "label": "ProfitHax",
+      "href": "https://www.profithax.com"
+    }
+  ],
+  "contact": {
+    "email": "bbbshreeparashurama@gmail.com ",
+    "phone": "+919741477555‬",
+    "phoneDisplay": "+91 97414 77555‬, +919591377442",
+    "address": " Nandi Link Grounds, Nayandahalli, Bengaluru 560026"
+  },
+  "social": [
+    {
+      "name": "Facebook",
+      "url": "#",
+      "icon": "facebook"
+    },
+    {
+      "name": "Twitter",
+      "url": "#",
+      "icon": "twitter"
+    },
+    {
+      "name": "Instagram",
+      "url": "#",
+      "icon": "instagram"
+    },
+    {
+      "name": "Linkedin",
+      "url": "#",
+      "icon": "linkedin"
+    }
+  ],
+  "bottomLinks": [
+    {
+      "label": "Privacy Policy",
+      "href": "#"
+    },
+    {
+      "label": "Terms of Service",
+      "href": "#"
+    },
+    {
+      "label": "Contact",
+      "href": "#"
+    }
+  ],
+  "copyrightText": "2025 BBB CHESS EVENT || © All Rights Reserved"
+}

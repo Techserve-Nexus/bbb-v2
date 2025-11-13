@@ -20,8 +20,6 @@ export default function Step1BasicAndFamily({ formData, setFormData, errors }: S
     setFormData({ ...formData, children: newChildren })
   }
 
-  const categories = ["Individual Player", "Corporate Team", "Chess Club", "Educational Institution", "Other"]
-
   return (
     <div>
       <h2 className="text-3xl font-bold text-foreground mb-8">Registration Details</h2>
@@ -62,21 +60,16 @@ export default function Step1BasicAndFamily({ formData, setFormData, errors }: S
 
           {/* Category */}
           <div>
-            <label htmlFor="category" className="block text-sm font-semibold text-foreground mb-2">Category</label>
-            <select
+            <label htmlFor="category" className="block text-sm font-semibold text-foreground mb-2">Category (Optional)</label>
+            <input
+              type="text"
               id="category"
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground transition-colors"
-            >
-              <option value="">Select a category</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+              className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground placeholder-muted-foreground transition-colors"
+              placeholder="e.g., Individual Player, Corporate Team, Chess Club"
+            />
           </div>
 
           {/* Contact Number */}

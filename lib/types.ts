@@ -78,6 +78,19 @@ export interface GalleryItem {
   createdAt: Date
 }
 
+export interface Banner {
+  id: string
+  title: string
+  desktopImage: string
+  tabletImage: string
+  mobileImage: string
+  priority: boolean
+  isActive: boolean
+  order: number
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface TicketOption {
   tier: "Business_Conclave" | "Chess"
   price: number

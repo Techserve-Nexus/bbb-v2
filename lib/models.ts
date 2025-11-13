@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model } from "mongoose"
-import { Registration, ChildInfo, Sponsor } from "./types"
+import { Registration, ChildInfo, Sponsor, Banner } from "./types"
 
 // Child Info Schema
 const ChildInfoSchema = new Schema<ChildInfo>({
@@ -90,6 +90,22 @@ const GalleryItemSchema = new Schema(
   }
 )
 
+// Banner Schema
+const BannerSchema = new Schema<Banner>(
+  {
+    title: { type: String, required: true },
+    desktopImage: { type: String, required: true },
+    tabletImage: { type: String, required: true },
+    mobileImage: { type: String, required: true },
+    priority: { type: Boolean, default: false },
+    isActive: { type: Boolean, default: true },
+    order: { type: Number, required: true, default: 0 },
+  },
+  {
+    timestamps: true,
+  }
+)
+
 // Payment Schema
 const PaymentSchema = new Schema(
   {
@@ -137,3 +153,6 @@ export const GalleryItemModel =
 
 export const PaymentModel =
   mongoose.models.Payment || mongoose.model("Payment", PaymentSchema)
+
+export const BannerModel: Model<Banner> =
+  mongoose.models.Banner || mongoose.model<Banner>("Banner", BannerSchema)
