@@ -3,31 +3,33 @@
 import { useState, useEffect } from "react"
 import { ChevronRight, ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import Step1BasicDetails from "./registration-steps/step1-basic-details"
-import Step2Tickets from "./registration-steps/step2-tickets"
-import Step3AdditionalDetails from "./registration-steps/step3-additional-details"
-import Step4Payment from "./registration-steps/step4-payment"
+import Step1BasicAndFamily from "./registration-steps/step1-basic-and-family"
+import Step2PerPersonTickets from "./registration-steps/step2-per-person-tickets"
+import Step3Payment from "./registration-steps/step4-payment"
 import { loadRazorpayScript } from "@/lib/razorpay"
 import { useRouter } from "next/navigation"
 
+interface PersonTicket {
+  personType: "self" | "spouse" | "child"
+  name: string
+  age?: "<12" | ">12"
+  tickets: string[] // ["Business_Conclave", "Chess", or both]
+}
+
 interface FormData {
-  // Step 1
+  // Step 1 - Basic Details + Family Info
   name: string
   chapterName: string
   category: string
   contactNo: string
   email: string
-
-  // Step 2
-  ticketTypes: string[] // Changed to array for multiple selection
-
-  // Step 3
   spouseName?: string
   children: Array<{ name: string; age: "<12" | ">12" }>
-  participations: string[]
-  conclavGroups: string[]
+
+  // Step 2 - Per Person Ticket Selection
+  personTickets: PersonTicket[]
   
-  // Step 4
+  // Step 3 - Payment
   paymentMethod: "razorpay" | "manual"
   paymentScreenshot?: string
   paymentScreenshotUrl?: string
@@ -42,16 +44,14 @@ export default function RegistrationForm() {
     category: "",
     contactNo: "",
     email: "",
-    ticketTypes: [],
     spouseName: "",
     children: [
       { name: "", age: "<12" },
       { name: "", age: "<12" },
       { name: "", age: "<12" },
     ],
-    participations: [],
-    conclavGroups: [],
-    paymentMethod: "manual", // Default to manual payment
+    personTickets: [],
+    paymentMethod: "manual",
     paymentScreenshot: undefined,
     paymentScreenshotUrl: undefined,
   })
@@ -100,14 +100,19 @@ export default function RegistrationForm() {
 
   const validateStep2 = () => {
     const newErrors: Record<string, string> = {}
-    if (!formData.ticketTypes || formData.ticketTypes.length === 0) {
-      newErrors.ticketType = "Please select at least one ticket type"
+    
+    // Check if at least one person has selected at least one ticket
+    const hasAnyTicket = formData.personTickets?.some(p => p.tickets && p.tickets.length > 0)
+    
+    if (!hasAnyTicket) {
+      newErrors.personTickets = "Please select at least one ticket for any person"
     }
+    
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const validateStep4 = () => {
+  const validateStep3 = () => {
     const newErrors: Record<string, string> = {}
     
     // Only validate screenshot for manual payment
@@ -123,7 +128,7 @@ export default function RegistrationForm() {
     if (currentStep === 1 && !validateStep1()) return
     if (currentStep === 2 && !validateStep2()) return
 
-    if (currentStep < 4) {
+    if (currentStep < 3) {
       setCurrentStep(currentStep + 1)
       window.scrollTo(0, 0)
     }
@@ -137,8 +142,8 @@ export default function RegistrationForm() {
   }
 
   const handleSubmit = async () => {
-    // Validate Step 4
-    if (!validateStep4()) return
+    // Validate Step 3 (Payment)
+    if (!validateStep3()) return
 
     setIsSubmitting(true)
     setSubmitError("")
@@ -151,12 +156,10 @@ export default function RegistrationForm() {
         category: formData.category,
         contactNo: formData.contactNo,
         email: formData.email,
-        ticketTypes: formData.ticketTypes,
-        paymentMethod: formData.paymentMethod,
         spouseName: formData.spouseName || undefined,
         children: formData.children.filter(child => child.name.trim() !== ""),
-        participations: formData.participations,
-        conclavGroups: formData.conclavGroups,
+        personTickets: formData.personTickets,
+        paymentMethod: formData.paymentMethod,
         paymentScreenshotUrl: formData.paymentMethod === "manual" ? formData.paymentScreenshotUrl : undefined,
       }
 
@@ -182,7 +185,7 @@ export default function RegistrationForm() {
       
       // If Razorpay payment, initiate payment flow
       if (formData.paymentMethod === "razorpay") {
-        await handleRazorpayPayment(regId, data.amount || calculateTotalAmount(formData.ticketTypes))
+        await handleRazorpayPayment(regId, data.amount || calculateTotalAmount(formData.personTickets))
       } else {
         // Manual payment - show success message
         setSubmitSuccess(true)
@@ -199,12 +202,18 @@ export default function RegistrationForm() {
     }
   }
 
-  const calculateTotalAmount = (ticketTypes: string[]) => {
+  const calculateTotalAmount = (personTickets: any[]) => {
     const prices: Record<string, number> = {
       Business_Conclave: 1000,
       Chess: 500,
     }
-    return ticketTypes.reduce((total, type) => total + (prices[type] || 0), 0)
+    let total = 0
+    personTickets?.forEach((person: any) => {
+      person.tickets?.forEach((ticket: string) => {
+        total += prices[ticket] || 0
+      })
+    })
+    return total
   }
 
   const handleRazorpayPayment = async (regId: string, amount: number) => {
@@ -238,7 +247,7 @@ export default function RegistrationForm() {
         amount: amount * 100,
         currency: "INR",
         name: "Chess Event 2025",
-        description: `Tickets: ${formData.ticketTypes.join(", ")} - ${regId}`,
+        description: `Event Tickets - ${regId}`,
         image: "/logo.png", // Add your logo
         prefill: {
           name: formData.name,
@@ -329,15 +338,13 @@ export default function RegistrationForm() {
                 category: "",
                 contactNo: "",
                 email: "",
-                ticketTypes: [],
                 spouseName: "",
                 children: [
                   { name: "", age: "<12" },
                   { name: "", age: "<12" },
                   { name: "", age: "<12" },
                 ],
-                participations: [],
-                conclavGroups: [],
+                personTickets: [],
                 paymentMethod: "manual",
                 paymentScreenshot: undefined,
                 paymentScreenshotUrl: undefined,
@@ -353,7 +360,7 @@ export default function RegistrationForm() {
           {/* Progress Bar */}
           <div className="mb-12">
             <div className="flex justify-between items-center mb-4">
-              {[1, 2, 3, 4].map((step) => (
+              {[1, 2, 3].map((step) => (
                 <div
                   key={step}
                   className={`flex-1 h-1 mx-1 rounded-full transition-all ${
@@ -364,15 +371,12 @@ export default function RegistrationForm() {
             </div>
             <div className="flex justify-between text-sm">
               <span className={currentStep === 1 ? "text-primary font-semibold" : "text-muted-foreground"}>
-                Basic Details
+                Registration Details
               </span>
               <span className={currentStep === 2 ? "text-primary font-semibold" : "text-muted-foreground"}>
-                Tickets
+                Select Tickets
               </span>
               <span className={currentStep === 3 ? "text-primary font-semibold" : "text-muted-foreground"}>
-                Additional
-              </span>
-              <span className={currentStep === 4 ? "text-primary font-semibold" : "text-muted-foreground"}>
                 Payment
               </span>
             </div>
@@ -388,10 +392,9 @@ export default function RegistrationForm() {
 
           {/* Form Steps */}
           <div className="bg-background border border-border rounded-lg p-8 md:p-12 mb-8">
-            {currentStep === 1 && <Step1BasicDetails formData={formData} setFormData={setFormData} errors={errors} />}
-            {currentStep === 2 && <Step2Tickets formData={formData} setFormData={setFormData} errors={errors} />}
-            {currentStep === 3 && <Step3AdditionalDetails formData={formData} setFormData={setFormData} />}
-            {currentStep === 4 && <Step4Payment formData={formData} setFormData={setFormData} />}
+            {currentStep === 1 && <Step1BasicAndFamily formData={formData} setFormData={setFormData} errors={errors} />}
+            {currentStep === 2 && <Step2PerPersonTickets formData={formData} setFormData={setFormData} errors={errors} />}
+            {currentStep === 3 && <Step3Payment formData={formData} setFormData={setFormData} />}
           </div>
 
           {/* Navigation Buttons */}
@@ -409,9 +412,9 @@ export default function RegistrationForm() {
               Previous
             </Button>
 
-            <div className="text-sm text-muted-foreground self-center">Step {currentStep} of 4</div>
+            <div className="text-sm text-muted-foreground self-center">Step {currentStep} of 3</div>
 
-            {currentStep < 4 ? (
+            {currentStep < 3 ? (
               <Button 
                 onClick={handleNext} 
                 disabled={isSubmitting}

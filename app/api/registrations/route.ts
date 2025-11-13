@@ -18,23 +18,22 @@ export async function POST(req: NextRequest) {
       category, 
       contactNo, 
       email, 
-      ticketTypes = [],
-      ticketType, // Keep for backward compatibility
-      paymentMethod = "manual", // "razorpay" or "manual"
       spouseName,
       children = [],
-      participations = [],
-      conclavGroups = [],
+      personTickets = [],
+      ticketTypes = [], // Keep for backward compatibility
+      ticketType, // Keep for backward compatibility
+      paymentMethod = "manual",
       paymentScreenshotUrl,
     } = body
 
-    // Handle backward compatibility: if ticketType is provided instead of ticketTypes
+    // Handle backward compatibility
     if (ticketType && (!ticketTypes || ticketTypes.length === 0)) {
       ticketType = ticketType.replace(/\s+/g, "_")
       ticketTypes = [ticketType]
     }
     
-    console.log("Ticket Types:", ticketTypes)
+    console.log("Person Tickets:", personTickets)
 
     // Validate required fields
     if (!name || !contactNo || !email) {
@@ -42,8 +41,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate at least one ticket is selected
-    if (!ticketTypes || ticketTypes.length === 0) {
-      return NextResponse.json({ error: "Please select at least one ticket type" }, { status: 400 })
+    const hasTickets = personTickets.some((p: any) => p.tickets && p.tickets.length > 0)
+    if (!hasTickets && (!ticketTypes || ticketTypes.length === 0)) {
+      return NextResponse.json({ error: "Please select at least one ticket" }, { status: 400 })
     }
 
     // For manual payment, screenshot is required
@@ -61,25 +61,32 @@ export async function POST(req: NextRequest) {
       category,
       contactNo,
       email,
-      ticketTypes,
-      ticketType: ticketTypes[0], // Store first ticket for backward compatibility
-      paymentMethod,
-      paymentStatus: paymentMethod === "razorpay" ? "pending" : "pending", // Both start as pending
-      ticketStatus: "under_review", // Ticket starts as under_review
       spouseName,
       children,
-      participations,
-      conclavGroups,
+      personTickets,
+      ticketTypes: personTickets.length > 0 
+        ? personTickets.flatMap((p: any) => p.tickets || [])
+        : ticketTypes,
+      ticketType: personTickets.length > 0 && personTickets[0].tickets?.length > 0
+        ? personTickets[0].tickets[0]
+        : ticketTypes[0],
+      paymentMethod,
+      paymentStatus: paymentMethod === "razorpay" ? "pending" : "pending",
+      ticketStatus: "under_review",
       paymentScreenshotUrl: paymentMethod === "manual" ? paymentScreenshotUrl : undefined,
     })
     console.log("Created registration:", registration)
 
-    // Send registration confirmation email (async, don't wait)
+    // Send registration confirmation email
     try {
+      const ticketSummary = personTickets.length > 0
+        ? personTickets.map((p: any) => `${p.name}: ${p.tickets.join(", ")}`).join(" | ")
+        : ticketTypes.join(", ")
+      
       const emailHTML = getRegistrationEmailTemplate({
         name,
         registrationId,
-        ticketType: ticketTypes.join(", "),
+        ticketType: ticketSummary,
         email,
         contactNo,
         chapterName,

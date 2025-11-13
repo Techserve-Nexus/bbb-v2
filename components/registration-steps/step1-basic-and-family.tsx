@@ -1,0 +1,170 @@
+"use client"
+
+import type React from "react"
+
+interface Step1Props {
+  formData: any
+  setFormData: (data: any) => void
+  errors: Record<string, string>
+}
+
+export default function Step1BasicAndFamily({ formData, setFormData, errors }: Step1Props) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+  }
+
+  const handleChildChange = (index: number, field: string, value: string) => {
+    const newChildren = [...formData.children]
+    newChildren[index] = { ...newChildren[index], [field]: value }
+    setFormData({ ...formData, children: newChildren })
+  }
+
+  const categories = ["Individual Player", "Corporate Team", "Chess Club", "Educational Institution", "Other"]
+
+  return (
+    <div>
+      <h2 className="text-3xl font-bold text-foreground mb-8">Registration Details</h2>
+      
+      <div className="space-y-8">
+        {/* Basic Details Section */}
+        <div className="space-y-6">
+          <h3 className="text-xl font-semibold text-foreground border-b pb-2">Basic Information</h3>
+          
+          {/* Name */}
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">Full Name *</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 rounded-lg border-2 transition-colors bg-background text-foreground placeholder-muted-foreground ${
+                errors.name ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"
+              } outline-none`}
+              placeholder="John Doe"
+            />
+            {errors.name && <p className="text-red-500 text-sm mt-2">{errors.name}</p>}
+          </div>
+
+          {/* Chapter Name */}
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">Chapter Name</label>
+            <input
+              type="text"
+              name="chapterName"
+              value={formData.chapterName}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground placeholder-muted-foreground transition-colors"
+              placeholder="Your Chapter/Organization Name"
+            />
+          </div>
+
+          {/* Category */}
+          <div>
+            <label htmlFor="category" className="block text-sm font-semibold text-foreground mb-2">Category</label>
+            <select
+              id="category"
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground transition-colors"
+            >
+              <option value="">Select a category</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Contact Number */}
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">Contact Number *</label>
+            <input
+              type="tel"
+              name="contactNo"
+              value={formData.contactNo}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 rounded-lg border-2 transition-colors bg-background text-foreground placeholder-muted-foreground ${
+                errors.contactNo ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"
+              } outline-none`}
+              placeholder="+91 98765 43210"
+            />
+            {errors.contactNo && <p className="text-red-500 text-sm mt-2">{errors.contactNo}</p>}
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">Email Address *</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 rounded-lg border-2 transition-colors bg-background text-foreground placeholder-muted-foreground ${
+                errors.email ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"
+              } outline-none`}
+              placeholder="john@example.com"
+            />
+            {errors.email && <p className="text-red-500 text-sm mt-2">{errors.email}</p>}
+          </div>
+        </div>
+
+        {/* Family Details Section */}
+        <div className="space-y-6">
+          <h3 className="text-xl font-semibold text-foreground border-b pb-2">Family Members</h3>
+          
+          {/* Spouse Name */}
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">Spouse Name</label>
+            <input
+              type="text"
+              name="spouseName"
+              value={formData.spouseName || ""}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground placeholder-muted-foreground transition-colors"
+              placeholder="If applicable"
+            />
+            <p className="text-xs text-muted-foreground mt-1">Add spouse to select tickets for them in next step</p>
+          </div>
+
+          {/* Children Details */}
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-3">Children (Up to 3)</label>
+            <div className="space-y-4">
+              {formData.children.map((child: any, index: number) => (
+                <div key={index} className="flex gap-3 items-start">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      placeholder={`Child ${index + 1} Name`}
+                      value={child.name}
+                      onChange={(e) => handleChildChange(index, "name", e.target.value)}
+                      className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground placeholder-muted-foreground transition-colors"
+                    />
+                  </div>
+                  <div className="w-40">
+                    <select
+                      value={child.age}
+                      onChange={(e) => handleChildChange(index, "age", e.target.value)}
+                      className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground transition-colors"
+                      disabled={!child.name}
+                    >
+                      <option value="<12">Under 12</option>
+                      <option value=">12">Above 12</option>
+                    </select>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              <strong>Note:</strong> Children under 12 get free entry. Children above 12 can select paid tickets in next step.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
