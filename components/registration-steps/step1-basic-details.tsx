@@ -39,7 +39,7 @@ export default function Step1BasicDetails({ formData, setFormData, errors }: Ste
 
         {/* Chapter Name */}
         <div>
-          <label className="block text-sm font-semibold text-foreground mb-2">Chapter Name (Optional)</label>
+          <label className="block text-sm font-semibold text-foreground mb-2">Chapter Name</label>
           <input
             type="text"
             name="chapterName"
@@ -55,7 +55,7 @@ export default function Step1BasicDetails({ formData, setFormData, errors }: Ste
 
         {/* Category */}
         <div>
-          <label htmlFor="category" className="block text-sm font-semibold text-foreground mb-2">Category (Optional)</label>
+          <label htmlFor="category" className="block text-sm font-semibold text-foreground mb-2">Category</label>
           <select
             id="category"
             name="category"

@@ -30,11 +30,6 @@ export const TICKET_OPTIONS = [
     price: 500,
     features: ["Professionally conducted", "Best of three games", "Play with Grand Master", "Special Prizes and Recognition"],
   },
-  // {
-  //   tier: "Silver",
-  //   price: 1500,
-  //   features: ["Standard Seating", "Refreshments", "Event Materials", "Digital Resources"],
-  // },
 ]
 
 export const CONCLAVE_GROUPS = [
