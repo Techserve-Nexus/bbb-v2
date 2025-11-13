@@ -18,7 +18,8 @@ export async function POST(req: NextRequest) {
       category, 
       contactNo, 
       email, 
-      ticketType = "Chess",
+      ticketTypes = [],
+      ticketType, // Keep for backward compatibility
       paymentMethod = "manual", // "razorpay" or "manual"
       spouseName,
       children = [],
@@ -27,13 +28,22 @@ export async function POST(req: NextRequest) {
       paymentScreenshotUrl,
     } = body
 
-    // Sanitize ticketType - replace spaces with underscores for backward compatibility
-    ticketType = ticketType.replace(/\s+/g, "_")
-    console.log("Sanitized ticketType:", ticketType)
+    // Handle backward compatibility: if ticketType is provided instead of ticketTypes
+    if (ticketType && (!ticketTypes || ticketTypes.length === 0)) {
+      ticketType = ticketType.replace(/\s+/g, "_")
+      ticketTypes = [ticketType]
+    }
+    
+    console.log("Ticket Types:", ticketTypes)
 
-    // Validate required fields (chapterName and category are now optional)
+    // Validate required fields
     if (!name || !contactNo || !email) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    }
+
+    // Validate at least one ticket is selected
+    if (!ticketTypes || ticketTypes.length === 0) {
+      return NextResponse.json({ error: "Please select at least one ticket type" }, { status: 400 })
     }
 
     // For manual payment, screenshot is required
@@ -51,7 +61,8 @@ export async function POST(req: NextRequest) {
       category,
       contactNo,
       email,
-      ticketType,
+      ticketTypes,
+      ticketType: ticketTypes[0], // Store first ticket for backward compatibility
       paymentMethod,
       paymentStatus: paymentMethod === "razorpay" ? "pending" : "pending", // Both start as pending
       ticketStatus: "under_review", // Ticket starts as under_review
@@ -68,7 +79,7 @@ export async function POST(req: NextRequest) {
       const emailHTML = getRegistrationEmailTemplate({
         name,
         registrationId,
-        ticketType,
+        ticketType: ticketTypes.join(", "),
         email,
         contactNo,
         chapterName,

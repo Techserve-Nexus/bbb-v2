@@ -19,8 +19,9 @@ const RegistrationSchema = new Schema<Registration>(
     ticketType: { 
       type: String, 
       enum: ["Business_Conclave", "Chess"], 
-      required: true 
+      required: false // Made optional as we're using ticketTypes array
     },
+    ticketTypes: [{ type: String }], // New array field for multiple ticket selections
     paymentMethod: {
       type: String,
       enum: ["razorpay", "manual"],
