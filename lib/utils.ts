@@ -21,7 +21,7 @@ export function formatPrice(price: number): string {
 
 export const TICKET_OPTIONS = [
   {
-    tier: "Business_Conclave",
+    tier: "Business Conclave",
     price: 1000,
     features: ["Master Class from Industry Experts", "Exclusive CCT", "Complimentary Food", "Business Connects"],
   },
