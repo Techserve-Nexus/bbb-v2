@@ -6,6 +6,7 @@ export interface Registration {
   category?: string
   contactNo: string
   email: string
+  isGuest?: boolean
   ticketType?: "Business_Conclave" | "Chess" // Keep for backward compatibility
   ticketTypes?: string[] // New field for multiple selections
   paymentMethod?: "razorpay" | "manual"

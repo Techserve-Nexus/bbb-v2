@@ -42,6 +42,7 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get("status") // payment status
     const ticketType = searchParams.get("ticketType")
     const ticketStatus = searchParams.get("ticketStatus")
+    const isGuest = searchParams.get("isGuest")
     const search = searchParams.get("search")
     const page = parseInt(searchParams.get("page") || "1")
     const limit = parseInt(searchParams.get("limit") || "50")
@@ -63,14 +64,41 @@ export async function GET(req: NextRequest) {
       filter.ticketStatus = ticketStatus
     }
 
+    if (isGuest && isGuest !== "all") {
+      if (isGuest === "true") {
+        filter.isGuest = true
+      } else {
+        // For non-guest, include both false and undefined/null
+        filter.$or = [
+          { isGuest: false },
+          { isGuest: null },
+          { isGuest: { $exists: false } }
+        ]
+      }
+    }
+
     // Search in multiple fields
     if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-        { registrationId: { $regex: search, $options: "i" } },
-        { contactNo: { $regex: search, $options: "i" } },
-      ]
+      const searchCondition = {
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+          { registrationId: { $regex: search, $options: "i" } },
+          { contactNo: { $regex: search, $options: "i" } },
+        ]
+      }
+      
+      // If there's already a $or condition (from isGuest filter), combine with $and
+      if (filter.$or) {
+        const existingOr = filter.$or
+        delete filter.$or
+        filter.$and = [
+          { $or: existingOr },
+          searchCondition
+        ]
+      } else {
+        Object.assign(filter, searchCondition)
+      }
     }
 
     // Get total count for pagination
@@ -105,8 +133,10 @@ export async function GET(req: NextRequest) {
       ticketStatus: reg.ticketStatus || "active",
       paymentReference: reg.paymentReference,
       paymentScreenshotUrl: reg.paymentScreenshotUrl,
+      isGuest: reg.isGuest || false,
       spouseName: reg.spouseName,
       children: reg.children,
+      personTickets: reg.personTickets || [],
       participations: reg.participations,
       conclavGroups: reg.conclavGroups,
       qrCode: reg.qrCode,

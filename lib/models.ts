@@ -24,6 +24,7 @@ const RegistrationSchema = new Schema<Registration>(
     category: { type: String, required: false },
     contactNo: { type: String, required: true },
     email: { type: String, required: true },
+    isGuest: { type: Boolean, default: false },
     spouseName: { type: String },
     children: [ChildInfoSchema],
     personTickets: [PersonTicketSchema], // New field for per-person ticket selections
@@ -141,6 +142,18 @@ const PaymentSchema = new Schema(
   }
 )
 
+// Settings Schema
+const SettingsSchema = new Schema(
+  {
+    registrationEnabled: { type: Boolean, default: true },
+    siteName: { type: String, default: "BBB Event" },
+    siteDescription: { type: String, default: "Event Registration System" },
+  },
+  {
+    timestamps: true,
+  }
+)
+
 // Models
 export const RegistrationModel: Model<Registration> =
   mongoose.models.Registration || mongoose.model<Registration>("Registration", RegistrationSchema)
@@ -156,3 +169,6 @@ export const PaymentModel =
 
 export const BannerModel: Model<Banner> =
   mongoose.models.Banner || mongoose.model<Banner>("Banner", BannerSchema)
+
+export const SettingsModel =
+  mongoose.models.Settings || mongoose.model("Settings", SettingsSchema)

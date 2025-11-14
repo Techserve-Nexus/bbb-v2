@@ -41,8 +41,10 @@ export async function GET(req: NextRequest) {
       "Payment Status",
       "Ticket Status",
       "Payment Reference",
+      "Guest Status",
       "Spouse Name",
       "Children Count",
+      "Family Tickets",
       "Participations",
       "Conclav Groups",
       "Created At",
@@ -51,6 +53,18 @@ export async function GET(req: NextRequest) {
 
     // Convert to CSV rows
     const rows = registrations.map((reg) => {
+      // Format personTickets for CSV
+      let familyTickets = ""
+      if (reg.personTickets && reg.personTickets.length > 0) {
+        familyTickets = reg.personTickets
+          .map((person: any) => {
+            const tickets = person.tickets?.join(", ") || "None"
+            const age = person.age ? ` (${person.age})` : ""
+            return `${person.personType}: ${person.name}${age} - ${tickets}`
+          })
+          .join(" | ")
+      }
+
       return [
         reg.registrationId || "",
         reg.name || "",
@@ -62,8 +76,10 @@ export async function GET(req: NextRequest) {
         reg.paymentStatus || "",
         reg.ticketStatus || "active",
         reg.paymentReference || "",
+        reg.isGuest ? "Guest" : "Member",
         reg.spouseName || "",
         reg.children?.length || 0,
+        familyTickets,
         reg.participations?.join("; ") || "",
         reg.conclavGroups?.join("; ") || "",
         new Date(reg.createdAt).toLocaleString(),

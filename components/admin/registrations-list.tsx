@@ -14,6 +14,7 @@ interface Registration {
   chapterName: string
   category: string
   ticketType: string
+  isGuest?: boolean
   personTickets?: Array<{
     personType: "self" | "spouse" | "child"
     name: string
@@ -45,6 +46,7 @@ export default function RegistrationsList() {
   const [filterPaymentStatus, setFilterPaymentStatus] = useState("all")
   const [filterTicketType, setFilterTicketType] = useState("all")
   const [filterTicketStatus, setFilterTicketStatus] = useState("all")
+  const [filterGuest, setFilterGuest] = useState("all")
   
   // Pagination
   const [page, setPage] = useState(1)
@@ -72,7 +74,7 @@ export default function RegistrationsList() {
 
   useEffect(() => {
     fetchRegistrations()
-  }, [page, limit, filterPaymentStatus, filterTicketType, filterTicketStatus])
+  }, [page, limit, filterPaymentStatus, filterTicketType, filterTicketStatus, filterGuest])
 
   // Debounce search
   useEffect(() => {
@@ -104,6 +106,7 @@ export default function RegistrationsList() {
       if (filterPaymentStatus !== "all") params.append("status", filterPaymentStatus)
       if (filterTicketType !== "all") params.append("ticketType", filterTicketType)
       if (filterTicketStatus !== "all") params.append("ticketStatus", filterTicketStatus)
+      if (filterGuest !== "all") params.append("isGuest", filterGuest)
 
       const response = await fetch(`/api/admin/registrations?${params}`, {
         headers: {
@@ -191,7 +194,7 @@ export default function RegistrationsList() {
   }
 
   const handleDeleteRegistration = async (registrationId: string) => {
-    if (!confirm("Are you sure you want to cancel this registration? This will mark it as expired.")) {
+    if (!confirm("Are you sure you want to permanently delete this registration? This action cannot be undone.")) {
       return
     }
 
@@ -213,7 +216,7 @@ export default function RegistrationsList() {
         throw new Error(data.error || "Failed to delete registration")
       }
 
-      alert("Registration cancelled successfully!")
+      alert("Registration deleted successfully!")
       fetchRegistrations() // Refresh the list
     } catch (err: any) {
       console.error("❌ Error deleting registration:", err)
@@ -323,7 +326,7 @@ export default function RegistrationsList() {
 
       {/* Filters */}
       <Card className="p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -335,6 +338,17 @@ export default function RegistrationsList() {
               className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
+
+          {/* Guest Filter */}
+          <select
+            value={filterGuest}
+            onChange={(e) => setFilterGuest(e.target.value)}
+            className="px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="all">All Registrations</option>
+            <option value="true">Guest Only</option>
+            <option value="false">Non-Guest Only</option>
+          </select>
 
           {/* Payment Status Filter */}
           <select
@@ -422,8 +436,17 @@ export default function RegistrationsList() {
                       {reg.registrationId}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="text-sm font-medium">{reg.name}</div>
-                      <div className="text-xs text-muted-foreground">{reg.email}</div>
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <div className="text-sm font-medium">{reg.name}</div>
+                          <div className="text-xs text-muted-foreground">{reg.email}</div>
+                        </div>
+                        {reg.isGuest && (
+                          <span className="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-semibold rounded-full">
+                            GUEST
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-sm">{reg.contactNo}</div>
@@ -786,7 +809,14 @@ export default function RegistrationsList() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
                   <div>
                     <p className="text-sm text-gray-500">Full Name</p>
-                    <p className="font-medium text-gray-900">{detailsRegistration.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-gray-900">{detailsRegistration.name}</p>
+                      {detailsRegistration.isGuest && (
+                        <span className="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-semibold rounded-full">
+                          GUEST
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Email</p>

@@ -23,6 +23,12 @@ interface TicketData {
   conclavGroups?: string[]
   createdAt: string
   qrCode?: string
+  personTickets?: Array<{
+    personType: string
+    name: string
+    age?: string
+    tickets: string[]
+  }>
 }
 
 export default function TicketVerificationPage() {
@@ -223,6 +229,51 @@ export default function TicketVerificationPage() {
                         <p className="font-semibold text-foreground">{ticket.children}</p>
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* Ticket Details by Person */}
+              {ticket.personTickets && ticket.personTickets.length > 0 && (
+                <div className="border-t pt-6">
+                  <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-primary rounded-full"></span>
+                    Ticket Details by Person
+                  </h4>
+                  <div className="space-y-4">
+                    {ticket.personTickets.map((person, index) => (
+                      <div key={index} className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="text-lg">
+                            {person.personType === "self" ? "👤" : person.personType === "spouse" ? "💑" : "👶"}
+                          </span>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-foreground">{person.name}</span>
+                            <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full capitalize">
+                              {person.personType}
+                            </span>
+                            {person.age && (
+                              <span className="px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                {person.age}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="ml-8">
+                          <p className="text-sm text-muted-foreground mb-2">Tickets:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {person.tickets.map((ticket, ticketIndex) => (
+                              <span 
+                                key={ticketIndex}
+                                className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium"
+                              >
+                                {ticket}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
