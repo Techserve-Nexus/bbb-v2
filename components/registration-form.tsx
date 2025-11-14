@@ -23,6 +23,7 @@ interface FormData {
   category: string
   contactNo: string
   email: string
+  isGuest?: boolean
   spouseName?: string
   children: Array<{ name: string; age: "<12" | ">12" }>
 
@@ -38,12 +39,15 @@ interface FormData {
 export default function RegistrationForm() {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
+  const [registrationEnabled, setRegistrationEnabled] = useState(true)
+  const [checkingStatus, setCheckingStatus] = useState(true)
   const [formData, setFormData] = useState<FormData>({
     name: "",
     chapterName: "",
     category: "",
     contactNo: "",
     email: "",
+    isGuest: false,
     spouseName: "",
     children: [
       { name: "", age: "<12" },
@@ -62,6 +66,24 @@ export default function RegistrationForm() {
   const [submitError, setSubmitError] = useState("")
   const [registrationId, setRegistrationId] = useState("")
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
+
+  // Check registration status on mount
+  useEffect(() => {
+    const checkRegistrationStatus = async () => {
+      try {
+        const response = await fetch("/api/settings/registration-status")
+        const data = await response.json()
+        setRegistrationEnabled(data.registrationEnabled)
+      } catch (error) {
+        console.error("Failed to check registration status:", error)
+        // Default to enabled on error
+        setRegistrationEnabled(true)
+      } finally {
+        setCheckingStatus(false)
+      }
+    }
+    checkRegistrationStatus()
+  }, [])
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -156,6 +178,7 @@ export default function RegistrationForm() {
         category: formData.category,
         contactNo: formData.contactNo,
         email: formData.email,
+        isGuest: formData.isGuest || false,
         spouseName: formData.spouseName || undefined,
         children: formData.children.filter(child => child.name.trim() !== ""),
         personTickets: formData.personTickets,
@@ -274,7 +297,7 @@ export default function RegistrationForm() {
             }
 
             // Success!
-            console.log("✅ Payment verified successfully:", verifyData)
+            // console.log("✅ Payment verified successfully:", verifyData)
             setSubmitSuccess(true)
             setIsSubmitting(false)
             setIsProcessingPayment(false)
@@ -285,7 +308,7 @@ export default function RegistrationForm() {
               router.push(`/ticket/${regId}`)
             }, 2000)
           } catch (verifyError) {
-            console.error("Payment verification error:", verifyError)
+            // console.error("Payment verification error:", verifyError)
             setSubmitError(verifyError instanceof Error ? verifyError.message : "Payment verification failed")
             setIsSubmitting(false)
             setIsProcessingPayment(false)
@@ -315,8 +338,37 @@ export default function RegistrationForm() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      {/* Success Message */}
-      {submitSuccess ? (
+      {/* Loading State */}
+      {checkingStatus ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Checking registration status...</p>
+          </div>
+        </div>
+      ) : !registrationEnabled ? (
+        /* Registration Closed Message */
+        <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-500 rounded-lg p-8 text-center">
+          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/40 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-red-800 dark:text-red-200 mb-3">
+            Registration Closed
+          </h2>
+          <p className="text-red-700 dark:text-red-300 mb-6">
+            We're sorry, but registration for this event is currently closed. Please check back later or contact the event organizers for more information.
+          </p>
+          <Button 
+            onClick={() => router.push("/")}
+            className="bg-red-600 hover:bg-red-700 text-white"
+          >
+            Back to Home
+          </Button>
+        </div>
+      ) : submitSuccess ? (
+        /* Success Message */
         <div className="bg-background border border-green-500 rounded-lg p-8 md:p-12 text-center">
           <div className="text-6xl mb-6">✅</div>
           <h2 className="text-3xl font-bold mb-4 text-green-600">Registration Successful!</h2>
@@ -385,7 +437,7 @@ export default function RegistrationForm() {
           {/* Error Message */}
           {submitError && (
             <div className="bg-red-50 border border-red-500 text-red-700 p-4 rounded-lg mb-6">
-              <p className="font-semibold">❌ Error:</p>
+              <p className="font-semibold"> Error:</p>
               <p>{submitError}</p>
             </div>
           )}

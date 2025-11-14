@@ -69,7 +69,7 @@ export async function PATCH(
     }
 
     // Update fields
-    const allowedFields = ["name", "logo", "website", "category", "description", "socialLinks"]
+    const allowedFields = ["name", "logo", "website", "sponsorCategory", "price", "description", "socialLinks"]
     allowedFields.forEach((field) => {
       if (body[field] !== undefined) {
         ;(sponsor as any)[field] = body[field]
@@ -88,7 +88,8 @@ export async function PATCH(
         name: sponsor.name,
         logo: sponsor.logo,
         website: sponsor.website,
-        category: sponsor.category,
+        sponsorCategory: sponsor.sponsorCategory,
+        price: sponsor.price,
         description: sponsor.description,
         socialLinks: sponsor.socialLinks,
       },

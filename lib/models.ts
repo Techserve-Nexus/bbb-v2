@@ -24,6 +24,7 @@ const RegistrationSchema = new Schema<Registration>(
     category: { type: String, required: false },
     contactNo: { type: String, required: true },
     email: { type: String, required: true },
+    isGuest: { type: Boolean, default: false },
     spouseName: { type: String },
     children: [ChildInfoSchema],
     personTickets: [PersonTicketSchema], // New field for per-person ticket selections
@@ -64,13 +65,40 @@ const SponsorSchema = new Schema<Sponsor>(
     name: { type: String, required: true },
     logo: { type: String, required: true },
     website: { type: String, required: true },
-    category: { 
-      type: String, 
-      enum: ["Business_Conclave", "Chess"], 
-      required: true 
+    sponsorCategory: {
+      type: String,
+      enum: ["Tamaram", "Tamaram+", "Rajatham", "Suvarnam", "Vajram", "Pradhan_Poshak"],
+      required: true
     },
+    price: { type: Number, required: true },
     description: { type: String, required: true },
     socialLinks: { type: Map, of: String },
+  },
+  {
+    timestamps: true,
+  }
+)
+
+// Sponsor Request Schema
+const SponsorRequestSchema = new Schema(
+  {
+    companyName: { type: String, required: true },
+    contactPerson: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
+    website: { type: String, required: true },
+    description: { type: String, required: true },
+    requestedAmount: { type: Number, required: true },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending"
+    },
+    approvedCategory: {
+      type: String,
+      enum: ["Tamaram", "Tamaram+", "Rajatham", "Suvarnam", "Vajram", "Pradhan_Poshak"]
+    },
+    rejectionReason: { type: String },
   },
   {
     timestamps: true,
@@ -141,12 +169,27 @@ const PaymentSchema = new Schema(
   }
 )
 
+// Settings Schema
+const SettingsSchema = new Schema(
+  {
+    registrationEnabled: { type: Boolean, default: true },
+    siteName: { type: String, default: "BBB Event" },
+    siteDescription: { type: String, default: "Event Registration System" },
+  },
+  {
+    timestamps: true,
+  }
+)
+
 // Models
 export const RegistrationModel: Model<Registration> =
   mongoose.models.Registration || mongoose.model<Registration>("Registration", RegistrationSchema)
 
 export const SponsorModel: Model<Sponsor> =
   mongoose.models.Sponsor || mongoose.model<Sponsor>("Sponsor", SponsorSchema)
+
+export const SponsorRequestModel =
+  mongoose.models.SponsorRequest || mongoose.model("SponsorRequest", SponsorRequestSchema)
 
 export const GalleryItemModel =
   mongoose.models.GalleryItem || mongoose.model("GalleryItem", GalleryItemSchema)
@@ -156,3 +199,6 @@ export const PaymentModel =
 
 export const BannerModel: Model<Banner> =
   mongoose.models.Banner || mongoose.model<Banner>("Banner", BannerSchema)
+
+export const SettingsModel =
+  mongoose.models.Settings || mongoose.model("Settings", SettingsSchema)

@@ -93,7 +93,7 @@ export async function PATCH(
 /**
  * DELETE /api/admin/registrations/[id]
  * 
- * Soft delete registration (mark as cancelled)
+ * Permanently delete registration from database
  * Requires admin authentication
  * 
  * @param id - Registration ID (registrationId, not MongoDB _id)
@@ -114,15 +114,8 @@ export async function DELETE(
 
     const { id } = await params
 
-    // Find and update registration
-    const registration = await RegistrationModel.findOneAndUpdate(
-      { registrationId: id },
-      {
-        paymentStatus: "failed",
-        ticketStatus: "expired",
-      },
-      { new: true }
-    )
+    // Find and permanently delete registration
+    const registration = await RegistrationModel.findOneAndDelete({ registrationId: id })
 
     if (!registration) {
       return NextResponse.json(
@@ -131,11 +124,11 @@ export async function DELETE(
       )
     }
 
-    console.log(`🗑️ Registration ${id} soft deleted by admin`)
+    console.log(`🗑️ Registration ${id} permanently deleted by admin`)
 
     return NextResponse.json({
       success: true,
-      message: "Registration cancelled successfully",
+      message: "Registration deleted successfully",
     })
   } catch (error) {
     console.error("❌ Error deleting registration:", error)

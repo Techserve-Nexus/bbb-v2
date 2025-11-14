@@ -52,6 +52,7 @@ export async function GET(
         conclavGroups: ticket.conclavGroups,
         qrCode: ticket.qrCode,
         createdAt: ticket.createdAt,
+        personTickets: ticket.personTickets || [],
       },
     })
   } catch (error: any) {
