@@ -105,7 +105,7 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
       {/* Payment Method Selection */}
       <div className="space-y-4">
         <h3 className="text-xl font-semibold">Select Payment Method</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
           {/* Manual Payment Option */}
           <button
             type="button"
@@ -119,14 +119,14 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
             <QrCode className={`w-12 h-12 mx-auto mb-3 ${
               formData.paymentMethod === "manual" ? "text-primary" : "text-muted-foreground"
             }`} />
-            <h4 className="font-semibold text-lg mb-2">QR Code / UPI</h4>
-            <p className="text-sm text-muted-foreground">
+            <h4 className="font-semibold text-lg mb-2"> / UPI</h4>
+            <p className="text-sm text-muted-foreground">QR Code
               Pay via UPI and upload screenshot
             </p>
           </button>
 
-          {/* Razorpay Option */}
-          <button
+          {/* Razorpay Option - COMMENTED OUT FOR DEPLOYMENT */}
+          {/* <button
             type="button"
             onClick={() => handlePaymentMethodChange("razorpay")}
             className={`p-6 rounded-lg border-2 transition-all ${
@@ -142,7 +142,7 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
             <p className="text-sm text-muted-foreground">
               Pay online instantly with card/UPI
             </p>
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -246,8 +246,8 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
         </>
       )}
 
-      {/* Razorpay Payment Section */}
-      {formData.paymentMethod === "razorpay" && (
+      {/* Razorpay Payment Section - COMMENTED OUT FOR DEPLOYMENT */}
+      {/* {formData.paymentMethod === "razorpay" && (
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-lg text-center">
           <CreditCard className="w-16 h-16 mx-auto mb-4 text-primary" />
           <h3 className="text-2xl font-bold mb-3">Online Payment</h3>
@@ -264,7 +264,7 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
             </p>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

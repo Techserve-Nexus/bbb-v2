@@ -105,25 +105,13 @@ export default function Hero() {
   const currentBanner = getCurrentBanner(activeBanners[currentSlide])
 
   return (
-    <div className="relative flex items-center justify-center overflow-hidden max-w-screen-2xl mx-auto select-none">
-      {/* Banner Image */}
-      <img src={currentBanner.src} alt={currentBanner.alt || "Hero Banner"} />
-      
-      {/* CTA Button Overlay */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center space-y-6 px-4">
-          <Link href="/register">
-            <Button 
-              size="lg" 
-              className="bg-primary hover:bg-primary/90 text-white font-bold text-lg px-8 py-6 rounded-full shadow-2xl transform transition-all duration-300 hover:scale-105 hover:shadow-3xl"
-            >
-              Register Now
-            </Button>
-          </Link>
-        </div>
-      </div>
+    <div className="w-full">
+      {/* Banner Image Container */}
+      <div className="relative flex items-center justify-center overflow-hidden max-w-screen-2xl mx-auto select-none">
+        {/* Banner Image */}
+        <img src={currentBanner.src} alt={currentBanner.alt || "Hero Banner"} />
 
-      {/* Navigation Arrows */}
+        {/* Navigation Arrows */}
       {activeBanners.length > 1 && (
         <>
           <button
@@ -160,6 +148,19 @@ export default function Hero() {
           ))}
         </div>
       )}
+      </div>
+
+      {/* CTA Button Below Image */}
+      <div className="flex items-center justify-center py-8 bg-background">
+        <Link href="/register">
+          <Button 
+            size="lg" 
+            className="bg-primary hover:bg-primary/90 text-white font-bold text-lg px-8 py-6 rounded-full shadow-2xl transform transition-all duration-300 hover:scale-105 hover:shadow-3xl"
+          >
+            Register Now
+          </Button>
+        </Link>
+      </div>
     </div>
   )
 }
