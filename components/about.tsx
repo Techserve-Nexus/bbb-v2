@@ -31,7 +31,7 @@ export default function About() {
               Strategic Excellence Meets Community
             </h2>
             <p className="text-muted-foreground text-lg mb-4 leading-relaxed">
-              Our chess event brings together passionate players, strategic minds, and enthusiasts from around the
+              Our Chaturanga Manthana brings together passionate players, strategic minds, and enthusiasts from around the
               world. We believe in creating an environment where excellence is celebrated and community thrives.
             </p>
             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">

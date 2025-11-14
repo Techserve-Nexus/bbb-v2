@@ -144,7 +144,7 @@ export default function SponsorsPage() {
           <div className="bg-gradient-to-r from-primary/10 via-background to-secondary/10 rounded-lg border border-primary/20 p-8 text-center">
             <h2 className="text-3xl font-bold text-foreground mb-4">Interested in Sponsoring?</h2>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Join our prestigious sponsors and be part of the premier chess event. We offer multiple sponsorship tiers
+              Join our prestigious sponsors and be part of the premier Chaturanga Manthana. We offer multiple sponsorship tiers
               with customized benefits.
             </p>
             <Button className="bg-primary hover:bg-secondary text-primary-foreground px-8 py-3">

@@ -47,7 +47,7 @@ export default function PaymentGateway({
         order_id: orderData.orderId,
         amount: amount * 100,
         currency: "INR",
-        name: "Chess Event 2025",
+        name: "Chaturanga Manthana 2025",
         description: `${ticketType} Ticket Registration`,
         prefill: {
           name: "",

@@ -14,7 +14,7 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-4 text-balance">About Our Event</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Discover the story, vision, and mission behind the premier chess event of 2025.
+            Discover the story, vision, and mission behind the premier Chaturanga Manthana of 2025.
           </p>
         </div>
       </section>

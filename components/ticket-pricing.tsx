@@ -13,7 +13,7 @@ export default function TicketPricing() {
           <p className="text-primary font-semibold mb-2">Ticket Options</p>
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">Choose Your Experience</h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Select the perfect ticket tier for your chess event experience
+            Select the perfect ticket tier for your Chaturanga Manthana experience
           </p>
         </div>
 

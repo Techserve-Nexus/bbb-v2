@@ -33,7 +33,7 @@ export default function GalleryPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-4 text-balance">Event Gallery</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Relive the best moments from our premium chess events
+            Relive the best moments from our premium Chaturanga Manthana
           </p>
         </div>
       </section>
@@ -122,7 +122,7 @@ export default function GalleryPage() {
 
             <h2 className="text-2xl font-bold text-foreground mb-2">Event Gallery Image</h2>
             <p className="text-muted-foreground mb-4">
-              This is a gallery item showcasing memorable moments from our chess events. Full media content will be
+              This is a gallery item showcasing memorable moments from our Chaturanga Manthanas. Full media content will be
               populated with actual event photos and videos.
             </p>
 
