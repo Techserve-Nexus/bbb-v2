@@ -34,12 +34,20 @@ export default function Navbar() {
     >
       <div className="mx-auto px-4 md:px-6 py-2">
         <div className="flex justify-between items-center">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="h-20 w-20 rounded-full bg-cover bg-center block"
-            style={{ backgroundImage: `url('${bannerConfig.logo.src}')` }}
-          >
+          {/* Logo with Text */}
+          <Link href="/" className="flex items-center gap-2 md:gap-3 group">
+            {/* Logo Image */}
+            <div
+              className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 rounded-full bg-cover bg-center transition-transform group-hover:scale-105"
+              style={{ backgroundImage: `url('${bannerConfig.logo.src}')` }}
+            />
+            
+            {/* Text beside Logo - Now visible on all devices */}
+            <div className="block">
+              <h1 className="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-orange-600 group-hover:text-orange-700 transition-colors leading-tight">
+                Shree Parashurama
+              </h1>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}

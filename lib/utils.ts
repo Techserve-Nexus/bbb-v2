@@ -23,7 +23,7 @@ export const TICKET_OPTIONS = [
   {
     tier: "Business Conclave",
     price: 1000,
-    features: ["Master Class from Industry Experts", "Exclusive CCT", "Complimentary Food", "Business Connects"],
+    features: ["Master Class from Industry Experts", "Exclusive CCT", "Complimentary Food", "Business Connects", "Food for business conclave "],
   },
   {
     tier: "Chess",
