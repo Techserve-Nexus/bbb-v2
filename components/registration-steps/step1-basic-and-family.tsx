@@ -67,8 +67,7 @@ export default function Step1BasicAndFamily({ formData, setFormData, errors }: S
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground placeholder-muted-foreground transition-colors"
-              placeholder="e.g., Individual Player, Corporate Team, Chess Club"
+              className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground placeholder-muted-foreground transition-colors" 
             />
           </div>
 
