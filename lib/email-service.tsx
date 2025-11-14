@@ -63,14 +63,14 @@ export function generateTicketEmailHTML(data: EmailData): string {
       <body>
         <div class="container">
           <div class="header">
-            <h1>Chess Event 2025</h1>
+            <h1>Chaturanga Manthana 2025</h1>
             <p>Your Ticket Confirmation</p>
           </div>
 
           <div class="content">
             <div class="section">
               <p>Hi <strong>${data.name}</strong>,</p>
-              <p>Thank you for registering for Chess Event 2025! We're thrilled to have you join us. Below is your ticket information and QR code.</p>
+              <p>Thank you for registering for Chaturanga Manthana 2025! We're thrilled to have you join us. Below is your ticket information and QR code.</p>
             </div>
 
             <div class="section">
@@ -116,7 +116,7 @@ export function generateTicketEmailHTML(data: EmailData): string {
           </div>
 
           <div class="footer">
-            <p>&copy; 2025 Chess Event. All rights reserved.</p>
+            <p>&copy; 2025 Chaturanga Manthana. All rights reserved.</p>
             <p>The Grand Convention Center, New Delhi | info@chessevent.com | +91 98765 43210</p>
           </div>
         </div>
@@ -136,12 +136,12 @@ export async function sendViasendGrid(to: string, registrationId: string, name: 
       personalizations: [
         {
           to: [{ email: to }],
-          subject: `Your Chess Event Ticket - ${registrationId}`,
+          subject: `Your Chaturanga Manthana Ticket - ${registrationId}`,
         },
       ],
       from: {
         email: process.env.SENDGRID_FROM_EMAIL || "noreply@chessevent.com",
-        name: "Chess Event 2025",
+        name: "Chaturanga Manthana 2025",
       },
       content: [
         {

@@ -1,7 +1,7 @@
 {
   "organization": {
-    "name": "BBB Chess Championship 2025",
-    "shortName": "BBB",
+    "name": "Chaturanga Manthana 2025",
+    "shortName": "Chaturanga",
     "website": "https://bbbchess.com",
     "supportEmail": "support@bbbchess.com",
     "replyToEmail": "noreply@bbbchess.com"
@@ -57,8 +57,8 @@
           "icon": "💼"
         }
       ],
-      "copyrightText": "© 2025 BBB Chess Championship. All rights reserved.",
-      "addressLine1": "BBB Chess Championship Organization",
+      "copyrightText": "© 2025 Chaturanga Manthana. All rights reserved.",
+      "addressLine1": "Chaturanga Manthana Organization",
       "addressLine2": "Mumbai, Maharashtra, India",
       "backgroundColor": "#F9FAFB",
       "textColor": "#6B7280",
@@ -68,7 +68,7 @@
   "ticketEmail": {
     "subject": "🎟️ Your Event Ticket - {registrationId}",
     "replyTo": "support@bbbchess.com",
-    "heading": "Your BBB Chess Championship Ticket",
+    "heading": "Your Chaturanga Manthana Ticket",
     "subheading": "Thank you for registering! Here are your ticket details.",
     "qrCodeLabel": "Scan this QR code at the venue",
     "instructions": [
@@ -122,18 +122,18 @@
       }
     }
   },
-  "smtp": {
+    "smtp": {
     "from": {
-      "name": "BBB Chess Championship",
+      "name": "Chaturanga Manthana",
       "email": "noreply@bbbchess.com"
     },
     "replyTo": {
-      "name": "BBB Support Team",
+      "name": "Chaturanga Support Team",
       "email": "support@bbbchess.com"
     }
   },
   "event": {
-    "name": "BBB Chess Championship 2025",
+    "name": "Chaturanga Manthana 2025",
     "date": "March 15-17, 2025",
     "venue": "Grand Convention Center, Mumbai",
     "contactNumber": "+91-XXXXX-XXXXX",

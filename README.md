@@ -1,2 +1,2 @@
-# Chess event website
+# Chaturanga Manthana website
 

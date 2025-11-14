@@ -179,7 +179,7 @@ export default function AdminLoginPage() {
             Protected by secure authentication
           </p>
           <p className="text-xs text-gray-400 mt-2">
-            © 2025 Chess Event. All rights reserved.
+            © 2025 Chaturanga Manthana. All rights reserved.
           </p>
         </div>
       </Card>

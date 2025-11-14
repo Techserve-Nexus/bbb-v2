@@ -79,7 +79,7 @@ function generateTicketPDF(
       <body>
         <div class="ticket">
           <div class="ticket-left">
-            <div class="ticket-header">CHESS EVENT 2025</div>
+            <div class="ticket-header">Chaturanga Manthana 2025</div>
             <div class="ticket-title">Admit One</div>
             <div class="ticket-subtitle">${ticketType} Ticket</div>
             <div class="ticket-details">
