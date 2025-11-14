@@ -239,13 +239,13 @@ export const getRegistrationEmailTemplate = ({
   <div class="container">
     <div class="header">
       <h1>🎉 Registration Successful!</h1>
-      <p style="margin: 10px 0 0;">Chess Event 2025</p>
+      <p style="margin: 10px 0 0;">Chaturanga Manthana 2025</p>
     </div>
     
     <div class="content">
       <p>Dear <strong>${name}</strong>,</p>
       
-      <p>Thank you for registering for Chess Event 2025! Your registration has been received successfully.</p>
+      <p>Thank you for registering for Chaturanga Manthana 2025! Your registration has been received successfully.</p>
       
       <div class="ticket-box">
         <p style="margin: 0; text-align: center; color: #666;">Your Registration ID</p>
@@ -284,12 +284,12 @@ export const getRegistrationEmailTemplate = ({
       
       <p>If you have any questions, please don't hesitate to contact us.</p>
       
-      <p>Best regards,<br><strong>Chess Event 2025 Team</strong></p>
+      <p>Best regards,<br><strong>Chaturanga Manthana 2025 Team</strong></p>
     </div>
     
     <div class="footer">
       <p>This is an automated email. Please do not reply to this message.</p>
-      <p>&copy; 2025 Chess Event. All rights reserved.</p>
+      <p>&copy; 2025 Chaturanga Manthana. All rights reserved.</p>
     </div>
   </div>
 </body>
@@ -434,7 +434,7 @@ export const getPaymentVerifiedEmailTemplate = ({
                 Email: <a href="mailto:techserve.developer@gmail.com" style="color: #FF6B35; text-decoration: none;">techserve.developer@gmail.com</a>
               </p>
               <p style="margin: 15px 0 0; font-size: 13px; color: #a1a1aa; border-top: 1px solid #e4e4e7; padding-top: 15px;">
-                &copy; 2025 BBB Chess Championship. All rights reserved.
+                &copy; 2025 Chaturanga Manthana. All rights reserved.
               </p>
             </td>
           </tr>
@@ -487,7 +487,7 @@ export const getPaymentVerifiedEmailTemplate = ({
               </p>
               
               <p style="margin: 0 0 30px; font-size: 16px; color: #52525b; line-height: 1.6;">
-                Great news! Your payment has been successfully verified. Your registration for the BBB Chess Championship 2025 is now <strong style="color: #10b981;">confirmed</strong>.
+                Great news! Your payment has been successfully verified. Your registration for Chaturanga Manthana 2025 is now <strong style="color: #10b981;">confirmed</strong>.
               </p>
               
               <!-- Success Box -->
@@ -577,7 +577,7 @@ export const getPaymentVerifiedEmailTemplate = ({
                 Thank you for registering!
               </p>
               <p style="margin: 0; font-size: 15px; color: #FF6B35; font-weight: 700;">
-                BBB Chess Championship Team
+                Chaturanga Manthana Team
               </p>
             </td>
           </tr>
@@ -592,7 +592,7 @@ export const getPaymentVerifiedEmailTemplate = ({
                 Contact us: <a href="mailto:techserve.developer@gmail.com" style="color: #FF6B35; text-decoration: none;">techserve.developer@gmail.com</a>
               </p>
               <p style="margin: 15px 0 0; font-size: 13px; color: #a1a1aa; border-top: 1px solid #e4e4e7; padding-top: 15px;">
-                &copy; 2025 BBB Chess Championship. All rights reserved.
+                &copy; 2025 Chaturanga Manthana. All rights reserved.
               </p>
             </td>
           </tr>

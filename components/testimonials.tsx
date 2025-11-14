@@ -19,7 +19,7 @@ export default function Testimonials() {
     },
     {
       name: "Arun Patel",
-      quote: "Best chess event I have attended. Highly recommended!",
+      quote: "Best Chaturanga Manthana I have attended. Highly recommended!",
       rating: 5,
     },
     {

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 export default function ParticipantsCounter() {
   const [count, setCount] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
-  const targetCount = 2847
+  const targetCount = 82
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {

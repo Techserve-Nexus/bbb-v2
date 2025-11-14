@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     await EmailLogModel.create({
       registrationId,
       recipient: to,
-      subject: "Your Chess Event Ticket",
+      subject: "Your Chaturanga Manthana Ticket",
       status: "sent",
       sentAt: new Date(),
     })
@@ -83,12 +83,12 @@ export async function POST(req: NextRequest) {
 //       personalizations: [
 //         {
 //           to: [{ email: to }],
-//           subject: `Your Chess Event Ticket - ${registrationId}`,
+//           subject: `Your Chaturanga Manthana Ticket - ${registrationId}`,
 //         },
 //       ],
 //       from: {
 //         email: process.env.SENDGRID_FROM_EMAIL || 'noreply@chessevent.com',
-//         name: 'Chess Event 2025',
+//         name: 'Chaturanga Manthana 2025',
 //       },
 //       content: [
 //         {

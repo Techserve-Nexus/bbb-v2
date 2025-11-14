@@ -269,7 +269,7 @@ export default function RegistrationForm() {
         order_id: orderData.orderId,
         amount: amount * 100,
         currency: "INR",
-        name: "Chess Event 2025",
+        name: "Chaturanga Manthana 2025",
         description: `Event Tickets - ${regId}`,
         image: "/logo.png", // Add your logo
         prefill: {
