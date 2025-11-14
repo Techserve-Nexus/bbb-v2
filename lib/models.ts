@@ -65,13 +65,40 @@ const SponsorSchema = new Schema<Sponsor>(
     name: { type: String, required: true },
     logo: { type: String, required: true },
     website: { type: String, required: true },
-    category: { 
-      type: String, 
-      enum: ["Business_Conclave", "Chess"], 
-      required: true 
+    sponsorCategory: {
+      type: String,
+      enum: ["Tamaram", "Tamaram+", "Rajatham", "Suvarnam", "Vajram", "Pradhan_Poshak"],
+      required: true
     },
+    price: { type: Number, required: true },
     description: { type: String, required: true },
     socialLinks: { type: Map, of: String },
+  },
+  {
+    timestamps: true,
+  }
+)
+
+// Sponsor Request Schema
+const SponsorRequestSchema = new Schema(
+  {
+    companyName: { type: String, required: true },
+    contactPerson: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
+    website: { type: String, required: true },
+    description: { type: String, required: true },
+    requestedAmount: { type: Number, required: true },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending"
+    },
+    approvedCategory: {
+      type: String,
+      enum: ["Tamaram", "Tamaram+", "Rajatham", "Suvarnam", "Vajram", "Pradhan_Poshak"]
+    },
+    rejectionReason: { type: String },
   },
   {
     timestamps: true,
@@ -160,6 +187,9 @@ export const RegistrationModel: Model<Registration> =
 
 export const SponsorModel: Model<Sponsor> =
   mongoose.models.Sponsor || mongoose.model<Sponsor>("Sponsor", SponsorSchema)
+
+export const SponsorRequestModel =
+  mongoose.models.SponsorRequest || mongoose.model("SponsorRequest", SponsorRequestSchema)
 
 export const GalleryItemModel =
   mongoose.models.GalleryItem || mongoose.model("GalleryItem", GalleryItemSchema)

@@ -37,6 +37,7 @@ export default function AdminLayout({ children, activeTab, setActiveTab }: Admin
     { id: "registrations", label: "Registrations", icon: FileText },
     { id: "payments", label: "Payments", icon: CreditCard },
     { id: "sponsors", label: "Sponsors", icon: Handshake },
+    { id: "sponsor-requests", label: "Sponsor Requests", icon: Handshake },
     { id: "banners", label: "Banners", icon: ImageIcon },
     { id: "settings", label: "Settings", icon: Settings },
   ]

@@ -65,9 +65,26 @@ export interface Sponsor {
   name: string
   logo: string
   website: string
-  category: "Business_Conclave" | "Chess"
+  sponsorCategory: "Tamaram" | "Tamaram+" | "Rajatham" | "Suvarnam" | "Vajram" | "Pradhan_Poshak"
+  price: number
   description: string
   socialLinks?: Record<string, string>
+}
+
+export interface SponsorRequest {
+  id: string
+  companyName: string
+  contactPerson: string
+  email: string
+  phone: string
+  website: string
+  description: string
+  requestedAmount: number
+  status: "pending" | "approved" | "rejected"
+  approvedCategory?: "Tamaram" | "Tamaram+" | "Rajatham" | "Suvarnam" | "Vajram" | "Pradhan_Poshak"
+  rejectionReason?: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface GalleryItem {

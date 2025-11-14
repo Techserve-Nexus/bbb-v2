@@ -35,14 +35,14 @@ export async function GET(req: NextRequest) {
     // Build query
     const query: any = {}
     if (category && category !== "all") {
-      query.category = category
+      query.sponsorCategory = category
     }
 
     console.log("🔍 Sponsors GET: Query", query)
 
     // Get sponsors
     const sponsors = await SponsorModel.find(query)
-      .sort({ category: 1, createdAt: -1 })
+      .sort({ price: -1, createdAt: -1 })
       .lean()
 
     console.log(`✅ Sponsors GET: Found ${sponsors.length} sponsors`)
@@ -52,7 +52,8 @@ export async function GET(req: NextRequest) {
       name: sponsor.name,
       logo: sponsor.logo,
       website: sponsor.website,
-      category: sponsor.category,
+      sponsorCategory: sponsor.sponsorCategory,
+      price: sponsor.price,
       description: sponsor.description,
       socialLinks: sponsor.socialLinks && typeof sponsor.socialLinks === 'object' 
         ? (sponsor.socialLinks instanceof Map 
@@ -102,22 +103,27 @@ export async function POST(req: NextRequest) {
     }
 
     await connectDB()
+    console.log("✅ DB connected for sponsor creation")
 
     const body = await req.json()
-    const { name, logo, website, category, description, socialLinks } = body
+    const { name, logo, website, sponsorCategory, price, description, socialLinks } = body
+
+    console.log("📝 Creating sponsor with data:", { name, website, sponsorCategory, price })
 
     // Validate required fields
-    if (!name || !logo || !website || !category || !description) {
+    if (!name || !logo || !website || !sponsorCategory || !price || !description) {
+      console.error("❌ Missing required fields:", { name: !!name, logo: !!logo, website: !!website, sponsorCategory: !!sponsorCategory, price: !!price, description: !!description })
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
         { status: 400 }
       )
     }
 
-    // Validate category
-    if (!["Platinum", "Gold", "Silver"].includes(category)) {
+    // Validate sponsor category
+    if (!["Tamaram", "Tamaram+", "Rajatham", "Suvarnam", "Vajram", "Pradhan_Poshak"].includes(sponsorCategory)) {
+      console.error("❌ Invalid sponsor category:", sponsorCategory)
       return NextResponse.json(
-        { success: false, error: "Invalid category" },
+        { success: false, error: "Invalid sponsor category" },
         { status: 400 }
       )
     }
@@ -125,45 +131,62 @@ export async function POST(req: NextRequest) {
     // Upload logo to Cloudinary
     let logoUrl = logo
     try {
+      console.log("📤 Uploading logo to Cloudinary...")
       const uploadResult = await uploadToCloudinary(logo, "sponsors")
       logoUrl = uploadResult.url
-    } catch (uploadError) {
+      console.log("✅ Logo uploaded successfully:", logoUrl)
+    } catch (uploadError: any) {
       console.error("❌ Error uploading logo:", uploadError)
+      console.error("❌ Error details:", uploadError.message)
       return NextResponse.json(
-        { success: false, error: "Failed to upload logo" },
+        { success: false, error: `Failed to upload logo: ${uploadError.message}` },
         { status: 500 }
       )
     }
 
     // Create sponsor
-    const sponsor = await SponsorModel.create({
-      name,
-      logo: logoUrl,
-      website,
-      category,
-      description,
-      socialLinks: socialLinks || {},
-    })
+    try {
+      console.log("💾 Creating sponsor in database...")
+      const sponsor = await SponsorModel.create({
+        name,
+        logo: logoUrl,
+        website,
+        sponsorCategory,
+        price,
+        description,
+        socialLinks: socialLinks || {},
+      })
 
-    console.log(`✅ Sponsor created: ${name}`)
+      console.log(`✅ Sponsor created successfully: ${name} (${sponsorCategory})`)
 
-    return NextResponse.json({
-      success: true,
-      message: "Sponsor created successfully",
-      sponsor: {
-        id: sponsor._id.toString(),
-        name: sponsor.name,
-        logo: sponsor.logo,
-        website: sponsor.website,
-        category: sponsor.category,
-        description: sponsor.description,
-        socialLinks: sponsor.socialLinks,
-      },
-    })
-  } catch (error) {
+      return NextResponse.json({
+        success: true,
+        message: "Sponsor created successfully",
+        sponsor: {
+          id: sponsor._id.toString(),
+          name: sponsor.name,
+          logo: sponsor.logo,
+          website: sponsor.website,
+          sponsorCategory: sponsor.sponsorCategory,
+          price: sponsor.price,
+          description: sponsor.description,
+          socialLinks: sponsor.socialLinks,
+        },
+      })
+    } catch (dbError: any) {
+      console.error("❌ Error creating sponsor in database:", dbError)
+      console.error("❌ DB Error message:", dbError.message)
+      return NextResponse.json(
+        { success: false, error: `Database error: ${dbError.message}` },
+        { status: 500 }
+      )
+    }
+  } catch (error: any) {
     console.error("❌ Error creating sponsor:", error)
+    console.error("❌ Error message:", error.message)
+    console.error("❌ Error stack:", error.stack)
     return NextResponse.json(
-      { success: false, error: "Failed to create sponsor" },
+      { success: false, error: error.message || "Failed to create sponsor" },
       { status: 500 }
     )
   }

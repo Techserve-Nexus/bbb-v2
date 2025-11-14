@@ -17,27 +17,21 @@ export async function GET() {
     await connectDB()
     console.log('✅ Connected to DB for sponsors API')
 
-    // Get all sponsors sorted by category (Platinum > Gold > Silver)
-    const categoryOrder = { Platinum: 1, Gold: 2, Silver: 3 }
-    
+    // Get all sponsors sorted by price (highest first)
     const sponsors = await SponsorModel.find()
-      .sort({ createdAt: -1 })
+      .sort({ price: -1, createdAt: -1 })
       .lean()
 
     console.log(`📊 Found ${sponsors.length} sponsors in database`)
-    sponsors.forEach((s: any) => console.log(`  - ${s.name} (${s.category})`))
+    sponsors.forEach((s: any) => console.log(`  - ${s.name} (${s.sponsorCategory} - ₹${s.price})`))
 
-    // Sort by category priority
-    const sortedSponsors = sponsors.sort((a: any, b: any) => {
-      return categoryOrder[a.category as keyof typeof categoryOrder] - categoryOrder[b.category as keyof typeof categoryOrder]
-    })
-
-    const formattedSponsors = sortedSponsors.map((sponsor: any) => ({
+    const formattedSponsors = sponsors.map((sponsor: any) => ({
       id: sponsor._id.toString(),
       name: sponsor.name,
       logo: sponsor.logo,
       website: sponsor.website,
-      category: sponsor.category,
+      sponsorCategory: sponsor.sponsorCategory,
+      price: sponsor.price,
       description: sponsor.description,
       socialLinks: sponsor.socialLinks && typeof sponsor.socialLinks === 'object' 
         ? (sponsor.socialLinks instanceof Map 
