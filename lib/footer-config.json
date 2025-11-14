@@ -19,11 +19,39 @@
     }
   ],
   "contact": {
-    "email": "bbbshreeparashurama@gmail.com ",
-    "phone": "+919741477555‬",
-    "phoneDisplay": "+91 97414 77555‬, +919591377442",
-    "address": " Nandi Link Grounds, Nayandahalli, Bengaluru 560026"
+    "email": "bbbshreeparashurama@gmail.com",
+    "phone": "+919741477555",
+    "phoneDisplay": "+91 97414 77555, +91 95913 77442",
+    "address": "No 1432/2, SNR Arcade, Krishnadevaray, Vijayanagar Road, Vijayanagar Bengaluru 560040",
+    "coordinators": [
+      {
+        "name": "Swaroop S",
+        "phone": "9019923915"
+      },
+      {
+        "name": "Guruprasad U",
+        "phone": "9741477555"
+      },
+      {
+        "name": "B Venkata Krishna",
+        "phone": "9448031064"
+      }
+    ]
   },
+  "legal": [
+    {
+      "label": "Privacy Policy",
+      "href": "/privacy-policy"
+    },
+    {
+      "label": "Refund Policy",
+      "href": "/refund-policy"
+    },
+    {
+      "label": "Terms & Conditions",
+      "href": "/terms-and-conditions"
+    }
+  ],
   "social": [
     {
       "name": "Facebook",
@@ -49,7 +77,7 @@
   "bottomLinks": [
     {
       "label": "Privacy Policy",
-      "href": "#"
+      "href": "/privacy-policy"
     },
     {
       "label": "Terms of Service",
