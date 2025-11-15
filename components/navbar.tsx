@@ -22,9 +22,9 @@ export default function Navbar() {
 
   const navLinks = [
     { href: "/", label: "Home", id: "home" },
-    // { href: "/about", label: "About Us", id: "about" },
+    { href: "/about", label: "About Us", id: "about" },
     { href: "/sponsors", label: "Sponsors", id: "sponsors" },
-    // { href: "/gallery", label: "Gallery", id: "gallery" },
+    { href: "/shreemembers", label: "Shree Parashurama Members", id: "shreemembers" },
   ]
 
   return (
@@ -71,7 +71,7 @@ export default function Navbar() {
           {/* CTA Button - Desktop */}
           <div className="hidden md:block">
             <Link href="/register">
-              <Button className="bg-primary hover:bg-secondary text-primary-foreground">Get Started</Button>
+              <Button className="bg-primary hover:bg-secondary text-primary-foreground">Register Now</Button>
             </Link>
           </div>
 
@@ -102,7 +102,7 @@ export default function Navbar() {
               </Link>
             ))}
             <Link href="/register" className="block mt-4">
-              <Button className="w-full bg-primary hover:bg-secondary text-primary-foreground">Get Started</Button>
+              <Button className="w-full bg-primary hover:bg-secondary text-primary-foreground">Register Now</Button>
             </Link>
           </div>
         )}
