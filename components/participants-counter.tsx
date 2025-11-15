@@ -53,7 +53,7 @@ export default function ParticipantsCounter() {
             <p className="text-2xl md:text-3xl text-foreground font-semibold mt-4">Participants Registered</p>
           </div>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Join thousands of chess enthusiasts from around the world at our premier event
+            Join thousands of chess enthusiasts and business people from around the world at our premier event
           </p>
         </div>
       </div>

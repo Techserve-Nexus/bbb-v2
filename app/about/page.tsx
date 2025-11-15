@@ -9,154 +9,94 @@ export default function AboutPage() {
     <main className="bg-background">
       <Navbar />
 
-      {/* Hero Section */}
+      {/* About BBB Section (new content) */}
       <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-primary/5 to-background">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-4 text-balance">About Our Event</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Discover the story, vision, and mission behind the premier Chaturanga Manthana of 2025.
+          <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-4 text-balance">About BBB-India</h1>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            BBB-India stands as a beacon of spiritual wisdom, cultural preservation, and selfless service (seva). With a
+            rich history and a widespread network across the country, the organization is dedicated to the holistic
+            development of individuals and communities, guided by timeless principles and the vision of its esteemed
+            leadership.
           </p>
         </div>
       </section>
 
-      {/* Founder's Message */}
-      <section className="py-20 px-4 md:px-6 bg-background">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-            <div>
-              <div className="w-full bg-primary/10 rounded-lg aspect-square flex items-center justify-center border-2 border-primary/20">
-                <div className="text-6xl">👔</div>
-              </div>
-            </div>
-            <div>
-              <p className="text-primary font-semibold mb-2">Message</p>
-              <h2 className="text-4xl font-bold text-foreground mb-6">From the Founder</h2>
-              <p className="text-foreground text-lg mb-4 leading-relaxed">
-                "Chess is more than a game—it's a language of strategy, patience, and excellence. Our event was born
-                from a vision to create a platform where chess enthusiasts, from beginners to grandmasters, can
-                converge, compete, and grow together."
-              </p>
-              <p className="text-muted-foreground text-lg leading-relaxed">
-                We believe in fostering a community where intellectual pursuit is celebrated, where friendships
-                transcend borders, and where every player leaves transformed by the experience.
-              </p>
-              <p className="text-primary font-semibold mt-6">— Event Organizers</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Vision & Mission */}
-      <section className="py-20 px-4 md:px-6 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-foreground mb-4">Our Vision & Mission</h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Vision */}
-            <div className="bg-background rounded-lg border border-border p-8 hover:shadow-lg transition-all">
-              <div className="text-4xl mb-4">🎯</div>
-              <h3 className="text-2xl font-bold text-foreground mb-4">Vision</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                To establish a world-class chess platform that brings together the global chess community, fostering
-                excellence, innovation, and cultural exchange. We envision an event that becomes the pinnacle of chess
-                competitions in India.
-              </p>
-            </div>
-
-            {/* Mission */}
-            <div className="bg-background rounded-lg border border-border p-8 hover:shadow-lg transition-all">
-              <div className="text-4xl mb-4">🚀</div>
-              <h3 className="text-2xl font-bold text-foreground mb-4">Mission</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Our mission is to create an inclusive, vibrant, and inspiring chess community. We are committed to
-                promoting chess excellence, enabling skill development, and building lasting connections among players,
-                sponsors, and chess enthusiasts worldwide.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Values */}
-      <section className="py-20 px-4 md:px-6 bg-background">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-foreground mb-4">Our Core Values</h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { icon: "🏆", title: "Excellence", desc: "We pursue the highest standards in every aspect." },
-              { icon: "🤝", title: "Community", desc: "We celebrate diversity and foster connections." },
-              { icon: "⚡", title: "Innovation", desc: "We embrace modern approaches to chess." },
-              { icon: "🌍", title: "Global Perspective", desc: "We welcome players from around the world." },
-              { icon: "💡", title: "Learning", desc: "We encourage continuous growth and development." },
-              { icon: "❤️", title: "Integrity", desc: "We uphold fairness and ethical standards." },
-            ].map((value, i) => (
-              <div
-                key={i}
-                className="bg-muted/50 rounded-lg p-6 border border-border hover:border-primary transition-colors"
-              >
-                <div className="text-4xl mb-3">{value.icon}</div>
-                <h3 className="text-lg font-bold text-foreground mb-2">{value.title}</h3>
-                <p className="text-sm text-muted-foreground">{value.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Venue & Contact */}
-      <section className="py-20 px-4 md:px-6 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-foreground mb-6">Event Venue</h2>
-              <div className="space-y-4 mb-8">
-                <div>
-                  <p className="text-sm text-muted-foreground font-semibold">LOCATION</p>
-                  <p className="text-lg text-foreground">The Grand Convention Center, New Delhi</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground font-semibold">ADDRESS</p>
-                  <p className="text-lg text-foreground">123 Chess Lane, Connaught Place, New Delhi - 110001</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground font-semibold">CONTACT</p>
-                  <p className="text-lg text-foreground">+91 98765 43210</p>
-                  <p className="text-lg text-foreground">info@chessevent.com</p>
-                </div>
-              </div>
-              <Link
-                href="/register"
-                className="inline-block px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-secondary transition-colors"
-              >
-                Register Now
-              </Link>
-            </div>
-
-            <div className="bg-primary/10 rounded-lg aspect-square flex items-center justify-center border-2 border-primary/20">
-              <div className="text-6xl">📍</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Download Brochure */}
-      <section className="py-20 px-4 md:px-6 bg-background">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-foreground mb-4">Get More Information</h2>
-          <p className="text-muted-foreground text-lg mb-8">
-            Download our comprehensive event brochure for complete details, schedule, and sponsorship opportunities.
+      <section className="py-12 px-4 md:px-6 bg-background">
+        <div className="max-w-4xl mx-auto">
+          <p className="mb-4">
+            Website:&nbsp;
+            <a href="https://bbb-india.com/" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+              https://bbb-india.com/
+            </a>
           </p>
-          <a
-            href="#"
-            className="inline-block px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-secondary transition-colors"
-          >
-            📄 Download Event Brochure
-          </a>
+
+          <p className="mb-6">A brief about BBB:</p>
+
+          <div className="prose max-w-none text-muted-foreground leading-relaxed">
+            <p>
+              BBB-India stands as a beacon of spiritual wisdom, cultural preservation, and selfless service (seva).
+              With a rich history and a widespread network across the country, the organization is dedicated to the
+              holistic development of individuals and communities, guided by timeless principles and the vision of its
+              esteemed leadership.
+            </p>
+
+            <h3>Key Pillars of BBB-India's Credibility & Mission:</h3>
+            <ol>
+              <li>
+                <strong>Nationwide Presence & Established Network:</strong> BBB-India is not a local initiative but a
+                well-established, pan-India movement. This national footprint signifies a robust organizational
+                structure, a shared vision, and a proven track record of impact, ensuring that our chapter operates
+                within a framework of stability and collective strength.
+              </li>
+              <li>
+                <strong>Focus on Spiritual & Value-Based Living:</strong> At its core, BBB-India is committed to
+                disseminating spiritual knowledge and promoting a life rooted in Dharma, righteousness, and ethical
+                conduct. This provides a profound philosophical foundation for all our chapter’s activities, ensuring
+                they are meaningful and purpose-driven.
+              </li>
+              <li>
+                <strong>Dedication to Selfless Service (Seva):</strong> A cornerstone of BBB-India’s work is its
+                commitment to serving society. Through various humanitarian projects, educational initiatives, and
+                community welfare programs, the organization translates spiritual ideals into tangible action for the
+                betterment of all.
+              </li>
+              <li>
+                <strong>Authentic Guidance & Leadership:</strong> The organization is blessed with the guidance of
+                respected spiritual leaders and a dedicated administrative body. This ensures that all activities,
+                including those of our Shree Parashurama chapter, are aligned with authentic teachings and managed
+                with integrity and wisdom.
+              </li>
+              <li>
+                <strong>A Platform for Collective Growth:</strong> BBB-India provides a unified platform for individuals
+                from all walks of life to connect, learn, and grow together in a positive and supportive environment.
+                It fosters a sense of unity and shared purpose that transcends individual differences.
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      {/* Shree Parashurama Chapter Section */}
+      <section className="py-16 px-4 md:px-6 bg-muted/30">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-foreground mb-4">Shree Parashurama Chapter</h2>
+          <p className="text-muted-foreground leading-relaxed mb-4">
+            Shree Parashurama Chapter is an official part of BBB-India, a nationally recognized organization dedicated
+            to spiritual growth and selfless service, guiding all our initiatives and values through networking with like-minded entrepreneurs.
+          </p>
+
+          <div className="bg-background rounded-lg border border-border p-6">
+            <p className="mb-3"><strong>Brief:</strong> Number of members: 82 · Initiated: Year 2021 · Business produced so far: ₹77.33 cr · Business categories in the chapter: 10 industries.</p>
+
+            <p className="mb-2"><strong>EC Team:</strong> Brief of roles & responsibilities (R & R) — (short 3-4 sentence summary describing leadership and coordination duties).</p>
+
+            <p className="mb-2"><strong>Members (high level):</strong> 1, 2, 3</p>
+
+            <p className="mb-2"><strong>Chaturanga Manthana Co-chair:</strong> Brief of roles & responsibilities (R & R) — (short 3-4 sentence summary).</p>
+
+            <p className="mb-0"><strong>Members (co-chair team):</strong> 1, 2, 3</p>
+          </div>
         </div>
       </section>
 

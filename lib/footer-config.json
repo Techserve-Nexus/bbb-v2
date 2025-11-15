@@ -10,12 +10,12 @@
       "href": "/"
     },
     {
-      "label": "Sponsors",
-      "href": "/sponsors"
+      "label": "About Us",
+      "href": "/about"
     },
     {
-      "label": "ProfitHax",
-      "href": "https://www.profithax.com"
+      "label": "Sponsors",
+      "href": "/sponsors"
     }
   ],
   "contact": {
