@@ -40,7 +40,7 @@ export default function Sponsors() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <p className="text-primary font-semibold mb-2">Our Partners</p>
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground text-balance">Sponsors & Partners</h2>
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground text-balance">Sponsors</h2>
           </div>
           <div className="text-center text-muted-foreground">Loading sponsors...</div>
         </div>

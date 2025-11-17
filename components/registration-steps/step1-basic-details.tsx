@@ -107,6 +107,15 @@ export default function Step1BasicDetails({ formData, setFormData, errors }: Ste
           {errors.email && <p className="text-red-500 text-sm mt-2">{errors.email}</p>}
         </div>
       </div>
+
+      {/* Event Details */}
+      <div className="mt-8 p-6 bg-primary/10 rounded-lg border-2 border-primary/20">
+        <h3 className="text-2xl font-bold text-foreground mb-3">Chaturanga Manthana 2025</h3>
+        <div className="space-y-2 text-foreground">
+          <p className="text-lg font-semibold">13th and 14th December 2025</p>
+          <p className="text-lg font-semibold">At Nandi Link Grounds, Bengaluru.</p>
+        </div>
+      </div>
     </div>
   )
 }
