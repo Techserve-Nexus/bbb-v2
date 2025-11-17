@@ -265,6 +265,15 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
           </div>
         </div>
       )} */}
+
+      {/* Event Details */}
+      <div className="p-6 bg-primary/10 rounded-lg border-2 border-primary/20">
+        <h3 className="text-lg font-bold text-foreground mb-2">Chaturanga Manthana 2025</h3>
+        <div className="space-y-1 text-foreground">
+          <p className="text-sm font-semibold">13th and 14th December 2025</p>
+          <p className="text-sm font-semibold">At Nandi Link Grounds, Bengaluru.</p>
+        </div>
+      </div>
     </div>
   )
 }
