@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { LogOut, Menu, X, LayoutDashboard, FileText, CreditCard, Handshake, Settings, Crown, Image as ImageIcon, Eye } from "lucide-react"
+import { LogOut, Menu, X, LayoutDashboard, FileText, CreditCard, Handshake, Settings, Crown, Image as ImageIcon, Mic, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -37,6 +37,8 @@ export default function AdminLayout({ children, activeTab, setActiveTab }: Admin
     { id: "registrations", label: "Registrations", icon: FileText },
     { id: "payments", label: "Payments", icon: CreditCard },
     { id: "sponsors", label: "Sponsors", icon: Handshake },
+    { id: "sponsor-requests", label: "Sponsor Requests", icon: Handshake },
+    { id: "speakers", label: "Speakers", icon: Mic },
     // { id: "sponsor-requests", label: "Sponsor Requests", icon: Handshake },
     // { id: "visitors", label: "Visitors", icon: Eye },
     { id: "banners", label: "Banners", icon: ImageIcon },

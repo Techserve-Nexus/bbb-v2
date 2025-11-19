@@ -38,10 +38,10 @@ export default function Sponsors() {
     return (
       <section className="py-20 px-4 md:px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-primary font-semibold mb-2">Our Partners</p>
+          {/* <div className="text-center mb-12">
+            <p className="text-primary font-semibold mb-2">Our sponsors</p>
             <h2 className="text-4xl md:text-5xl font-bold text-foreground text-balance">Sponsors</h2>
-          </div>
+          </div> */}
           <div className="text-center text-muted-foreground">Loading sponsors...</div>
         </div>
       </section>
@@ -93,7 +93,7 @@ export default function Sponsors() {
               }
             }
             .animate-scroll {
-              animation: scroll 1s linear infinite;
+              animation: scroll 3s linear infinite;
             }
           `}</style>
         </div>

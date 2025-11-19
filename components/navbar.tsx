@@ -2,14 +2,16 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
+import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import bannerConfig from "@/lib/banner-config.json"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
-  const [activeLink, setActiveLink] = useState("home")
   const [isScrolled, setIsScrolled] = useState(false)
+  const pathname = usePathname()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,13 +57,12 @@ export default function Navbar() {
               <Link
                 key={link.id}
                 href={link.href}
-                onClick={() => setActiveLink(link.id)}
-                className={`relative text-sm font-medium transition-colors ${activeLink === link.id ? "text-primary" : "text-foreground hover:text-primary"
+                className={`relative text-sm font-medium transition-colors ${pathname === link.href ? "text-primary" : "text-foreground hover:text-primary"
                   }`}
               >
                 {link.label}
-                {activeLink === link.id && (
-                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-secondary rounded-full" />
+                {pathname === link.href && (
+                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-linear-to-r from-primary to-secondary rounded-full" />
                 )}
               </Link>
             ))}
@@ -91,10 +92,9 @@ export default function Navbar() {
                 key={link.id}
                 href={link.href}
                 onClick={() => {
-                  setActiveLink(link.id)
                   setIsOpen(false)
                 }}
-                className={`block px-4 py-2 rounded-lg transition-colors ${activeLink === link.id ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"
+                className={`block px-4 py-2 rounded-lg transition-colors ${pathname === link.href ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"
                   }`}
               >
                 {link.label}
