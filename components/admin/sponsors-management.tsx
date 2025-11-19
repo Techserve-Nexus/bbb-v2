@@ -10,7 +10,8 @@ interface Sponsor {
   name: string
   logo: string
   website: string
-  category: "Platinum" | "Gold" | "Silver"
+  sponsorCategory: "Tamaram" | "Tamaram+" | "Rajatham" | "Suvarnam" | "Vajram" | "Pradhan_Poshak"
+  price: number
   description: string
   socialLinks?: Record<string, string>
   createdAt: string
@@ -30,7 +31,8 @@ export default function SponsorsManagement() {
     name: "",
     logo: "",
     website: "",
-    category: "Silver" as "Platinum" | "Gold" | "Silver",
+    sponsorCategory: "Tamaram" as "Tamaram" | "Tamaram+" | "Rajatham" | "Suvarnam" | "Vajram" | "Pradhan_Poshak",
+    price: 25000,
     description: "",
     socialLinks: {
       facebook: "",
@@ -128,7 +130,7 @@ export default function SponsorsManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!formData.name || !formData.website || !formData.category || !formData.description) {
+    if (!formData.name || !formData.website || !formData.sponsorCategory || !formData.description) {
       alert("Please fill in all required fields")
       return
     }
@@ -196,7 +198,8 @@ export default function SponsorsManagement() {
       name: sponsor.name,
       logo: sponsor.logo,
       website: sponsor.website,
-      category: sponsor.category,
+      sponsorCategory: sponsor.sponsorCategory,
+      price: sponsor.price,
       description: sponsor.description,
       socialLinks: {
         facebook: sponsor.socialLinks?.facebook || "",
@@ -248,7 +251,8 @@ export default function SponsorsManagement() {
       name: "",
       logo: "",
       website: "",
-      category: "Silver",
+      sponsorCategory: "Tamaram",
+      price: 25000,
       description: "",
       socialLinks: {
         facebook: "",
@@ -264,11 +268,26 @@ export default function SponsorsManagement() {
 
   const getCategoryBadge = (category: string) => {
     const colors: Record<string, string> = {
-      Platinum: "bg-purple-100 text-purple-800 border-purple-300",
-      Gold: "bg-yellow-100 text-yellow-800 border-yellow-300",
-      Silver: "bg-gray-100 text-gray-800 border-gray-300",
+      "Pradhan_Poshak": "bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-300",
+      "Vajram": "bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300",
+      "Suvarnam": "bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-300",
+      "Rajatham": "bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-300",
+      "Tamaram+": "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300",
+      "Tamaram": "bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-900/30 dark:text-gray-300",
     }
     return colors[category] || "bg-gray-100 text-gray-800"
+  }
+
+  const getCategoryPrice = (category: string): number => {
+    const prices: Record<string, number> = {
+      "Tamaram": 25000,
+      "Tamaram+": 50000,
+      "Rajatham": 100000,
+      "Suvarnam": 200000,
+      "Vajram": 300000,
+      "Pradhan_Poshak": 500000,
+    }
+    return prices[category] || 0
   }
 
   if (error) {
@@ -328,10 +347,13 @@ export default function SponsorsManagement() {
             onChange={(e) => setFilterCategory(e.target.value)}
             className="px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           >
-            <option value="all">All Categories</option>
-            <option value="Platinum">Platinum</option>
-            <option value="Gold">Gold</option>
-            <option value="Silver">Silver</option>
+            <option value="all">All Sponsor Categories</option>
+            <option value="Pradhan_Poshak">Pradhan Poshak (₹5,00,000)</option>
+            <option value="Vajram">Vajram (₹3,00,000)</option>
+            <option value="Suvarnam">Suvarnam (₹2,00,000)</option>
+            <option value="Rajatham">Rajatham (₹1,00,000)</option>
+            <option value="Tamaram+">Tamaram+ (₹50,000)</option>
+            <option value="Tamaram">Tamaram (₹25,000)</option>
           </select>
         </div>
       </Card>
@@ -372,26 +394,44 @@ export default function SponsorsManagement() {
                 />
               </div>
 
-              {/* Category */}
+              {/* Sponsor Category */}
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Category <span className="text-red-500">*</span>
+                  Sponsor Category <span className="text-red-500">*</span>
                 </label>
                 <select
-                  value={formData.category}
-                  onChange={(e) =>
+                  value={formData.sponsorCategory}
+                  onChange={(e) => {
+                    const category = e.target.value as "Tamaram" | "Tamaram+" | "Rajatham" | "Suvarnam" | "Vajram" | "Pradhan_Poshak"
                     setFormData({
                       ...formData,
-                      category: e.target.value as "Platinum" | "Gold" | "Silver",
+                      sponsorCategory: category,
+                      price: getCategoryPrice(category),
                     })
-                  }
+                  }}
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   required
                 >
-                  <option value="Platinum">Platinum</option>
-                  <option value="Gold">Gold</option>
-                  <option value="Silver">Silver</option>
+                  <option value="Tamaram">Tamaram (₹25,000)</option>
+                  <option value="Tamaram+">Tamaram+ (₹50,000)</option>
+                  <option value="Rajatham">Rajatham (₹1,00,000)</option>
+                  <option value="Suvarnam">Suvarnam (₹2,00,000)</option>
+                  <option value="Vajram">Vajram (₹3,00,000)</option>
+                  <option value="Pradhan_Poshak">Pradhan Poshak (₹5,00,000)</option>
                 </select>
+              </div>
+
+              {/* Price (Read-only, auto-calculated) */}
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Sponsorship Amount <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={`₹${formData.price.toLocaleString("en-IN")}`}
+                  className="w-full px-4 py-2 border rounded-lg bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
+                  readOnly
+                />
               </div>
 
               {/* Website */}
@@ -606,14 +646,17 @@ export default function SponsorsManagement() {
                 />
               </div>
 
-              {/* Category Badge */}
-              <div className="mb-2">
+              {/* Sponsor Category Badge and Price */}
+              <div className="mb-3 flex items-center justify-between">
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium border ${getCategoryBadge(
-                    sponsor.category
+                    sponsor.sponsorCategory
                   )}`}
                 >
-                  {sponsor.category}
+                  {sponsor.sponsorCategory.replace("_", " ")}
+                </span>
+                <span className="text-sm font-bold text-green-600 dark:text-green-400">
+                  ₹{sponsor.price.toLocaleString("en-IN")}
                 </span>
               </div>
 

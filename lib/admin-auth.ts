@@ -6,6 +6,7 @@
  */
 
 interface AuthResult {
+  isValid: any
   authorized: boolean
   error?: string
   adminEmail?: string

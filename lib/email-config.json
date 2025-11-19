@@ -2,7 +2,7 @@
   "organization": {
     "name": "Chaturanga Manthana 2025",
     "shortName": "Chaturanga",
-    "website": "https://bbbchess.com",
+    "website": "https://shreeparashurama.com",
     "supportEmail": "support@bbbchess.com",
     "replyToEmail": "noreply@bbbchess.com"
   },
@@ -20,7 +20,7 @@
       "background": "#F9FAFB"
     },
     "logo": {
-      "url": "https://bbbchess.com/logo.png",
+      "url": "https://shreeparashurama.com/logobbb.svg",
       "alt": "BBB Chess Championship Logo",
       "width": 150,
       "height": 60
@@ -137,6 +137,6 @@
     "date": "March 15-17, 2025",
     "venue": "Grand Convention Center, Mumbai",
     "contactNumber": "+91-XXXXX-XXXXX",
-    "websiteUrl": "https://bbbchess.com"
+    "websiteUrl": "https://shreeparashurama.com"
   }
 }

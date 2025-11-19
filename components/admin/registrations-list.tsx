@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Search, Download, RefreshCw, ChevronLeft, ChevronRight, Mail, Trash2, CheckCircle, XCircle, Eye, Info } from "lucide-react"
+import { Search, Download, RefreshCw, ChevronLeft, ChevronRight, Mail, Trash2, CheckCircle, XCircle, Eye, Info, Columns, MoreVertical } from "lucide-react"
 
 interface Registration {
   id: string
@@ -14,6 +14,7 @@ interface Registration {
   chapterName: string
   category: string
   ticketType: string
+  isGuest?: boolean
   personTickets?: Array<{
     personType: "self" | "spouse" | "child"
     name: string
@@ -35,6 +36,18 @@ interface Registration {
   updatedAt: string
 }
 
+interface ColumnVisibility {
+  id: boolean
+  name: boolean
+  contact: boolean
+  chapter: boolean
+  ticket: boolean
+  payment: boolean
+  ticketStatus: boolean
+  date: boolean
+  actions: boolean
+}
+
 export default function RegistrationsList() {
   const [registrations, setRegistrations] = useState<Registration[]>([])
   const [loading, setLoading] = useState(true)
@@ -45,12 +58,27 @@ export default function RegistrationsList() {
   const [filterPaymentStatus, setFilterPaymentStatus] = useState("all")
   const [filterTicketType, setFilterTicketType] = useState("all")
   const [filterTicketStatus, setFilterTicketStatus] = useState("all")
+  const [filterGuest, setFilterGuest] = useState("all")
   
   // Pagination
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [total, setTotal] = useState(0)
   const [limit, setLimit] = useState(20)
+
+  // Column Visibility
+  const [showColumnFilter, setShowColumnFilter] = useState(false)
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
+    id: true,
+    name: true,
+    contact: true,
+    chapter: true,
+    ticket: true,
+    payment: true,
+    ticketStatus: true,
+    date: true,
+    actions: true,
+  })
 
   // Verification Modal
   const [showVerifyModal, setShowVerifyModal] = useState(false)
@@ -70,9 +98,12 @@ export default function RegistrationsList() {
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [detailsRegistration, setDetailsRegistration] = useState<Registration | null>(null)
 
+  // Action Menu Dropdown
+  const [openActionMenu, setOpenActionMenu] = useState<string | null>(null)
+
   useEffect(() => {
     fetchRegistrations()
-  }, [page, limit, filterPaymentStatus, filterTicketType, filterTicketStatus])
+  }, [page, limit, filterPaymentStatus, filterTicketType, filterTicketStatus, filterGuest])
 
   // Debounce search
   useEffect(() => {
@@ -104,6 +135,7 @@ export default function RegistrationsList() {
       if (filterPaymentStatus !== "all") params.append("status", filterPaymentStatus)
       if (filterTicketType !== "all") params.append("ticketType", filterTicketType)
       if (filterTicketStatus !== "all") params.append("ticketStatus", filterTicketStatus)
+      if (filterGuest !== "all") params.append("isGuest", filterGuest)
 
       const response = await fetch(`/api/admin/registrations?${params}`, {
         headers: {
@@ -122,7 +154,7 @@ export default function RegistrationsList() {
       setTotalPages(data.pagination.pages)
       setTotal(data.pagination.total)
     } catch (err: any) {
-      console.error("❌ Error fetching registrations:", err)
+      console.error("Error fetching registrations:", err)
       setError(err.message || "Failed to load registrations")
     } finally {
       setLoading(false)
@@ -191,7 +223,7 @@ export default function RegistrationsList() {
   }
 
   const handleDeleteRegistration = async (registrationId: string) => {
-    if (!confirm("Are you sure you want to cancel this registration? This will mark it as expired.")) {
+    if (!confirm("Are you sure you want to permanently delete this registration? This action cannot be undone.")) {
       return
     }
 
@@ -213,7 +245,7 @@ export default function RegistrationsList() {
         throw new Error(data.error || "Failed to delete registration")
       }
 
-      alert("Registration cancelled successfully!")
+      alert("Registration deleted successfully!")
       fetchRegistrations() // Refresh the list
     } catch (err: any) {
       console.error("❌ Error deleting registration:", err)
@@ -323,7 +355,7 @@ export default function RegistrationsList() {
 
       {/* Filters */}
       <Card className="p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -335,6 +367,17 @@ export default function RegistrationsList() {
               className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
+
+          {/* Guest Filter */}
+          <select
+            value={filterGuest}
+            onChange={(e) => setFilterGuest(e.target.value)}
+            className="px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="all">All Registrations</option>
+            <option value="true">Guest Only</option>
+            <option value="false">Non-Guest Only</option>
+          </select>
 
           {/* Payment Status Filter */}
           <select
@@ -386,7 +429,109 @@ export default function RegistrationsList() {
             <option value="50">50 per page</option>
             <option value="100">100 per page</option>
           </select>
+
+          {/* Column Filter Button */}
+          <div className="relative">
+            <Button
+              onClick={() => setShowColumnFilter(!showColumnFilter)}
+              variant="outline"
+              className="w-full flex items-center gap-2"
+            >
+              <Columns className="w-4 h-4" />
+              <span className="hidden sm:inline">Columns</span>
+            </Button>
+          </div>
         </div>
+
+        {/* Column Visibility Dropdown */}
+        {showColumnFilter && (
+          <div className="mt-4 p-4 border rounded-lg bg-muted/50">
+            <h3 className="text-sm font-semibold mb-3">Show/Hide Columns</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={columnVisibility.id}
+                  onChange={(e) => setColumnVisibility({ ...columnVisibility, id: e.target.checked })}
+                  className="rounded"
+                />
+                <span className="text-sm">ID</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={columnVisibility.name}
+                  onChange={(e) => setColumnVisibility({ ...columnVisibility, name: e.target.checked })}
+                  className="rounded"
+                />
+                <span className="text-sm">Name</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={columnVisibility.contact}
+                  onChange={(e) => setColumnVisibility({ ...columnVisibility, contact: e.target.checked })}
+                  className="rounded"
+                />
+                <span className="text-sm">Contact</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={columnVisibility.chapter}
+                  onChange={(e) => setColumnVisibility({ ...columnVisibility, chapter: e.target.checked })}
+                  className="rounded"
+                />
+                <span className="text-sm">Chapter</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={columnVisibility.ticket}
+                  onChange={(e) => setColumnVisibility({ ...columnVisibility, ticket: e.target.checked })}
+                  className="rounded"
+                />
+                <span className="text-sm">Ticket</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={columnVisibility.payment}
+                  onChange={(e) => setColumnVisibility({ ...columnVisibility, payment: e.target.checked })}
+                  className="rounded"
+                />
+                <span className="text-sm">Payment</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={columnVisibility.ticketStatus}
+                  onChange={(e) => setColumnVisibility({ ...columnVisibility, ticketStatus: e.target.checked })}
+                  className="rounded"
+                />
+                <span className="text-sm">Ticket Status</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={columnVisibility.date}
+                  onChange={(e) => setColumnVisibility({ ...columnVisibility, date: e.target.checked })}
+                  className="rounded"
+                />
+                <span className="text-sm">Date</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={columnVisibility.actions}
+                  onChange={(e) => setColumnVisibility({ ...columnVisibility, actions: e.target.checked })}
+                  className="rounded"
+                />
+                <span className="text-sm">Actions</span>
+              </label>
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* Table */}
@@ -404,143 +549,201 @@ export default function RegistrationsList() {
             <table className="w-full">
               <thead className="bg-muted/50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">ID</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Name</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Contact</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Chapter</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Ticket</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Payment</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Ticket Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Date</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Actions</th>
+                  {columnVisibility.id && <th className="px-4 py-3 text-left text-sm font-semibold">ID</th>}
+                  {columnVisibility.name && <th className="px-4 py-3 text-left text-sm font-semibold">Name</th>}
+                  {columnVisibility.contact && <th className="px-4 py-3 text-left text-sm font-semibold">Contact</th>}
+                  {columnVisibility.chapter && <th className="px-4 py-3 text-left text-sm font-semibold">Chapter</th>}
+                  {columnVisibility.ticket && <th className="px-4 py-3 text-left text-sm font-semibold">Ticket</th>}
+                  {columnVisibility.payment && <th className="px-4 py-3 text-left text-sm font-semibold">Payment</th>}
+                  {columnVisibility.ticketStatus && <th className="px-4 py-3 text-left text-sm font-semibold">Ticket Status</th>}
+                  {columnVisibility.date && <th className="px-4 py-3 text-left text-sm font-semibold">Date</th>}
+                  {columnVisibility.actions && <th className="px-4 py-3 text-left text-sm font-semibold">Actions</th>}
                 </tr>
               </thead>
               <tbody>
                 {registrations.map((reg) => (
                   <tr key={reg.id} className="border-t hover:bg-muted/30">
-                    <td className="px-4 py-3 text-sm font-mono">
-                      {reg.registrationId}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="text-sm font-medium">{reg.name}</div>
-                      <div className="text-xs text-muted-foreground">{reg.email}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="text-sm">{reg.contactNo}</div>
-                    </td>
-                    <td className="px-4 py-3 text-sm">{reg.chapterName}</td>
-                    <td className="px-4 py-3">
-                      {reg.personTickets && reg.personTickets.length > 0 ? (
-                        <div className="space-y-1 max-w-xs">
-                          <div className="text-sm font-medium">{reg.personTickets.length} Person(s)</div>
-                          <div className="text-xs text-muted-foreground mb-1">
-                            {reg.personTickets.reduce((total, p) => total + p.tickets.length, 0)} Ticket(s) Total
+                    {columnVisibility.id && (
+                      <td className="px-4 py-3 text-sm font-mono">
+                        {reg.registrationId}
+                      </td>
+                    )}
+                    {columnVisibility.name && (
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div>
+                            <div className="text-sm font-medium">{reg.name}</div>
+                            <div className="text-xs text-muted-foreground">{reg.email}</div>
                           </div>
-                          <div className="space-y-1 text-xs">
-                            {reg.personTickets.map((person, idx) => (
-                              <div key={idx} className="bg-purple-50 px-2 py-1 rounded border border-purple-200">
-                                <div className="font-medium text-gray-700 truncate">{person.name}</div>
-                                <div className="flex flex-wrap gap-1 mt-0.5">
-                                  {person.tickets.map((ticket, tIdx) => (
-                                    <span key={tIdx} className="inline-block px-1.5 py-0.5 bg-purple-200 text-purple-800 rounded text-xs">
-                                      {ticket}
-                                    </span>
-                                  ))}
+                          {reg.isGuest && (
+                            <span className="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-semibold rounded-full">
+                              GUEST
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    )}
+                    {columnVisibility.contact && (
+                      <td className="px-4 py-3">
+                        <div className="text-sm">{reg.contactNo}</div>
+                      </td>
+                    )}
+                    {columnVisibility.chapter && (
+                      <td className="px-4 py-3 text-sm">{reg.chapterName}</td>
+                    )}
+                    {columnVisibility.ticket && (
+                      <td className="px-4 py-3">
+                        {reg.personTickets && reg.personTickets.length > 0 ? (
+                          <div className="space-y-1 max-w-xs">
+                            <div className="text-sm font-medium">{reg.personTickets.length} Person(s)</div>
+                            <div className="text-xs text-muted-foreground mb-1">
+                              {reg.personTickets.reduce((total, p) => total + p.tickets.length, 0)} Ticket(s) Total
+                            </div>
+                            <div className="space-y-1 text-xs">
+                              {reg.personTickets.map((person, idx) => (
+                                <div key={idx} className="bg-purple-50 px-2 py-1 rounded border border-purple-200">
+                                  <div className="font-medium text-gray-700 truncate">{person.name}</div>
+                                  <div className="flex flex-wrap gap-1 mt-0.5">
+                                    {person.tickets.map((ticket, tIdx) => (
+                                      <span key={tIdx} className="inline-block px-1.5 py-0.5 bg-purple-200 text-purple-800 rounded text-xs">
+                                        {ticket}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-sm font-medium">{reg.ticketType}</span>
+                        )}
+                      </td>
+                    )}
+                    {columnVisibility.payment && (
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(reg.paymentStatus)}`}>
+                          {reg.paymentStatus.toUpperCase()}
+                        </span>
+                      </td>
+                    )}
+                    {columnVisibility.ticketStatus && (
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(reg.ticketStatus)}`}>
+                          {reg.ticketStatus.toUpperCase()}
+                        </span>
+                      </td>
+                    )}
+                    {columnVisibility.date && (
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {new Date(reg.createdAt).toLocaleDateString()}
+                      </td>
+                    )}
+                    {columnVisibility.actions && (
+                      <td className="px-4 py-3">
+                        <div className="relative">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setOpenActionMenu(openActionMenu === reg.id ? null : reg.id)}
+                            className="hover:bg-muted"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+
+                          {/* Dropdown Menu */}
+                          {openActionMenu === reg.id && (
+                            <>
+                              {/* Backdrop to close menu */}
+                              <div 
+                                className="fixed inset-0 z-10" 
+                                onClick={() => setOpenActionMenu(null)}
+                              />
+                              
+                              {/* Menu */}
+                              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-border z-20">
+                                <div className="py-1">
+                                  {/* View Details */}
+                                  <button
+                                    onClick={() => {
+                                      openDetailsModal(reg)
+                                      setOpenActionMenu(null)
+                                    }}
+                                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left hover:bg-muted transition-colors"
+                                  >
+                                    <Info className="w-4 h-4 text-blue-600" />
+                                    <span>View Full Details</span>
+                                  </button>
+
+                                  {/* Payment Failed Status */}
+                                  {reg.paymentStatus === "failed" && (
+                                    <div className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 bg-red-50">
+                                      <XCircle className="w-4 h-4" />
+                                      <span className="font-medium">Payment Canceled</span>
+                                    </div>
+                                  )}
+
+                                  {/* Verify Payment - Only for pending manual payments */}
+                                  {reg.paymentStatus === "pending" && (reg.paymentMethod === "manual" || !reg.paymentMethod) && (
+                                    <>
+                                      {reg.paymentScreenshotUrl && (
+                                        <button
+                                          onClick={() => {
+                                            openScreenshot(reg.paymentScreenshotUrl!)
+                                            setOpenActionMenu(null)
+                                          }}
+                                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left hover:bg-muted transition-colors"
+                                        >
+                                          <Eye className="w-4 h-4 text-blue-600" />
+                                          <span>View Payment Screenshot</span>
+                                        </button>
+                                      )}
+                                      <button
+                                        onClick={() => {
+                                          openVerifyModal(reg)
+                                          setOpenActionMenu(null)
+                                        }}
+                                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left hover:bg-muted transition-colors"
+                                      >
+                                        <CheckCircle className="w-4 h-4 text-green-600" />
+                                        <span>Verify Payment</span>
+                                      </button>
+                                    </>
+                                  )}
+
+                                  {/* Resend Email - Only for successful payments */}
+                                  {reg.paymentStatus === "success" && (
+                                    <button
+                                      onClick={() => {
+                                        handleResendEmail(reg.registrationId)
+                                        setOpenActionMenu(null)
+                                      }}
+                                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left hover:bg-muted transition-colors"
+                                    >
+                                      <Mail className="w-4 h-4 text-purple-600" />
+                                      <span>Resend Ticket Email</span>
+                                    </button>
+                                  )}
+
+                                  {/* Delete Registration - Only for pending or successful */}
+                                  {reg.paymentStatus !== "failed" && (
+                                    <button
+                                      onClick={() => {
+                                        handleDeleteRegistration(reg.registrationId)
+                                        setOpenActionMenu(null)
+                                      }}
+                                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left hover:bg-red-50 text-red-600 transition-colors"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                      <span>Cancel Registration</span>
+                                    </button>
+                                  )}
                                 </div>
                               </div>
-                            ))}
-                          </div>
+                            </>
+                          )}
                         </div>
-                      ) : (
-                        <span className="text-sm font-medium">{reg.ticketType}</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(reg.paymentStatus)}`}>
-                        {reg.paymentStatus.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(reg.ticketStatus)}`}>
-                        {reg.ticketStatus.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-muted-foreground">
-                      {new Date(reg.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-2">
-                        {/* View Details Button - Always visible */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openDetailsModal(reg)}
-                          title="View Full Details"
-                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                        >
-                          <Info className="w-4 h-4" />
-                        </Button>
-
-                        {/* Show cross icon for failed/canceled payments */}
-                        {reg.paymentStatus === "failed" && (
-                          <div className="flex items-center gap-2 text-red-600" title="Payment Canceled/Failed">
-                            <XCircle className="w-5 h-5" />
-                            <span className="text-sm font-medium">Canceled</span>
-                          </div>
-                        )}
-                        
-                        {/* Verify Button - Only for pending manual payments */}
-                        {reg.paymentStatus === "pending" && (reg.paymentMethod === "manual" || !reg.paymentMethod) && (
-                          <>
-                            {reg.paymentScreenshotUrl && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => openScreenshot(reg.paymentScreenshotUrl!)}
-                                title="View Payment Screenshot"
-                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                            )}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => openVerifyModal(reg)}
-                              title="Verify Payment"
-                              className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </Button>
-                          </>
-                        )}
-                        
-                        {/* Resend Email - Only for successful payments */}
-                        {reg.paymentStatus === "success" && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleResendEmail(reg.registrationId)}
-                            title="Resend Ticket Email with QR Code"
-                          >
-                            <Mail className="w-4 h-4" />
-                          </Button>
-                        )}
-                        
-                        {/* Delete Button - Only for pending or successful registrations */}
-                        {reg.paymentStatus !== "failed" && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteRegistration(reg.registrationId)}
-                            title="Cancel Registration"
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </td>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -758,7 +961,7 @@ export default function RegistrationsList() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-lg">
+            <div className="sticky top-0 bg-linear-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-lg">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold">{detailsRegistration.name}</h2>
@@ -786,7 +989,14 @@ export default function RegistrationsList() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
                   <div>
                     <p className="text-sm text-gray-500">Full Name</p>
-                    <p className="font-medium text-gray-900">{detailsRegistration.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-gray-900">{detailsRegistration.name}</p>
+                      {detailsRegistration.isGuest && (
+                        <span className="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-semibold rounded-full">
+                          GUEST
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
