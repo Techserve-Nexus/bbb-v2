@@ -3,20 +3,43 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
-import { Power, PowerOff, RefreshCw } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Power, PowerOff, RefreshCw, BarChart3, Database, Users, Edit2, Check, X } from "lucide-react"
 
 interface Settings {
   registrationEnabled: boolean
   siteName: string
   siteDescription: string
+  useRealStats: boolean
+  dummyStats: {
+    totalRegistrations: number
+    approvedRegistrations: number
+    totalVisitors: number
+  }
+  participantsCount: number
 }
 
 export default function AdminSettings() {
-  const [settings, setSettings] = useState<Settings | null>(null)
+  const router = useRouter()
+  const [settings, setSettings] = useState<Settings>({
+    registrationEnabled: true,
+    siteName: "BBB Event",
+    siteDescription: "Event Registration System",
+    useRealStats: true,
+    dummyStats: {
+      totalRegistrations: 0,
+      approvedRegistrations: 0,
+      totalVisitors: 0,
+    },
+    participantsCount: 82,
+  })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
+  const [isEditingParticipants, setIsEditingParticipants] = useState(false)
+  const [tempParticipantsCount, setTempParticipantsCount] = useState(82)
+  const [migrating, setMigrating] = useState(false)
 
   useEffect(() => {
     fetchSettings()
@@ -29,6 +52,12 @@ export default function AdminSettings() {
 
       const adminEmail = localStorage.getItem("adminEmail")
       const adminPassword = localStorage.getItem("adminPassword")
+
+      if (!adminEmail || !adminPassword) {
+        console.error("❌ No admin credentials found in localStorage")
+        router.push("/admin/login")
+        return
+      }
 
       const response = await fetch("/api/admin/settings", {
         headers: {
@@ -43,7 +72,17 @@ export default function AdminSettings() {
         throw new Error(data.error || "Failed to fetch settings")
       }
 
-      setSettings(data.settings)
+      // Ensure dummyStats is always initialized
+      const fetchedSettings = data.settings
+      if (!fetchedSettings.dummyStats) {
+        fetchedSettings.dummyStats = {
+          totalRegistrations: 0,
+          approvedRegistrations: 0,
+          totalVisitors: 0,
+        }
+      }
+
+      setSettings(fetchedSettings)
     } catch (err: any) {
       console.error("❌ Error fetching settings:", err)
       setError(err.message || "Failed to load settings")
@@ -53,8 +92,6 @@ export default function AdminSettings() {
   }
 
   const handleToggleRegistration = async () => {
-    if (!settings) return
-
     const newValue = !settings.registrationEnabled
 
     try {
@@ -74,6 +111,7 @@ export default function AdminSettings() {
         },
         body: JSON.stringify({
           registrationEnabled: newValue,
+          participantsCount:82,
         }),
       })
 
@@ -126,20 +164,55 @@ export default function AdminSettings() {
     )
   }
 
-  if (!settings) {
-    return null
-  }
-
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-        <button
-          onClick={fetchSettings}
-          className="px-4 py-2 text-sm bg-muted hover:bg-muted/80 rounded-lg transition-colors flex items-center gap-2"
-        >
-          <RefreshCw className="w-4 h-4" /> Refresh
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              if (!confirm("Run database migration to ensure participantsCount field exists?")) return
+              
+              setMigrating(true)
+              setError("")
+              try {
+                const adminEmail = localStorage.getItem("adminEmail")
+                const adminPassword = localStorage.getItem("adminPassword")
+
+                const response = await fetch("/api/admin/migrate-participants", {
+                  method: "POST",
+                  headers: {
+                    "x-admin-email": adminEmail || "",
+                    "x-admin-password": adminPassword || "",
+                  },
+                })
+
+                const data = await response.json()
+                if (!response.ok) throw new Error(data.error)
+
+                setSuccessMessage(`✅ Migration: ${data.message} (${data.action})`)
+                setTimeout(() => setSuccessMessage(""), 5000)
+                
+                // Refresh settings after migration
+                await fetchSettings()
+              } catch (err: any) {
+                setError(err.message || "Migration failed")
+              } finally {
+                setMigrating(false)
+              }
+            }}
+            disabled={migrating}
+            className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
+          >
+            {migrating ? "Migrating..." : "Run Migration"}
+          </button>
+          <button
+            onClick={fetchSettings}
+            className="px-4 py-2 text-sm bg-muted hover:bg-muted/80 rounded-lg transition-colors flex items-center gap-2"
+          >
+            <RefreshCw className="w-4 h-4" /> Refresh
+          </button>
+        </div>
       </div>
 
       <div className="space-y-6 max-w-2xl">
@@ -208,12 +281,304 @@ export default function AdminSettings() {
           </div>
         </Card>
 
+        {/* Statistics Display Control */}
+
+        {/* <Card className="p-6 border border-border">
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-bold text-foreground mb-2">Statistics Display Control</h2>
+              <p className="text-sm text-muted-foreground">
+                Choose whether to display real database statistics or custom dummy data on the public homepage.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-3">
+                {settings.useRealStats ? (
+                  <>
+                    <Database className="w-5 h-5 text-blue-600" />
+                    <div>
+                      <p className="font-semibold">Using Real Statistics</p>
+                      <p className="text-xs text-muted-foreground">Showing actual database counts</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <BarChart3 className="w-5 h-5 text-purple-600" />
+                    <div>
+                      <p className="font-semibold">Using Dummy Statistics</p>
+                      <p className="text-xs text-muted-foreground">Showing custom values</p>
+                    </div>
+                  </>
+                )}
+              </div>
+              <Button
+                onClick={async () => {
+                  try {
+                    setSaving(true)
+                    setError("")
+                    
+                    const adminEmail = localStorage.getItem("adminEmail")
+                    const adminPassword = localStorage.getItem("adminPassword")
+
+                    const response = await fetch("/api/admin/settings", {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                        "x-admin-email": adminEmail || "",
+                        "x-admin-password": adminPassword || "",
+                      },
+                      body: JSON.stringify({
+                        useRealStats: !settings.useRealStats,
+                      }),
+                    })
+
+                    const data = await response.json()
+                    if (!response.ok) throw new Error(data.error)
+
+                    setSettings(data.settings)
+                    setSuccessMessage("✅ Stats display mode updated!")
+                    setTimeout(() => setSuccessMessage(""), 3000)
+                  } catch (err: any) {
+                    setError(err.message || "Failed to update")
+                  } finally {
+                    setSaving(false)
+                  }
+                }}
+                disabled={saving}
+                variant="outline"
+              >
+                {saving ? "Updating..." : "Toggle Mode"}
+              </Button>
+            </div>
+
+            {!settings.useRealStats && (
+              <div className="space-y-4 p-4 border border-border rounded-lg bg-background">
+                <h3 className="font-semibold text-sm">Set Dummy Statistics Values</h3>
+                
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Total Registrations</label>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Enter total registrations count"
+                      value={settings.dummyStats?.totalRegistrations ?? 0}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        dummyStats: {
+                          ...(settings.dummyStats || { totalRegistrations: 0, approvedRegistrations: 0, totalVisitors: 0 }),
+                          totalRegistrations: parseInt(e.target.value) || 0,
+                        }
+                      })}
+                      className="w-full px-4 py-2 border border-border rounded-lg bg-background"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Approved Registrations</label>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Enter approved registrations count"
+                      value={settings.dummyStats?.approvedRegistrations ?? 0}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        dummyStats: {
+                          ...(settings.dummyStats || { totalRegistrations: 0, approvedRegistrations: 0, totalVisitors: 0 }),
+                          approvedRegistrations: parseInt(e.target.value) || 0,
+                        }
+                      })}
+                      className="w-full px-4 py-2 border border-border rounded-lg bg-background"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Total Visitors</label>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Enter total visitors count"
+                      value={settings.dummyStats?.totalVisitors ?? 0}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        dummyStats: {
+                          ...(settings.dummyStats || { totalRegistrations: 0, approvedRegistrations: 0, totalVisitors: 0 }),
+                          totalVisitors: parseInt(e.target.value) || 0,
+                        }
+                      })}
+                      className="w-full px-4 py-2 border border-border rounded-lg bg-background"
+                    />
+                  </div>
+                </div>
+
+                <Button
+                  onClick={async () => {
+                    try {
+                      setSaving(true)
+                      setError("")
+                      
+                      const adminEmail = localStorage.getItem("adminEmail")
+                      const adminPassword = localStorage.getItem("adminPassword")
+
+                      const response = await fetch("/api/admin/settings", {
+                        method: "PUT",
+                        headers: {
+                          "Content-Type": "application/json",
+                          "x-admin-email": adminEmail || "",
+                          "x-admin-password": adminPassword || "",
+                        },
+                        body: JSON.stringify({
+                          dummyStats: settings.dummyStats,
+                        }),
+                      })
+
+                      const data = await response.json()
+                      if (!response.ok) throw new Error(data.error)
+
+                      setSettings(data.settings)
+                      setSuccessMessage("✅ Dummy statistics saved!")
+                      setTimeout(() => setSuccessMessage(""), 3000)
+                    } catch (err: any) {
+                      setError(err.message || "Failed to save")
+                    } finally {
+                      setSaving(false)
+                    }
+                  }}
+                  disabled={saving}
+                  className="w-full"
+                >
+                  {saving ? "Saving..." : "Save Dummy Statistics"}
+                </Button>
+              </div>
+            )}
+
+            <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <p className="text-xs text-amber-800 dark:text-amber-200">
+                <strong>Note:</strong> Dummy statistics will be displayed on the public homepage only. Admin panel always shows real database statistics.
+              </p>
+            </div>
+          </div>
+        </Card> */}
+
+        {/* Participants Counter Control */}
+        <Card className="p-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <Users className="w-5 h-5 text-blue-600" />
+            <div>
+              <h3 className="text-lg font-semibold">Participants Counter Control</h3>
+              <p className="text-sm text-muted-foreground">
+                Set the participant count displayed on the homepage counter
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {!isEditingParticipants ? (
+              // Display Mode
+              <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div>
+                  <p className="text-sm text-muted-foreground">Current Participant Count</p>
+                  <p className="text-3xl font-bold text-blue-600">{(settings.participantsCount || 0).toLocaleString()}</p>
+                </div>
+                <Button
+                  onClick={() => {
+                    setIsEditingParticipants(true)
+                    setTempParticipantsCount(settings.participantsCount || 82)
+                  }}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  Edit
+                </Button>
+              </div>
+            ) : (
+              // Edit Mode
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Participant Count</label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="Enter participant count"
+                    value={tempParticipantsCount || 0}
+                    onChange={(e) => setTempParticipantsCount(parseInt(e.target.value) || 0)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    This number will be displayed on the homepage with an animated counter
+                  </p>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    onClick={async () => {
+                      setSaving(true)
+                      setError("")
+                      try {
+                        const adminEmail = localStorage.getItem("adminEmail")
+                        const adminPassword = localStorage.getItem("adminPassword")
+
+                        console.log("Saving participants count:", tempParticipantsCount)
+
+                        const response = await fetch("/api/admin/settings", {
+                          method: "PUT",
+                          headers: {
+                            "Content-Type": "application/json",
+                            "x-admin-email": adminEmail || "",
+                            "x-admin-password": adminPassword || "",
+                          },
+                          body: JSON.stringify({
+                            participantsCount: tempParticipantsCount,
+                          }),
+                        })
+
+                        const data = await response.json()
+                        if (!response.ok) throw new Error(data.error)
+
+                        console.log("Saved successfully:", data.settings)
+                        setSettings(data.settings)
+                        setIsEditingParticipants(false)
+                        setSuccessMessage("Participant count saved!")
+                        setTimeout(() => setSuccessMessage(""), 3000)
+                      } catch (err: any) {
+                        console.error("Error saving:", err)
+                        setError(err.message || "Failed to save")
+                      } finally {
+                        setSaving(false)
+                      }
+                    }}
+                    disabled={saving}
+                    className="flex-1 flex items-center justify-center gap-2"
+                  >
+                    <Check className="w-4 h-4" />
+                    {saving ? "Saving..." : "Save"}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setIsEditingParticipants(false)
+                      setTempParticipantsCount(settings.participantsCount || 82)
+                    }}
+                    variant="outline"
+                    disabled={saving}
+                    className="flex items-center gap-2"
+                  >
+                    <X className="w-4 h-4" />
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </Card>
+
         {/* Info Note */}
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        {/* <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
           <p className="text-sm text-blue-800 dark:text-blue-200">
             <strong>Note:</strong> When registration is closed, the registration form will display a message to users and prevent new submissions. Existing registrations will not be affected.
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   )

@@ -114,3 +114,19 @@ export interface TicketOption {
   price: number
   features: string[]
 }
+
+export interface Settings {
+  id?: string
+  registrationEnabled: boolean
+  siteName: string
+  siteDescription: string
+  useRealStats: boolean
+  dummyStats: {
+    totalRegistrations: number
+    approvedRegistrations: number
+    totalVisitors: number
+  }
+  participantsCount: number
+  createdAt?: Date
+  updatedAt?: Date
+}

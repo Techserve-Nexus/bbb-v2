@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
-import { ArrowUpRight, Users, CreditCard, TrendingUp, DollarSign, RefreshCw } from "lucide-react"
+import { ArrowUpRight, Users, CreditCard, TrendingUp, DollarSign, RefreshCw, Eye } from "lucide-react"
 
 interface DashboardStats {
   totalParticipants: number // Total people count
@@ -40,6 +40,11 @@ interface DashboardStats {
       revenue: number
     }>
     growthPercentage: number
+  }
+  visitors?: {
+    total: number
+    unique: number
+    today: number
   }
 }
 
@@ -168,6 +173,30 @@ export default function DashboardOverview() {
           color="text-purple-600"
         />
       </div>
+
+      {/* Visitor Stats */}
+      {stats.visitors && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <StatCard
+            icon={Eye}
+            label="Total Page Views"
+            value={stats.visitors.total.toLocaleString()}
+            color="text-indigo-600"
+          />
+          <StatCard
+            icon={Users}
+            label="Unique Visitors"
+            value={stats.visitors.unique.toLocaleString()}
+            color="text-cyan-600"
+          />
+          <StatCard
+            icon={TrendingUp}
+            label="Today's Visitors"
+            value={stats.visitors.today.toLocaleString()}
+            color="text-orange-600"
+          />
+        </div>
+      )}
 
       {/* Guest vs Member Stats */}
       <Card className="p-6 border border-border mb-8">

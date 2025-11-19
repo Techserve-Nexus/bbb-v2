@@ -5,7 +5,26 @@ import { useEffect, useState } from "react"
 export default function ParticipantsCounter() {
   const [count, setCount] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
-  const targetCount = 82
+  const [targetCount, setTargetCount] = useState(82)
+
+  // Fetch participants count from settings
+  useEffect(() => {
+    const fetchParticipantsCount = async () => {
+      try {
+        const response = await fetch("/api/settings/participants", {
+          cache: "no-store",
+        })
+        const data = await response.json()
+        if (data.success) {
+          console.log("Fetched participants count:", data.participantsCount)
+          setTargetCount(data.participantsCount || 82)
+        }
+      } catch (error) {
+        console.error("Failed to fetch participants count:", error)
+      }
+    }
+    fetchParticipantsCount()
+  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
