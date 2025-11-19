@@ -25,7 +25,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         // No credentials stored
         if (!adminEmail || !adminPassword) {
-          console.log("📍 No credentials found, redirecting to login...")
+          console.log("No credentials found, redirecting to login...")
           router.push("/admin/login")
           return
         }
@@ -41,7 +41,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const data = await response.json()
 
         if (!data.authenticated) {
-          console.log("🚫 Invalid credentials, redirecting to login...")
+          console.log("Invalid credentials, redirecting to login...")
           localStorage.removeItem("adminEmail")
           localStorage.removeItem("adminPassword")
           localStorage.removeItem("adminToken")
@@ -50,10 +50,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }
 
         // Authenticated successfully
-        console.log("✅ Admin authenticated")
+        console.log("Admin authenticated")
         setIsAuthenticated(true)
       } catch (error) {
-        console.error("❌ Auth check failed:", error)
+        console.error("Auth check failed:", error)
         router.push("/admin/login")
       } finally {
         setIsLoading(false)
@@ -66,7 +66,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // Show loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-purple-50 to-blue-50">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600 font-medium">Verifying authentication...</p>

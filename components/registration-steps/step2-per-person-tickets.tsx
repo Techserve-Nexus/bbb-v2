@@ -28,10 +28,14 @@ export default function Step2PerPersonTickets({ formData, setFormData, errors }:
       persons.push({ personType: "spouse", name: formData.spouseName })
     }
     
-    // Children above 12 (paid tickets)
+    // Children - Include based on guest/member status
     formData.children.forEach((child: any, index: number) => {
-      if (child.name && child.name.trim() && child.age === ">12") {
-        persons.push({ personType: "child", name: child.name, age: child.age, index })
+      if (child.name && child.name.trim()) {
+        // For guests: all children need tickets (both <12 and >12)
+        // For members: only children >12 need tickets
+        if (formData.isGuest || child.age === ">12") {
+          persons.push({ personType: "child", name: child.name, age: child.age, index })
+        }
       }
     })
     
@@ -122,7 +126,7 @@ export default function Step2PerPersonTickets({ formData, setFormData, errors }:
                 <p className="text-sm text-muted-foreground">
                   {person.personType === "self" ? "Main Registrant" : 
                    person.personType === "spouse" ? "Spouse" : 
-                   "Child (Above 12)"}
+                   person.age === "<12" ? "Child (Under 12)" : "Child (Above 12)"}
                 </p>
               </div>
 
@@ -192,17 +196,42 @@ export default function Step2PerPersonTickets({ formData, setFormData, errors }:
         })}
       </div>
 
-      {/* Children Under 12 - Free Entry Notice */}
+      {/* Children Under 12 - Conditional Notice */}
       {childrenUnder12.length > 0 && (
-        <div className="mt-6 p-4 bg-green-50 border-2 border-green-200 rounded-lg">
-          <h4 className="font-semibold text-green-900 mb-2">✅ Free Entry (Children Under 12)</h4>
-          <div className="space-y-1">
-            {childrenUnder12.map((child: any, idx: number) => (
-              <p key={idx} className="text-sm text-green-800">
-                • {child.name} - Free admission to all events
+        <div className={`mt-6 p-4 rounded-lg border-2 ${
+          formData.isGuest 
+            ? "bg-orange-50 border-orange-200" 
+            : "bg-green-50 border-green-200"
+        }`}>
+          {formData.isGuest ? (
+            <>
+              <h4 className="font-semibold text-orange-900 mb-2">Guest Registration - Children Under 12</h4>
+              <p className="text-sm text-orange-800 mb-2">
+                As a guest, tickets are required for children under 12. Please select tickets above.
               </p>
-            ))}
-          </div>
+              <div className="space-y-1">
+                {childrenUnder12.map((child: any, idx: number) => (
+                  <p key={idx} className="text-sm text-orange-800">
+                    • {child.name} - Requires ticket selection
+                  </p>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <h4 className="font-semibold text-green-900 mb-2">Free Entry (Children Under 12)</h4>
+              <p className="text-sm text-green-800 mb-2">
+                As a member, children under 12 has Free Entry.
+              </p>
+              <div className="space-y-1">
+                {childrenUnder12.map((child: any, idx: number) => (
+                  <p key={idx} className="text-sm text-green-800">
+                    • {child.name} - has free entry to event
+                  </p>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
 

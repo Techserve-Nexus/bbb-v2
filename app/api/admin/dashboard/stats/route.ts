@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { verifyAdminAuth } from "@/lib/admin-auth"
 import connectDB from "@/lib/db"
-import { RegistrationModel } from "@/lib/models"
+import { RegistrationModel, VisitorModel } from "@/lib/models"
 
 export const runtime = "nodejs"
 export const maxDuration = 30
@@ -188,6 +188,19 @@ export async function GET(req: NextRequest) {
     const growthPercentage =
       previousWeekCount > 0 ? ((lastWeekCount - previousWeekCount) / previousWeekCount) * 100 : 0
 
+    // Get visitor statistics
+    const totalVisitors = await VisitorModel.countDocuments()
+    const uniqueVisitors = await VisitorModel.distinct("sessionId").then(
+      (sessions) => sessions.length
+    )
+    
+    // Today's visitors
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const todayVisitors = await VisitorModel.countDocuments({
+      createdAt: { $gte: today },
+    })
+
     // Return stats
     return NextResponse.json({
       success: true,
@@ -208,6 +221,11 @@ export async function GET(req: NextRequest) {
         trends: {
           daily: dailyTrends,
           growthPercentage: Math.round(growthPercentage * 10) / 10,
+        },
+        visitors: {
+          total: totalVisitors,
+          unique: uniqueVisitors,
+          today: todayVisitors,
         },
       },
     })
