@@ -9,6 +9,7 @@ import SponsorsManagement from "@/components/admin/sponsors-management"
 import SponsorRequestsList from "@/components/admin/sponsor-requests-list"
 import BannerManagement from "@/components/admin/banner-management"
 import AdminSettings from "@/components/admin/admin-settings"
+import SpeakersManagement from "@/components/admin/speakers-management"
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard")
@@ -20,6 +21,7 @@ export default function AdminPage() {
       {activeTab === "payments" && <PaymentsManagement />}
       {activeTab === "sponsors" && <SponsorsManagement />}
       {activeTab === "sponsor-requests" && <SponsorRequestsList />}
+      {activeTab === "speakers" && <SpeakersManagement />}
       {activeTab === "banners" && <BannerManagement />}
       {activeTab === "settings" && <AdminSettings />}
     </AdminLayout>

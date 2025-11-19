@@ -114,3 +114,16 @@ export interface TicketOption {
   price: number
   features: string[]
 }
+
+export interface Speaker {
+  id: string
+  name: string
+  photo: string
+  designation: string
+  bio: string
+  socialLink: string
+  order: number
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}

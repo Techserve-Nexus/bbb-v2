@@ -181,6 +181,22 @@ const SettingsSchema = new Schema(
   }
 )
 
+// Speaker Schema
+const SpeakerSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    photo: { type: String, required: true },
+    designation: { type: String, required: true },
+    bio: { type: String, required: true },
+    socialLink: { type: String, required: true },
+    order: { type: Number, required: true, default: 0 },
+    isActive: { type: Boolean, default: true },
+  },
+  {
+    timestamps: true,
+  }
+)
+
 // Models
 export const RegistrationModel: Model<Registration> =
   mongoose.models.Registration || mongoose.model<Registration>("Registration", RegistrationSchema)
@@ -202,3 +218,6 @@ export const BannerModel: Model<Banner> =
 
 export const SettingsModel =
   mongoose.models.Settings || mongoose.model("Settings", SettingsSchema)
+
+export const SpeakerModel =
+  mongoose.models.Speaker || mongoose.model("Speaker", SpeakerSchema)
