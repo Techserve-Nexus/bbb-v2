@@ -126,7 +126,8 @@ export interface Speaker {
   isActive: boolean
   createdAt: Date
   updatedAt: Date
-  
+}
+
 export interface Settings {
   id?: string
   registrationEnabled: boolean

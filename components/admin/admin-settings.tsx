@@ -462,13 +462,15 @@ export default function AdminSettings() {
         </Card> */}
 
         {/* Participants Counter Control */}
-        <Card className="p-6 space-y-4">
+        <Card className="p-6 space-y-4 border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
           <div className="flex items-center gap-3">
-            <Users className="w-5 h-5 text-blue-600" />
+            <div className="p-3 bg-blue-600 rounded-lg">
+              <Users className="w-6 h-6 text-white" />
+            </div>
             <div>
-              <h3 className="text-lg font-semibold">Participants Counter Control</h3>
+              <h3 className="text-xl font-bold text-foreground">Homepage Participants Counter</h3>
               <p className="text-sm text-muted-foreground">
-                Set the participant count displayed on the homepage counter
+                Set the participant count displayed on the homepage with animated counter effect
               </p>
             </div>
           </div>
@@ -476,42 +478,48 @@ export default function AdminSettings() {
           <div className="space-y-4">
             {!isEditingParticipants ? (
               // Display Mode
-              <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <div className="flex items-center justify-between p-6 bg-white dark:bg-gray-900 border-2 border-blue-300 dark:border-blue-700 rounded-xl shadow-sm">
                 <div>
-                  <p className="text-sm text-muted-foreground">Current Participant Count</p>
-                  <p className="text-3xl font-bold text-blue-600">{(settings.participantsCount || 0).toLocaleString()}</p>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Current Participant Count</p>
+                  <p className="text-5xl font-black text-blue-600 dark:text-blue-400">
+                    {(settings.participantsCount || 0).toLocaleString()}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    This number appears on the homepage
+                  </p>
                 </div>
                 <Button
                   onClick={() => {
                     setIsEditingParticipants(true)
                     setTempParticipantsCount(settings.participantsCount || 82)
                   }}
-                  variant="outline"
-                  className="flex items-center gap-2"
+                  size="lg"
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
                 >
                   <Edit2 className="w-4 h-4" />
-                  Edit
+                  Update Count
                 </Button>
               </div>
             ) : (
               // Edit Mode
-              <div className="space-y-3">
+              <div className="space-y-4 p-6 bg-white dark:bg-gray-900 border-2 border-blue-300 dark:border-blue-700 rounded-xl shadow-sm">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Participant Count</label>
+                  <label className="text-sm font-semibold text-foreground">New Participant Count</label>
                   <input
                     type="number"
                     min="0"
                     placeholder="Enter participant count"
                     value={tempParticipantsCount || 0}
                     onChange={(e) => setTempParticipantsCount(parseInt(e.target.value) || 0)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800"
+                    className="w-full px-4 py-3 text-lg font-semibold border-2 border-blue-300 dark:border-blue-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    This number will be displayed on the homepage with an animated counter
+                  <p className="text-xs text-muted-foreground flex items-start gap-2">
+                    <span className="text-blue-600 font-bold">💡</span>
+                    This number will be displayed on the homepage with an animated counter. Visitors will see this count incrementing smoothly.
                   </p>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <Button
                     onClick={async () => {
                       setSaving(true)
@@ -540,7 +548,7 @@ export default function AdminSettings() {
                         console.log("Saved successfully:", data.settings)
                         setSettings(data.settings)
                         setIsEditingParticipants(false)
-                        setSuccessMessage("Participant count saved!")
+                        setSuccessMessage("✅ Participant count updated successfully!")
                         setTimeout(() => setSuccessMessage(""), 3000)
                       } catch (err: any) {
                         console.error("Error saving:", err)
@@ -550,10 +558,11 @@ export default function AdminSettings() {
                       }
                     }}
                     disabled={saving}
-                    className="flex-1 flex items-center justify-center gap-2"
+                    size="lg"
+                    className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700"
                   >
-                    <Check className="w-4 h-4" />
-                    {saving ? "Saving..." : "Save"}
+                    <Check className="w-5 h-5" />
+                    {saving ? "Saving..." : "Save Changes"}
                   </Button>
                   <Button
                     onClick={() => {
@@ -562,9 +571,10 @@ export default function AdminSettings() {
                     }}
                     variant="outline"
                     disabled={saving}
+                    size="lg"
                     className="flex items-center gap-2"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-5 h-5" />
                     Cancel
                   </Button>
                 </div>
