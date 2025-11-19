@@ -23,12 +23,12 @@ export default function Step1BasicAndFamily({ formData, setFormData, errors }: S
   return (
     <div>
       <h2 className="text-3xl font-bold text-foreground mb-8">Registration Details</h2>
-      
+
       <div className="space-y-8">
         {/* Basic Details Section */}
         <div className="space-y-6">
           <h3 className="text-xl font-semibold text-foreground border-b pb-2">Basic Information</h3>
-          
+
           {/* Name */}
           <div>
             <label className="block text-sm font-semibold text-foreground mb-2">Full Name *</label>
@@ -37,10 +37,9 @@ export default function Step1BasicAndFamily({ formData, setFormData, errors }: S
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-lg border-2 transition-colors bg-background text-foreground placeholder-muted-foreground ${
-                errors.name ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"
-              } outline-none`}
-              placeholder="John Doe"
+              className={`w-full px-4 py-3 rounded-lg border-2 transition-colors bg-background text-foreground placeholder-muted-foreground ${errors.name ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"
+                } outline-none`}
+              placeholder=""
             />
             {errors.name && <p className="text-red-500 text-sm mt-2">{errors.name}</p>}
           </div>
@@ -54,20 +53,21 @@ export default function Step1BasicAndFamily({ formData, setFormData, errors }: S
               value={formData.chapterName}
               onChange={handleChange}
               className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground placeholder-muted-foreground transition-colors"
-              placeholder="Your Chapter/Organization Name"
+              placeholder=""
             />
           </div>
 
           {/* Category */}
           <div>
-            <label htmlFor="category" className="block text-sm font-semibold text-foreground mb-2">Category (Optional)</label>
+            <label htmlFor="category" className="block text-sm font-semibold text-foreground mb-2">Category</label>
             <input
               type="text"
               id="category"
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground placeholder-muted-foreground transition-colors" 
+              className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground placeholder-muted-foreground transition-colors"
+              placeholder=""
             />
           </div>
 
@@ -79,10 +79,9 @@ export default function Step1BasicAndFamily({ formData, setFormData, errors }: S
               name="contactNo"
               value={formData.contactNo}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-lg border-2 transition-colors bg-background text-foreground placeholder-muted-foreground ${
-                errors.contactNo ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"
-              } outline-none`}
-              placeholder="+91 98765 43210"
+              className={`w-full px-4 py-3 rounded-lg border-2 transition-colors bg-background text-foreground placeholder-muted-foreground ${errors.contactNo ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"
+                } outline-none`}
+              placeholder=""
             />
             {errors.contactNo && <p className="text-red-500 text-sm mt-2">{errors.contactNo}</p>}
           </div>
@@ -95,19 +94,60 @@ export default function Step1BasicAndFamily({ formData, setFormData, errors }: S
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-lg border-2 transition-colors bg-background text-foreground placeholder-muted-foreground ${
-                errors.email ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"
-              } outline-none`}
-              placeholder="john@example.com"
+              className={`w-full px-4 py-3 rounded-lg border-2 transition-colors bg-background text-foreground placeholder-muted-foreground ${errors.email ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"
+                } outline-none`}
+              placeholder=""
             />
             {errors.email && <p className="text-red-500 text-sm mt-2">{errors.email}</p>}
+          </div>
+
+          {/* Guest/Member Registration Radio Buttons */}
+          <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+            <label className="block text-sm font-semibold text-blue-900 mb-3">Registration Type *</label>
+            <div className="space-y-3">
+              {/* Register as Member (Default) */}
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="registrationType"
+                  value="member"
+                  checked={!formData.isGuest}
+                  onChange={() => setFormData({ ...formData, isGuest: false })}
+                  className="mt-1 w-5 h-5 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                />
+                <div>
+                  <span className="text-sm font-semibold text-blue-900">Register as Member</span>
+                  <p className="text-xs text-blue-700 mt-1">
+                    Free admission for children under 12 years
+                  </p>
+                </div>
+              </label>
+
+              {/* Register as Guest */}
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="registrationType"
+                  value="guest"
+                  checked={formData.isGuest || false}
+                  onChange={() => setFormData({ ...formData, isGuest: true })}
+                  className="mt-1 w-5 h-5 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                />
+                <div>
+                  <span className="text-sm font-semibold text-blue-900">Register as Guest</span>
+                  <p className="text-xs text-blue-700 mt-1">
+                    Ticket charges apply for all attendees including children under 12
+                  </p>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
 
         {/* Family Details Section */}
         <div className="space-y-6">
           <h3 className="text-xl font-semibold text-foreground border-b pb-2">Family Members</h3>
-          
+
           {/* Spouse Name */}
           <div>
             <label className="block text-sm font-semibold text-foreground mb-2">Spouse Name</label>

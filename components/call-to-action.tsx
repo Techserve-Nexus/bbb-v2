@@ -13,11 +13,11 @@ export default function CallToAction() {
         <p className="text-lg text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
           Secure your spot at the premier Chaturanga Manthana of 2025. Limited tickets available.
         </p>
-        <Link href="/register">
+        {/* <Link href="/register">
           <Button size="lg" className="bg-primary-foreground hover:bg-muted text-primary text-lg px-8 py-6">
             Get Started Now
           </Button>
-        </Link>
+        </Link> */}
       </div>
     </section>
   )

@@ -28,15 +28,13 @@ export default function About() {
           >
             <p className="text-primary font-semibold mb-2">About Event</p>
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6 text-balance">
-              Strategic Excellence Meets Community
+              Fostering Legacy, Strategy, and Community: The Shree Parashurama's Initiative
             </h2>
             <p className="text-muted-foreground text-lg mb-4 leading-relaxed">
-              Our Chaturanga Manthana brings together passionate players, strategic minds, and enthusiasts from around the
-              world. We believe in creating an environment where excellence is celebrated and community thrives.
+              <b>The Ultimate Conclave for the Modern Leader</b>
             </p>
             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-              With world-class competitions, masterclasses, and networking opportunities, this event is designed for
-              players of all levels to grow, compete, and connect.
+              Presented by The Shreeparashurama initiative, Chaturanga Manthana is an exclusive retreat for the modern professional entrepreneur, blending sharp intellect with powerful relationships. This extraordinary gathering seamlessly integrates a high-level Business Conclave with a strategic tournament and vibrant family celebrations, promising to elevate your professional trajectory, sharpen your mind, and deepen family bonds.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex items-start gap-3">
@@ -66,7 +64,7 @@ export default function About() {
           >
             <div className="relative">
               <div className="absolute -top-4 -left-4 w-24 h-24 bg-primary/10 rounded-lg" />
-              <div className="relative bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg p-8 border border-primary/20">
+              <div className="relative bg-linear-to-br from-primary/20 to-secondary/20 rounded-lg p-8 border border-primary/20">
                 <div className="grid grid-cols-2 gap-4">
                   {["Expert Training", "Live Tournaments", "Community", "Global Stage"].map((item, i) => (
                     <div key={i} className="bg-background p-4 rounded-lg text-center border border-border">

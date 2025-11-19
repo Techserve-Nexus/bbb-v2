@@ -2,19 +2,28 @@
 
 import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
-import { ArrowUpRight, Users, CreditCard, TrendingUp, DollarSign, RefreshCw } from "lucide-react"
+import { ArrowUpRight, Users, CreditCard, TrendingUp, DollarSign, RefreshCw, Eye } from "lucide-react"
 
 interface DashboardStats {
-  totalParticipants: number
+  totalParticipants: number // Total people count
+  totalRegistrations: number // Total registration count
   totalRevenue: number
   ticketsSold: {
-    platinum: number
-    gold: number
-    silver: number
+    businessConclave: number
+    chess: number
   }
   pendingPayments: number
   successfulPayments: number
   failedPayments: number
+  guestStats: {
+    guest: number
+    member: number
+  }
+  familyBreakdown: {
+    self: number
+    spouse: number
+    children: number
+  }
   recentRegistrations: Array<{
     id: string
     registrationId: string
@@ -31,6 +40,11 @@ interface DashboardStats {
       revenue: number
     }>
     growthPercentage: number
+  }
+  visitors?: {
+    total: number
+    unique: number
+    today: number
   }
 }
 
@@ -154,38 +168,108 @@ export default function DashboardOverview() {
         />
         <StatCard
           icon={TrendingUp}
-          label="Pending Payments"
-          value={stats.pendingPayments}
-          color="text-orange-600"
+          label="Total Registrations"
+          value={stats.totalRegistrations}
+          color="text-purple-600"
         />
       </div>
+
+      {/* Visitor Stats */}
+      {stats.visitors && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <StatCard
+            icon={Eye}
+            label="Total Page Views"
+            value={stats.visitors.total.toLocaleString()}
+            color="text-indigo-600"
+          />
+          <StatCard
+            icon={Users}
+            label="Unique Visitors"
+            value={stats.visitors.unique.toLocaleString()}
+            color="text-cyan-600"
+          />
+          <StatCard
+            icon={TrendingUp}
+            label="Today's Visitors"
+            value={stats.visitors.today.toLocaleString()}
+            color="text-orange-600"
+          />
+        </div>
+      )}
+
+      {/* Guest vs Member Stats */}
+      <Card className="p-6 border border-border mb-8">
+        <h2 className="text-xl font-bold text-foreground mb-4">Registration Type</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <p className="text-3xl font-bold text-blue-600">{stats.guestStats.member}</p>
+            <p className="text-sm text-muted-foreground mt-1">Members</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {stats.totalRegistrations > 0 
+                ? `${((stats.guestStats.member / stats.totalRegistrations) * 100).toFixed(1)}%`
+                : "0%"}
+            </p>
+          </div>
+          <div className="text-center p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+            <p className="text-3xl font-bold text-indigo-600">{stats.guestStats.guest}</p>
+            <p className="text-sm text-muted-foreground mt-1">Guests</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {stats.totalRegistrations > 0 
+                ? `${((stats.guestStats.guest / stats.totalRegistrations) * 100).toFixed(1)}%`
+                : "0%"}
+            </p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Family Breakdown */}
+      <Card className="p-6 border border-border mb-8">
+        <h2 className="text-xl font-bold text-foreground mb-4">Family Breakdown</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+            <p className="text-2xl font-bold text-green-600">{stats.familyBreakdown.self}</p>
+            <p className="text-sm text-muted-foreground mt-1">Self</p>
+          </div>
+          <div className="text-center p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg">
+            <p className="text-2xl font-bold text-pink-600">{stats.familyBreakdown.spouse}</p>
+            <p className="text-sm text-muted-foreground mt-1">Spouse</p>
+          </div>
+          <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+            <p className="text-2xl font-bold text-orange-600">{stats.familyBreakdown.children}</p>
+            <p className="text-sm text-muted-foreground mt-1">Children</p>
+          </div>
+        </div>
+      </Card>
 
       {/* Ticket Distribution */}
       <Card className="p-6 border border-border mb-8">
         <h2 className="text-xl font-bold text-foreground mb-4">Ticket Distribution</h2>
         <div className="space-y-4">
           {[
-            { tier: "Platinum", count: stats.ticketsSold.platinum, color: "bg-purple-600" },
-            { tier: "Gold", count: stats.ticketsSold.gold, color: "bg-yellow-600" },
-            { tier: "Silver", count: stats.ticketsSold.silver, color: "bg-gray-400" },
-          ].map((ticket) => (
-            <div key={ticket.tier} className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="font-medium">{ticket.tier}</span>
-                <span className="text-muted-foreground">
-                  {ticket.count} ({stats.totalParticipants > 0 ? ((ticket.count / stats.totalParticipants) * 100).toFixed(1) : 0}%)
-                </span>
+            { tier: "Business Conclave", count: stats.ticketsSold.businessConclave, color: "bg-blue-600" },
+            { tier: "Chess", count: stats.ticketsSold.chess, color: "bg-purple-600" },
+          ].map((ticket) => {
+            const totalTickets = stats.ticketsSold.businessConclave + stats.ticketsSold.chess
+            return (
+              <div key={ticket.tier} className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium">{ticket.tier}</span>
+                  <span className="text-muted-foreground">
+                    {ticket.count} ({totalTickets > 0 ? ((ticket.count / totalTickets) * 100).toFixed(1) : 0}%)
+                  </span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div
+                    className={`${ticket.color} h-2 rounded-full transition-all`}
+                    style={{
+                      width: totalTickets > 0 ? `${(ticket.count / totalTickets) * 100}%` : "0%",
+                    }}
+                  />
+                </div>
               </div>
-              <div className="w-full bg-muted rounded-full h-2">
-                <div
-                  className={`${ticket.color} h-2 rounded-full transition-all`}
-                  style={{
-                    width: stats.totalParticipants > 0 ? `${(ticket.count / stats.totalParticipants) * 100}%` : "0%",
-                  }}
-                />
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </Card>
 

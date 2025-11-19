@@ -1,5 +1,5 @@
 import connectDB from "@/lib/db"
-import { RegistrationModel } from "@/lib/models"
+import { RegistrationModel, SettingsModel } from "@/lib/models"
 import { type NextRequest, NextResponse } from "next/server"
 import { generateRegistrationId } from "@/lib/utils"
 import { sendEmail, getRegistrationEmailTemplate } from "@/lib/email"
@@ -10,6 +10,15 @@ export const maxDuration = 30 // Max 30 seconds
 export async function POST(req: NextRequest) {
   try {
     await connectDB()
+
+    // Check if registration is enabled
+    const settings = await SettingsModel.findOne({})
+    if (settings && settings.registrationEnabled === false) {
+      return NextResponse.json(
+        { error: "Registration is currently closed. Please try again later." },
+        { status: 403 }
+      )
+    }
     
     const body = await req.json()
     let { 
@@ -17,7 +26,8 @@ export async function POST(req: NextRequest) {
       chapterName, 
       category, 
       contactNo, 
-      email, 
+      email,
+      isGuest = false,
       spouseName,
       children = [],
       personTickets = [],
@@ -61,6 +71,7 @@ export async function POST(req: NextRequest) {
       category,
       contactNo,
       email,
+      isGuest,
       spouseName,
       children,
       personTickets,
