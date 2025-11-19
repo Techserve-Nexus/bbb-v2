@@ -108,6 +108,15 @@ export default function Step2Tickets({ formData, setFormData, errors }: Step2Pro
           <strong>Note:</strong> You can select multiple tickets. After selection, you'll proceed to payment. Receipt shall be shared to the registered email.
         </p>
       </div>
+
+      {/* Event Details */}
+      <div className="mt-8 p-6 bg-primary/10 rounded-lg border-2 border-primary/20 max-w-3xl">
+        <h3 className="text-2xl font-bold text-foreground mb-3">Chaturanga Manthana 2025</h3>
+        <div className="space-y-2 text-foreground">
+          <p className="text-lg font-semibold">13th and 14th December 2025</p>
+          <p className="text-lg font-semibold">At Nandi Link Grounds, Bengaluru.</p>
+        </div>
+      </div>
     </div>
   )
 }

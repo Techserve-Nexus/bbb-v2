@@ -7,6 +7,7 @@ import RegistrationsList from "@/components/admin/registrations-list"
 import PaymentsManagement from "@/components/admin/payments-management"
 import SponsorsManagement from "@/components/admin/sponsors-management"
 import SponsorRequestsList from "@/components/admin/sponsor-requests-list"
+import VisitorsAnalytics from "@/components/admin/visitors-analytics"
 import BannerManagement from "@/components/admin/banner-management"
 import AdminSettings from "@/components/admin/admin-settings"
 import SpeakersManagement from "@/components/admin/speakers-management"
@@ -22,6 +23,7 @@ export default function AdminPage() {
       {activeTab === "sponsors" && <SponsorsManagement />}
       {activeTab === "sponsor-requests" && <SponsorRequestsList />}
       {activeTab === "speakers" && <SpeakersManagement />}
+      {activeTab === "visitors" && <VisitorsAnalytics />}
       {activeTab === "banners" && <BannerManagement />}
       {activeTab === "settings" && <AdminSettings />}
     </AdminLayout>

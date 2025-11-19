@@ -61,17 +61,17 @@ export default function Sponsors() {
         </div>
 
         {/* Marquee Sponsors */}
-        <div className="relative overflow-hidden bg-background rounded-lg border border-border p-8">
+        <div className="relative overflow-hidden bg-background rounded-lg border border-border p-8" onClick={()=>{window.location.href='/sponsors'}}>
           <div className="flex gap-6 animate-scroll whitespace-nowrap">
             {[...sponsors, ...sponsors].map((sponsor, index) => (
               <div
                 key={index}
                 onMouseEnter={() => setIsHovered(index)}
                 onMouseLeave={() => setIsHovered(null)}
-                className="flex-shrink-0 w-48 h-32 bg-muted rounded-lg border border-border flex flex-col items-center justify-center cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-lg hover:scale-105"
+                className="shrink-0 w-48 h-32 bg-muted rounded-lg border border-border flex flex-col items-center justify-center cursor-pointer transition-all duration-100 hover:border-primary hover:shadow-lg hover:scale-105"
               >
                 {sponsor.logo ? (
-                  <img src={sponsor.logo} alt={sponsor.name} className="w-16 h-16 object-contain mb-2" />
+                  <img src={sponsor.logo} alt={sponsor.name} className="object-contain mb-2" />
                 ) : (
                   <div className="text-3xl font-bold text-primary mb-2">🏢</div>
                 )}

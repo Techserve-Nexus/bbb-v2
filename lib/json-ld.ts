@@ -21,12 +21,12 @@ export function generateEventJsonLd() {
       },
     },
     image: [
-      'https://your-domain.com/event-image.jpg',
+      'https://shreeparashurama.com/event-image.jpg',
     ],
     organizer: {
       '@type': 'Organization',
       name: 'BBB Event Organization',
-      url: 'https://your-domain.com',
+      url: 'https://shreeparashurama.com',
     },
     offers: [
       {
@@ -35,7 +35,7 @@ export function generateEventJsonLd() {
         price: '5000',
         priceCurrency: 'INR',
         availability: 'https://schema.org/InStock',
-        url: 'https://your-domain.com/register',
+        url: 'https://shreeparashurama.com/register',
         validFrom: '2024-12-01T00:00:00+05:30',
       },
       {
@@ -44,7 +44,7 @@ export function generateEventJsonLd() {
         price: '3500',
         priceCurrency: 'INR',
         availability: 'https://schema.org/InStock',
-        url: 'https://your-domain.com/register',
+        url: 'https://shreeparashurama.com/register',
         validFrom: '2024-12-01T00:00:00+05:30',
       },
       {
@@ -53,7 +53,7 @@ export function generateEventJsonLd() {
         price: '2000',
         priceCurrency: 'INR',
         availability: 'https://schema.org/InStock',
-        url: 'https://your-domain.com/register',
+        url: 'https://shreeparashurama.com/register',
         validFrom: '2024-12-01T00:00:00+05:30',
       },
     ],
@@ -65,8 +65,8 @@ export function generateOrganizationJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'BBB Event Organization',
-    url: 'https://your-domain.com',
-    logo: 'https://your-domain.com/logo.png',
+    url: 'https://shreeparashurama.com',
+    logo: 'https://shreeparashurama.com/logo.png',
     description: 'Official organization hosting BBB Event 2025',
     sameAs: [
       'https://facebook.com/bbbevent',
@@ -88,11 +88,11 @@ export function generateWebsiteJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'BBB Event 2025',
-    url: 'https://your-domain.com',
+    url: 'https://shreeparashurama.com',
     description: 'Official registration portal for BBB Event 2025',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://your-domain.com/search?q={search_term_string}',
+      target: 'https://shreeparashurama.com/search?q={search_term_string}',
       'query-input': 'required name=search_term_string',
     },
   }
