@@ -25,13 +25,20 @@ export async function GET(req: NextRequest) {
     await connectDB()
 
     // Get settings (create default if doesn't exist)
-    let settings = await SettingsModel.findOne({})
+    let settings = await SettingsModel.findOne({"siteName": "BBB Event"})
     
     if (!settings) {
       settings = await SettingsModel.create({
         registrationEnabled: true,
         siteName: "BBB Event",
         siteDescription: "Event Registration System",
+        useRealStats: true,
+        dummyStats: {
+          totalRegistrations: 0,
+          approvedRegistrations: 0,
+          totalVisitors: 0,
+        },
+        participantsCount: 82,
       })
     }
 
@@ -41,6 +48,9 @@ export async function GET(req: NextRequest) {
         registrationEnabled: settings.registrationEnabled,
         siteName: settings.siteName,
         siteDescription: settings.siteDescription,
+        useRealStats: settings.useRealStats,
+        dummyStats: settings.dummyStats,
+        participantsCount: settings.participantsCount,
       },
     })
   } catch (error) {
@@ -72,17 +82,33 @@ export async function PUT(req: NextRequest) {
     await connectDB()
 
     const body = await req.json()
+    
+    console.log("📥 Received body:", JSON.stringify(body, null, 2))
 
     // Get or create settings
-    let settings = await SettingsModel.findOne({})
+    let settings = await SettingsModel.findOne({"siteName": "BBB Event"})
+    
+    console.log(" Existing settings found:", settings ? "YES" : "NO")
     
     if (!settings) {
+      console.log("Creating new settings document...")
       settings = await SettingsModel.create({
         registrationEnabled: body.registrationEnabled ?? true,
         siteName: body.siteName || "BBB Event",
         siteDescription: body.siteDescription || "Event Registration System",
+        useRealStats: body.useRealStats ?? true,
+        dummyStats: body.dummyStats || {
+          totalRegistrations: 0,
+          approvedRegistrations: 0,
+          totalVisitors: 0,
+        },
+        participantsCount: body.participantsCount ?? 82,
       })
+      console.log("New settings created with participantsCount:", settings.participantsCount)
     } else {
+      console.log("Updating existing settings...")
+      console.log("Current participantsCount before update:", settings.participantsCount)
+      
       // Update fields
       if (body.registrationEnabled !== undefined) {
         settings.registrationEnabled = body.registrationEnabled
@@ -93,7 +119,18 @@ export async function PUT(req: NextRequest) {
       if (body.siteDescription !== undefined) {
         settings.siteDescription = body.siteDescription
       }
+      if (body.useRealStats !== undefined) {
+        settings.useRealStats = body.useRealStats
+      }
+      if (body.dummyStats !== undefined) {
+        settings.dummyStats = body.dummyStats
+      }
+      if (body.participantsCount !== undefined) {
+        console.log(`Updating participantsCount from ${settings.participantsCount} to ${body.participantsCount}`)
+        settings.participantsCount = body.participantsCount
+      }
       await settings.save()
+      console.log(`Settings saved to database. New participantsCount: ${settings.participantsCount}`)
     }
 
     console.log(`✅ Settings updated by admin: ${auth.email}`)
@@ -105,6 +142,9 @@ export async function PUT(req: NextRequest) {
         registrationEnabled: settings.registrationEnabled,
         siteName: settings.siteName,
         siteDescription: settings.siteDescription,
+        useRealStats: settings.useRealStats,
+        dummyStats: settings.dummyStats,
+        participantsCount: settings.participantsCount,
       },
     })
   } catch (error) {

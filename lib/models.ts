@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model } from "mongoose"
-import { Registration, ChildInfo, Sponsor, Banner } from "./types"
+import { Registration, ChildInfo, Sponsor, Banner, Settings } from "./types"
 
 // Child Info Schema
 const ChildInfoSchema = new Schema<ChildInfo>({
@@ -169,12 +169,35 @@ const PaymentSchema = new Schema(
   }
 )
 
+// Visitor Schema
+const VisitorSchema = new Schema(
+  {
+    ipAddress: { type: String, required: true },
+    userAgent: { type: String },
+    page: { type: String, required: true },
+    sessionId: { type: String, required: true, index: true },
+    referrer: { type: String },
+    country: { type: String },
+    city: { type: String },
+  },
+  {
+    timestamps: true,
+  }
+)
+
 // Settings Schema
-const SettingsSchema = new Schema(
+const SettingsSchema = new Schema<Settings>(
   {
     registrationEnabled: { type: Boolean, default: true },
     siteName: { type: String, default: "BBB Event" },
     siteDescription: { type: String, default: "Event Registration System" },
+    useRealStats: { type: Boolean, default: true },
+    dummyStats: {
+      totalRegistrations: { type: Number, default: 0 },
+      approvedRegistrations: { type: Number, default: 0 },
+      totalVisitors: { type: Number, default: 0 },
+    },
+    participantsCount: { type: Number, default: 82 },
   },
   {
     timestamps: true,
@@ -200,5 +223,8 @@ export const PaymentModel =
 export const BannerModel: Model<Banner> =
   mongoose.models.Banner || mongoose.model<Banner>("Banner", BannerSchema)
 
-export const SettingsModel =
-  mongoose.models.Settings || mongoose.model("Settings", SettingsSchema)
+export const SettingsModel: Model<Settings> =
+  mongoose.models.Settings || mongoose.model<Settings>("Settings", SettingsSchema)
+
+export const VisitorModel =
+  mongoose.models.Visitor || mongoose.model("Visitor", VisitorSchema)

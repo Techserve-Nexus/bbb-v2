@@ -101,21 +101,46 @@ export default function Step1BasicAndFamily({ formData, setFormData, errors }: S
             {errors.email && <p className="text-red-500 text-sm mt-2">{errors.email}</p>}
           </div>
 
-          {/* Guest Registration Checkbox */}
+          {/* Guest/Member Registration Radio Buttons */}
           <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                name="isGuest"
-                checked={formData.isGuest || false}
-                onChange={(e) => setFormData({ ...formData, isGuest: e.target.checked })}
-                className="mt-1 w-5 h-5 rounded border-2 border-blue-400 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-              />
-              <div>
-                <span className="text-sm font-semibold text-blue-900">Register as Guest</span>
-                <p className="text-xs text-blue-700 mt-1">Check this box if you are registering as a guest attendee</p>
-              </div>
-            </label>
+            <label className="block text-sm font-semibold text-blue-900 mb-3">Registration Type *</label>
+            <div className="space-y-3">
+              {/* Register as Member (Default) */}
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="registrationType"
+                  value="member"
+                  checked={!formData.isGuest}
+                  onChange={() => setFormData({ ...formData, isGuest: false })}
+                  className="mt-1 w-5 h-5 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                />
+                <div>
+                  <span className="text-sm font-semibold text-blue-900">Register as Member</span>
+                  <p className="text-xs text-blue-700 mt-1">
+                    Free admission for children under 12 years
+                  </p>
+                </div>
+              </label>
+
+              {/* Register as Guest */}
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="registrationType"
+                  value="guest"
+                  checked={formData.isGuest || false}
+                  onChange={() => setFormData({ ...formData, isGuest: true })}
+                  className="mt-1 w-5 h-5 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                />
+                <div>
+                  <span className="text-sm font-semibold text-blue-900">Register as Guest</span>
+                  <p className="text-xs text-blue-700 mt-1">
+                    Ticket charges apply for all attendees including children under 12
+                  </p>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
 
