@@ -96,9 +96,9 @@ export default function Home() {
                     role_in_sp: "",
                     photo: "/mc-team/pawan.jpg",
                     category: "Project Management Consultancy",
-                    company_name: "Pavana Powers Technologies",
+                    company_name: "TDE Build Tech",
                     phone: "9880280484",
-                    email: "pavanapowerstechnologies@gmail.com",
+                    email: "hello@tdebuildtech.com ",
                     Description: "As a Project Management and Construction Solutions partner, they provide vendor coordination, supervision, quality checks, and smooth execution for construction projects. Their mission is to simplify construction with effective vendor management, strict quality control, and cost optimization while delivering excellence."
                   },
                   {
@@ -162,17 +162,6 @@ export default function Home() {
                     email: "snis2003@gmail.com",
                     Description: "SNIS provides industrial automation solutions, offering cable entry systems and programming ports. Serves industries including Iron & Steel, Cement, Power, Water Treatment, Paper, Rubber, and more."
                   },
-                  // {
-                  //   id: 4,
-                  //   name: "Medhini Rao",
-                  //   role_in_sp: "",
-                  //   photo: "/mc-team/medhini.jpg",
-                  //   category: "",
-                  //   company_name: "",
-                  //   phone: "",
-                  //   email: "",
-                  //   Description: ""
-                  // }
                 ]
               }
               cardHeight="h-56 md:h-64 lg:h-72"
@@ -194,7 +183,7 @@ export default function Home() {
         <CallToAction />
 
         {/* Location Map Section */}
-        <section className="  md:px-6 bg-orange-500/30">
+        <section className="md:px-6 bg-orange-500/30">
           <div className="max-w-7xl mx-auto">
             {/* <div className="text-center mb-8">
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">Event Location</h2>

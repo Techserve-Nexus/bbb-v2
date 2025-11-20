@@ -116,7 +116,7 @@ export default function Step1BasicAndFamily({ formData, setFormData, errors }: S
                   className="mt-1 w-5 h-5 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                 />
                 <div>
-                  <span className="text-sm font-semibold text-blue-900">Register as Member</span>
+                  <span className="text-sm font-semibold text-blue-900">I am a member of BBB</span>
                   <p className="text-xs text-blue-700 mt-1">
                     Free admission for children under 12 years
                   </p>
@@ -134,7 +134,7 @@ export default function Step1BasicAndFamily({ formData, setFormData, errors }: S
                   className="mt-1 w-5 h-5 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                 />
                 <div>
-                  <span className="text-sm font-semibold text-blue-900">Register as Guest</span>
+                  <span className="text-sm font-semibold text-blue-900">I am not a member of BBB</span>
                   <p className="text-xs text-blue-700 mt-1">
                     Ticket charges apply for all attendees including children under 12
                   </p>
