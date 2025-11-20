@@ -36,12 +36,8 @@ export default function Sponsors() {
 
   if (loading) {
     return (
-      <section className="py-20 px-4 md:px-6 bg-muted/30">
+      <section className="py-6 px-4 md:px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto">
-          {/* <div className="text-center mb-12">
-            <p className="text-primary font-semibold mb-2">Our sponsors</p>
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground text-balance">Sponsors</h2>
-          </div> */}
           <div className="text-center text-muted-foreground">Loading sponsors...</div>
         </div>
       </section>
@@ -53,7 +49,7 @@ export default function Sponsors() {
   }
 
   return (
-    <section className="py-20 px-4 md:px-6 bg-muted/30">
+    <section className="py-2 px-4 md:px-6 bg-muted/30">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-primary font-semibold mb-2">Our</p>
@@ -62,40 +58,31 @@ export default function Sponsors() {
 
         {/* Marquee Sponsors */}
         <div className="relative overflow-hidden bg-background rounded-lg border border-border p-8" onClick={()=>{window.location.href='/sponsors'}}>
-          <div className="flex gap-6 animate-scroll whitespace-nowrap">
-            {[...sponsors, ...sponsors].map((sponsor, index) => (
-              <div
-                key={index}
-                onMouseEnter={() => setIsHovered(index)}
-                onMouseLeave={() => setIsHovered(null)}
-                className="shrink-0 w-48 h-32 bg-muted rounded-lg border border-border flex flex-col items-center justify-center cursor-pointer transition-all duration-100 hover:border-primary hover:shadow-lg hover:scale-105"
-              >
-                {sponsor.logo ? (
-                  <img src={sponsor.logo} alt={sponsor.name} className="object-contain mb-2" />
-                ) : (
-                  <div className="text-3xl font-bold text-primary mb-2">🏢</div>
-                )}
-                <h3 className="font-semibold text-foreground text-center px-2 truncate w-full">{sponsor.name}</h3>
-                <p className="text-xs text-muted-foreground mt-1">{sponsor.category}</p>
-                {isHovered === index && sponsor.description && (
-                  <p className="text-xs text-primary mt-2 font-semibold truncate w-full px-2">{sponsor.description}</p>
-                )}
-              </div>
-            ))}
-          </div>
-          <style jsx>{`
-            @keyframes scroll {
-              0% {
-                transform: translateX(0);
-              }
-              100% {
-                transform: translateX(-50%);
-              }
-            }
-            .animate-scroll {
-              animation: scroll 3s linear infinite;
-            }
-          `}</style>
+          {/* @ts-ignore */}
+          <marquee behavior="scroll" direction="left" scrollamount="3">
+            <div className="flex gap-6">
+              {[...sponsors, ...sponsors].map((sponsor, index) => (
+                <div
+                  key={index}
+                  onMouseEnter={() => setIsHovered(index)}
+                  onMouseLeave={() => setIsHovered(null)}
+                  className="shrink-0 w-48 h-32 bg-muted rounded-lg border border-border flex flex-col items-center justify-center cursor-pointer transition-all duration-100 hover:border-primary hover:shadow-lg hover:scale-105"
+                >
+                  {sponsor.logo ? (
+                    <img src={sponsor.logo} alt={sponsor.name} className="object-contain mb-2" />
+                  ) : (
+                    <div className="text-3xl font-bold text-primary mb-2">🏢</div>
+                  )}
+                  <h3 className="font-semibold text-foreground text-center px-2 truncate w-full">{sponsor.name}</h3>
+                  <p className="text-xs text-muted-foreground mt-1">{sponsor.category}</p>
+                  {isHovered === index && sponsor.description && (
+                    <p className="text-xs text-primary mt-2 font-semibold truncate w-full px-2">{sponsor.description}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            {/* @ts-ignore */}
+          </marquee>
         </div>
       </div>
     </section>

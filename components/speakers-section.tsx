@@ -75,6 +75,14 @@ export default function SpeakersSection() {
   // Show grid if 4 or fewer speakers, carousel if more
   const useCarousel = speakers.length > 4
 
+  // Dynamic grid columns based on speaker count
+  const getGridClass = () => {
+    if (speakers.length === 1) return "grid-cols-1"
+    if (speakers.length === 2) return "grid-cols-1 sm:grid-cols-2"
+    if (speakers.length === 3) return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+    return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+  }
+
   return (
     <section className="py-16 px-4 md:px-6 bg-muted/30">
       <div className="max-w-6xl mx-auto">
@@ -85,9 +93,11 @@ export default function SpeakersSection() {
 
         {!useCarousel ? (
           /* Grid layout for 4 or fewer speakers */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className={`grid ${getGridClass()} gap-6 justify-items-center max-w-5xl mx-auto`}>
             {speakers.map((speaker) => (
-              <SpeakerCard key={speaker.id} speaker={speaker} />
+              <div key={speaker.id} className="w-full max-w-sm">
+                <SpeakerCard speaker={speaker} />
+              </div>
             ))}
           </div>
         ) : (
@@ -140,7 +150,7 @@ export default function SpeakersSection() {
 
 function SpeakerCard({ speaker }: { speaker: Speaker }) {
   return (
-    <div className="bg-background rounded-lg border border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden h-full flex flex-col">
+    <div className="bg-background rounded-lg border border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden h-full flex flex-col flex-wrap">
       {/* Speaker Photo */}
       <div className="w-full aspect-square bg-muted relative overflow-hidden">
         <img
@@ -151,10 +161,10 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
       </div>
 
       {/* Speaker Info */}
-      <div className="p-6 flex flex-col flex-grow">
+      <div className="p-6 flex flex-col grow">
         <h3 className="text-xl font-bold text-foreground mb-1">{speaker.name}</h3>
         <p className="text-sm text-primary font-semibold mb-3">{speaker.designation}</p>
-        <p className="text-sm text-muted-foreground line-clamp-3 flex-grow mb-4">
+        <p className="text-sm text-muted-foreground line-clamp-3 grow mb-4">
           {speaker.bio}
         </p>
 
