@@ -14,6 +14,7 @@ export interface Registration {
   paymentId?: string
   paymentReference?: string
   paymentScreenshotUrl?: string
+  amount?: number
   spouseName?: string
   children: ChildInfo[]
   personTickets?: PersonTicket[] // Per-person ticket selections

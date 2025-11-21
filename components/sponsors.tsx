@@ -59,7 +59,7 @@ export default function Sponsors() {
         {/* Marquee Sponsors */}
         <div className="relative overflow-hidden bg-background rounded-lg border border-border p-8" onClick={()=>{window.location.href='/sponsors'}}>
           {/* @ts-ignore */}
-          <marquee behavior="scroll" direction="left" scrollamount="3">
+          <marquee behavior="scroll" direction="left" scrollamount="10">
             <div className="flex gap-6">
               {[...sponsors, ...sponsors].map((sponsor, index) => (
                 <div

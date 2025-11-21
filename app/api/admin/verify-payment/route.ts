@@ -40,13 +40,34 @@ export async function POST(req: NextRequest) {
 
     const action = status === "success" ? "approve" : "reject"
 
-    // Calculate amount based on ticket type
-    const ticketPrices = {
-      Platinum: 3999,
-      Gold: 2999,
-      Silver: 1999,
+    // Use amount from registration (already calculated with guest/member logic)
+    let amount = (registration as any).amount || 0
+    
+    // Fallback: Calculate if amount is 0 (for old registrations without amount field)
+    if (amount === 0 && registration.personTickets && registration.personTickets.length > 0) {
+      const TICKET_PRICES: Record<string, number> = {
+        Business_Conclave: 1000,
+        Chess: 500,
+      }
+      
+      console.log("⚠️ Registration has no amount, calculating from personTickets...")
+      registration.personTickets.forEach((person: any) => {
+        const { personType, age, tickets } = person
+        tickets?.forEach((ticket: string) => {
+          const isFreeChild = !registration.isGuest && personType === "child" && age === "<12"
+          if (!isFreeChild) {
+            amount += TICKET_PRICES[ticket] || 0
+          }
+        })
+      })
+      
+      // Update registration with calculated amount
+      ;(registration as any).amount = amount
+      await registration.save()
+      console.log("✅ Calculated and saved amount:", amount)
     }
-    const amount = ticketPrices[registration.ticketType as keyof typeof ticketPrices] || 1999
+    
+    console.log("💰 Payment verification - Amount:", amount, "| Action:", action)
 
     if (action === "approve") {
       // Create payment record

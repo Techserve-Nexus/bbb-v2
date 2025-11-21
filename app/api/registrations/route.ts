@@ -61,6 +61,39 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Payment screenshot is required for manual payment" }, { status: 400 })
     }
 
+    // Calculate total amount from tickets with Guest/Member logic
+    const TICKET_PRICES: Record<string, number> = {
+      Business_Conclave: 1000,
+      Chess: 500,
+    }
+    
+    console.log("🔍 Calculating amount for registration...")
+    console.log("  - isGuest:", isGuest)
+    console.log("  - personTickets:", JSON.stringify(personTickets, null, 2))
+    
+    let totalAmount = 0
+    if (personTickets.length > 0) {
+      personTickets.forEach((person: any, index: number) => {
+        const { personType, age, tickets } = person
+        console.log(`  - Person ${index + 1}: ${person.name} (${personType}, age: ${age})`)
+        
+        tickets?.forEach((ticket: string) => {
+          // For Members: Children under 12 don't pay
+          // For Guests: Everyone pays (including children under 12)
+          const isFreeChild = !isGuest && personType === "child" && age === "<12"
+          const ticketPrice = TICKET_PRICES[ticket] || 0
+          
+          console.log(`    - Ticket: ${ticket}, Price: ₹${ticketPrice}, Free: ${isFreeChild}`)
+          
+          if (!isFreeChild) {
+            totalAmount += ticketPrice
+          }
+        })
+      })
+    }
+    
+    console.log("💰 Total amount calculated:", totalAmount)
+
     const registrationId = generateRegistrationId()
     console.log("Generated Registration ID:", registrationId)
 
@@ -81,6 +114,7 @@ export async function POST(req: NextRequest) {
       ticketType: personTickets.length > 0 && personTickets[0].tickets?.length > 0
         ? personTickets[0].tickets[0]
         : ticketTypes[0],
+      amount: totalAmount,
       paymentMethod,
       paymentStatus: paymentMethod === "razorpay" ? "pending" : "pending",
       ticketStatus: "under_review",
@@ -118,6 +152,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       registrationId: registration.registrationId,
+      amount: totalAmount,
       paymentMethod,
       message: paymentMethod === "razorpay" 
         ? "Registration created. Please complete payment." 
