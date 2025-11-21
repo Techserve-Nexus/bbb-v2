@@ -88,8 +88,16 @@ export default function Step2PerPersonTickets({ formData, setFormData, errors }:
   const calculateTotalAmount = () => {
     let total = 0
     formData.personTickets?.forEach((person: any) => {
-      person.tickets?.forEach((ticket: string) => {
-        total += TICKET_PRICES[ticket as keyof typeof TICKET_PRICES] || 0
+      const { personType, age, tickets } = person
+      
+      tickets?.forEach((ticket: string) => {
+        // For Members: Children under 12 don't pay
+        // For Guests: Everyone pays (including children under 12)
+        const isFreeChild = !formData.isGuest && personType === "child" && age === "<12"
+        
+        if (!isFreeChild) {
+          total += TICKET_PRICES[ticket as keyof typeof TICKET_PRICES] || 0
+        }
       })
     })
     return total

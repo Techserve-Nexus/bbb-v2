@@ -47,6 +47,7 @@ const RegistrationSchema = new Schema<Registration>(
     paymentId: { type: String },
     paymentReference: { type: String },
     paymentScreenshotUrl: { type: String },
+    amount: { type: Number, required: true, default: 0 },
     qrCode: { type: String },
     ticketStatus: {
       type: String,
