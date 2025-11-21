@@ -89,22 +89,28 @@ export async function GET(req: NextRequest) {
     }
 
     // Calculate total revenue (only from successful payments)
-    const ticketPrices: Record<string, number> = {
-      Business_Conclave: 2000,
-      Chess: 1000,
-    }
-
+    // Use the amount field from registrations (already calculated with guest/member logic)
     let totalRevenue = 0
     allRegistrations
       .filter((r: any) => r.paymentStatus === "success")
       .forEach((reg: any) => {
-        if (reg.personTickets && reg.personTickets.length > 0) {
+        // Use saved amount if available, otherwise calculate from tickets
+        if (reg.amount && reg.amount > 0) {
+          totalRevenue += reg.amount
+        } else if (reg.personTickets && reg.personTickets.length > 0) {
+          // Fallback calculation for old registrations without amount field
+          const TICKET_PRICES: Record<string, number> = {
+            Business_Conclave: 1000,
+            Chess: 500,
+          }
           reg.personTickets.forEach((person: any) => {
-            if (person.tickets && person.tickets.length > 0) {
-              person.tickets.forEach((ticket: string) => {
-                totalRevenue += ticketPrices[ticket] || 0
-              })
-            }
+            const { personType, age, tickets } = person
+            tickets?.forEach((ticket: string) => {
+              const isFreeChild = !reg.isGuest && personType === "child" && age === "<12"
+              if (!isFreeChild) {
+                totalRevenue += TICKET_PRICES[ticket] || 0
+              }
+            })
           })
         }
       })
@@ -153,13 +159,23 @@ export async function GET(req: NextRequest) {
       dayRegistrations
         .filter((r: any) => r.paymentStatus === "success")
         .forEach((reg: any) => {
-          if (reg.personTickets && reg.personTickets.length > 0) {
+          // Use saved amount if available, otherwise calculate from tickets
+          if (reg.amount && reg.amount > 0) {
+            dayRevenue += reg.amount
+          } else if (reg.personTickets && reg.personTickets.length > 0) {
+            // Fallback calculation for old registrations without amount field
+            const TICKET_PRICES: Record<string, number> = {
+              Business_Conclave: 1000,
+              Chess: 500,
+            }
             reg.personTickets.forEach((person: any) => {
-              if (person.tickets && person.tickets.length > 0) {
-                person.tickets.forEach((ticket: string) => {
-                  dayRevenue += ticketPrices[ticket] || 0
-                })
-              }
+              const { personType, age, tickets } = person
+              tickets?.forEach((ticket: string) => {
+                const isFreeChild = !reg.isGuest && personType === "child" && age === "<12"
+                if (!isFreeChild) {
+                  dayRevenue += TICKET_PRICES[ticket] || 0
+                }
+              })
             })
           }
         })
