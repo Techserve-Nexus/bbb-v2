@@ -40,7 +40,7 @@ export default function TicketPricing() {
                 <ul className="space-y-3 mb-8">
                   {ticket.features.map((feature, i) => (
                     <li key={i} className="flex items-center gap-3">
-                      <Check size={18} className="text-primary flex-shrink-0" />
+                      <Check size={18} className="text-primary shrink-0" />
                       <span className="text-foreground text-sm">{feature}</span>
                     </li>
                   ))}

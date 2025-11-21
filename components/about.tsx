@@ -38,7 +38,7 @@ export default function About() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-1">
                   <div className="w-3 h-3 rounded-full bg-primary" />
                 </div>
                 <div>
@@ -47,12 +47,12 @@ export default function About() {
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-1">
                   <div className="w-3 h-3 rounded-full bg-primary" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Networking</h3>
-                  <p className="text-sm text-muted-foreground">Connect with global chess community</p>
+                  <p className="text-sm text-muted-foreground">Connecting with global entrepreneurs</p>
                 </div>
               </div>
             </div>
@@ -66,7 +66,14 @@ export default function About() {
               <div className="absolute -top-4 -left-4 w-24 h-24 bg-primary/10 rounded-lg" />
               <div className="relative bg-linear-to-br from-primary/20 to-secondary/20 rounded-lg p-8 border border-primary/20">
                 <div className="grid grid-cols-2 gap-4">
-                  {["Expert Training", "Live Tournaments", "Community", "Global Stage"].map((item, i) => (
+                  {
+                  [
+                    "Experts Masterclass",
+                    "Live Tournaments", 
+                    "Exploring Synergy", 
+                    "Global Stage"
+                  ]
+                    .map((item, i) => (
                     <div key={i} className="bg-background p-4 rounded-lg text-center border border-border">
                       <p className="text-sm font-semibold text-primary">{item}</p>
                     </div>

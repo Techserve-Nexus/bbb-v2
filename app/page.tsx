@@ -66,7 +66,9 @@ export default function Home() {
 
       <main className="bg-background">
         <Navbar />
+
         <Hero />
+
         <About />
 
         {/* Chaturanga Manthana Chair Team (landing page) */}
@@ -176,10 +178,15 @@ export default function Home() {
         <JoinUsSection />
 
         <Sponsors />
+
         <TicketPricing />
+
         <ParticipantsCounter />
+
         {/* <LiveStats /> */}
+
         {/* <Testimonials /> */}
+        
         <CallToAction />
 
         {/* Location Map Section */}
