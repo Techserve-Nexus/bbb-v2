@@ -34,6 +34,7 @@ interface Registration {
   qrCode?: string
   createdAt: string
   updatedAt: string
+  amount: number
 }
 
 interface ColumnVisibility {
@@ -84,6 +85,7 @@ export default function RegistrationsList() {
   const [showVerifyModal, setShowVerifyModal] = useState(false)
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null)
   const [verifying, setVerifying] = useState(false)
+  const [verificationAction, setVerificationAction] = useState<"approve" | "reject" | null>(null)
   const [verificationData, setVerificationData] = useState({
     upiId: "",
     transactionId: "",
@@ -100,6 +102,37 @@ export default function RegistrationsList() {
 
   // Action Menu Dropdown
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null)
+  const [menuPosition, setMenuPosition] = useState<{ top?: number; bottom?: number; right: number }>({ right: 0 })
+
+  const handleActionMenuToggle = (regId: string, event: React.MouseEvent<HTMLButtonElement>) => {
+    if (openActionMenu === regId) {
+      setOpenActionMenu(null)
+      return
+    }
+    
+    // Calculate menu position relative to viewport
+    const button = event.currentTarget
+    const rect = button.getBoundingClientRect()
+    const spaceBelow = window.innerHeight - rect.bottom
+    const spaceAbove = rect.top
+    
+    // Position menu based on available space
+    if (spaceBelow < 400 && spaceAbove > spaceBelow) {
+      // Open upward
+      setMenuPosition({ 
+        bottom: window.innerHeight - rect.top,
+        right: window.innerWidth - rect.right
+      })
+    } else {
+      // Open downward
+      setMenuPosition({ 
+        top: rect.bottom,
+        right: window.innerWidth - rect.right
+      })
+    }
+    
+    setOpenActionMenu(regId)
+  }
 
   useEffect(() => {
     fetchRegistrations()
@@ -257,6 +290,7 @@ export default function RegistrationsList() {
     if (!selectedRegistration) return
 
     setVerifying(true)
+    setVerificationAction(action)
     try {
       const adminEmail = localStorage.getItem("adminEmail")
       const adminPassword = localStorage.getItem("adminPassword")
@@ -293,6 +327,7 @@ export default function RegistrationsList() {
       alert(err.message || "Failed to verify payment")
     } finally {
       setVerifying(false)
+      setVerificationAction(null)
     }
   }
 
@@ -640,11 +675,11 @@ export default function RegistrationsList() {
                     )}
                     {columnVisibility.actions && (
                       <td className="px-4 py-3">
-                        <div className="relative">
+                        <div className="relative inline-block">
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => setOpenActionMenu(openActionMenu === reg.id ? null : reg.id)}
+                            onClick={(e) => handleActionMenuToggle(reg.id, e)}
                             className="hover:bg-muted"
                           >
                             <MoreVertical className="w-4 h-4" />
@@ -659,8 +694,15 @@ export default function RegistrationsList() {
                                 onClick={() => setOpenActionMenu(null)}
                               />
                               
-                              {/* Menu */}
-                              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-border z-20">
+                              {/* Menu - Fixed positioning */}
+                              <div 
+                                className="fixed w-56 bg-white rounded-lg shadow-lg border border-border z-20 max-h-[400px] overflow-y-auto"
+                                style={{
+                                  top: menuPosition.top !== undefined ? `${menuPosition.top}px` : 'auto',
+                                  bottom: menuPosition.bottom !== undefined ? `${menuPosition.bottom}px` : 'auto',
+                                  right: `${menuPosition.right}px`
+                                }}
+                              >
                                 <div className="py-1">
                                   {/* View Details */}
                                   <button
@@ -898,7 +940,7 @@ export default function RegistrationsList() {
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white"
               >
                 <CheckCircle className="w-4 h-4 mr-2" />
-                {verifying ? "Approving..." : "Approve Payment"}
+                {verifying && verificationAction === "approve" ? "Approving..." : "Approve Payment"}
               </Button>
               <Button
                 onClick={() => handleVerifyPayment("reject")}
@@ -907,12 +949,13 @@ export default function RegistrationsList() {
                 className="flex-1 text-red-600 hover:bg-red-50 border-red-600"
               >
                 <XCircle className="w-4 h-4 mr-2" />
-                {verifying ? "Rejecting..." : "Reject Payment"}
+                {verifying && verificationAction === "reject" ? "Rejecting..." : "Reject Payment"}
               </Button>
               <Button
                 onClick={() => {
                   setShowVerifyModal(false)
                   setSelectedRegistration(null)
+                  setVerificationAction(null)
                   setVerificationData({ upiId: "", transactionId: "", verificationNotes: "" })
                 }}
                 disabled={verifying}
@@ -928,7 +971,7 @@ export default function RegistrationsList() {
       {/* Screenshot Modal */}
       {showScreenshot && (
         <div 
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-60 p-4"
           onClick={() => setShowScreenshot(false)}
         >
           <div className="relative max-w-4xl max-h-[90vh]">
@@ -1120,8 +1163,40 @@ export default function RegistrationsList() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
                   <div>
+                    <p className="text-sm text-gray-500">Total Amount</p>
+                    <p className="font-bold text-gray-900 text-xl">
+                      ₹{detailsRegistration.amount || (() => {
+                        const prices: Record<string, number> = {
+                          Business_Conclave: 1000,
+                          Chess: 500,
+                        }
+                        let total = 0
+                        if (detailsRegistration.personTickets && detailsRegistration.personTickets.length > 0) {
+                          detailsRegistration.personTickets.forEach((person: any) => {
+                            const { personType, age, tickets } = person
+                            
+                            tickets?.forEach((ticket: string) => {
+                              // For Members: Children under 12 don't pay
+                              // For Guests: Everyone pays (including children under 12)
+                              const isFreeChild = !detailsRegistration.isGuest && personType === "child" && age === "<12"
+                              
+                              if (!isFreeChild) {
+                                total += prices[ticket] || 0
+                              }
+                            })
+                          })
+                        }
+                        return total
+                      })()}
+                    </p>
+                  </div>
+                  <div>
                     <p className="text-sm text-gray-500">Payment Method</p>
-                    <p className="font-medium text-gray-900 capitalize">{detailsRegistration.paymentMethod || "N/A"}</p>
+                    <p className="font-medium text-gray-900 capitalize">
+                      {detailsRegistration.paymentMethod === "razorpay" ? "Razorpay" : 
+                       detailsRegistration.paymentMethod === "manual" ? "Manual" : 
+                       detailsRegistration.paymentScreenshotUrl ? "Manual" : "Razorpay"}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Payment Status</p>
@@ -1141,7 +1216,10 @@ export default function RegistrationsList() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => openScreenshot(detailsRegistration.paymentScreenshotUrl!)}
+                        onClick={() => {
+                          setShowDetailsModal(false)
+                          openScreenshot(detailsRegistration.paymentScreenshotUrl!)
+                        }}
                         className="text-blue-600"
                       >
                         <Eye className="w-4 h-4 mr-2" />

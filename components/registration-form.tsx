@@ -232,8 +232,16 @@ export default function RegistrationForm() {
     }
     let total = 0
     personTickets?.forEach((person: any) => {
-      person.tickets?.forEach((ticket: string) => {
-        total += prices[ticket] || 0
+      const { personType, age, tickets } = person
+      
+      tickets?.forEach((ticket: string) => {
+        // For Members: Children under 12 don't pay
+        // For Guests: Everyone pays (including children under 12)
+        const isFreeChild = !formData.isGuest && personType === "child" && age === "<12"
+        
+        if (!isFreeChild) {
+          total += prices[ticket] || 0
+        }
       })
     })
     return total
