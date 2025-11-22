@@ -162,6 +162,17 @@ export default function Home() {
                     email: "snis2003@gmail.com",
                     Description: "SNIS provides industrial automation solutions, offering cable entry systems and programming ports. Serves industries including Iron & Steel, Cement, Power, Water Treatment, Paper, Rubber, and more."
                   },
+                  {
+                    id: 4,
+                    name: "Medini Rao",
+                    role_in_sp: "Chapter director, Shree Parashurama",
+                    photo: "/mc-team/medini.jpg",
+                    category: "",
+                    company_name: "Zest Kitchens",
+                    phone: "",
+                    email: "",
+                    Description: ""
+                  },
                 ]
               }
               cardHeight="h-56 md:h-64 lg:h-72"

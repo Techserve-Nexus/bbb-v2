@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Mail, Phone, Building2, User } from "lucide-react"
 
 type TeamMember = {
@@ -23,86 +23,125 @@ export default function TeamCarousel({
   cardHeight?: string
 }) {
   const [index, setIndex] = useState(0)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const next = () => setIndex((p) => (p + 1) % items.length)
   const prev = () => setIndex((p) => (p - 1 + items.length) % items.length)
 
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -320, behavior: 'smooth' })
+    }
+  }
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 320, behavior: 'smooth' })
+    }
+  }
+
   return (
     <div>
-      {/* Desktop / Tablet Grid */}
-      <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {items.map((member) => (
-          <div
-            key={member.id}
-            className="bg-background rounded-xl border border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden group"
+      {/* Desktop / Tablet Horizontal Scroll */}
+      <div className="hidden md:block">
+        <div className="relative">
+          {/* Left Arrow */}
+          <button
+            onClick={scrollLeft}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-primary/90 hover:bg-primary text-white p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+            aria-label="Scroll left"
           >
-            {/* Photo Section */}
-            <div className="relative w-full aspect-square bg-linear-to-br from-primary/10 to-secondary/10 overflow-hidden">
-              {member.photo ? (
-                <img
-                  src={member.photo}
-                  alt={member.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <User size={64} className="text-primary/30" />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          {/* Right Arrow */}
+          <button
+            onClick={scrollRight}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-primary/90 hover:bg-primary text-white p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+            aria-label="Scroll right"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          <div ref={scrollContainerRef} className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
+            {items.map((member) => (
+              <div
+                key={member.id}
+                className="shrink-0 w-80 bg-background rounded-xl border border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden group"
+              >
+                {/* Photo Section */}
+                <div className="relative w-full aspect-square bg-linear-to-br from-primary/10 to-secondary/10 overflow-hidden">
+                  {member.photo ? (
+                    <img
+                      src={member.photo}
+                      alt={member.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <User size={64} className="text-primary/30" />
+                    </div>
+                  )}
+                  {/* Category Badge */}
+                  {member.category && (
+                    <div className="absolute top-3 right-3 bg-primary/90 backdrop-blur-sm text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                      {member.category}
+                    </div>
+                  )}
                 </div>
-              )}
-              {/* Category Badge */}
-              {member.category && (
-                <div className="absolute top-3 right-3 bg-primary/90 backdrop-blur-sm text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-                  {member.category}
-                </div>
-              )}
-            </div>
 
-            {/* Info Section */}
-            <div className="p-5 space-y-3">
-              <div>
-                <h3 className="text-lg font-bold text-foreground line-clamp-1">
-                  {member.name}
-                </h3>
-                <p className="text-sm text-primary font-semibold mt-1 line-clamp-1">
-                  {member.role_in_sp}
-                </p>
-              </div>
-
-              {member.company_name && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Building2 size={14} className="shrink-0" />
-                  <span className="line-clamp-1">{member.company_name}</span>
-                </div>
-              )}
-
-              {member.Description && (
-                <p className="text-xs text-muted-foreground line-clamp-2">
-                  {member.Description}
-                </p>
-              )}
-
-              {/* Contact Info */}
-              <div className="pt-2 space-y-1 border-t border-border">
-                {member.phone && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
-                    <Phone size={12} className="shrink-0" />
-                    <a href={`tel:${member.phone}`} className="line-clamp-1">
-                      {member.phone}
-                    </a>
+                {/* Info Section */}
+                <div className="p-5 space-y-3">
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground line-clamp-1">
+                      {member.name}
+                    </h3>
+                    <p className="text-sm text-primary font-semibold mt-1 line-clamp-1">
+                      {member.role_in_sp}
+                    </p>
                   </div>
-                )}
-                {member.email && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
-                    <Mail size={12} className="shrink-0" />
-                    <a href={`mailto:${member.email}`} className="line-clamp-1">
-                      {member.email}
-                    </a>
+
+                  {member.company_name && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Building2 size={14} className="shrink-0" />
+                      <span className="line-clamp-1">{member.company_name}</span>
+                    </div>
+                  )}
+
+                  {member.Description && (
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {member.Description}
+                    </p>
+                  )}
+
+                  {/* Contact Info */}
+                  <div className="pt-2 space-y-1 border-t border-border">
+                    {member.phone && (
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
+                        <Phone size={12} className="shrink-0" />
+                        <a href={`tel:${member.phone}`} className="line-clamp-1">
+                          {member.phone}
+                        </a>
+                      </div>
+                    )}
+                    {member.email && (
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
+                        <Mail size={12} className="shrink-0" />
+                        <a href={`mailto:${member.email}`} className="line-clamp-1">
+                          {member.email}
+                        </a>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
 
       {/* Mobile carousel */}
