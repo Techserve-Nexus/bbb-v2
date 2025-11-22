@@ -26,7 +26,7 @@ export const TICKET_OPTIONS = [
     features: [
       "Master Class from Industry Experts", 
       "Business Connects", 
-      "Food for business conclave "
+      "Executive Lunch, High Tea & Dinner"
     ],
   },
   {
