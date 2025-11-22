@@ -51,8 +51,8 @@ export default function About() {
                   <div className="w-3 h-3 rounded-full bg-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">Connecting with global entrepreneurs</h3>
-                  <p className="text-sm text-muted-foreground">Connect with global chess community</p>
+                  <h3 className="font-semibold text-foreground">Networking</h3>
+                  <p className="text-sm text-muted-foreground">Connecting with global entrepreneurs</p>
                 </div>
               </div>
             </div>
