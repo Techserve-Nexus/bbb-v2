@@ -235,7 +235,7 @@ export default function Home() {
                     id: 4,
                     name: "Medini Rao",
                     role_in_sp: "Chapter director, Shree Parashurama",
-                    photo: "/mc-team/medini.jpg",
+                    photo: "/mc-team/Medini.jpg",
                     category: "",
                     company_name: "Zest Kitchens",
                     phone: "",
