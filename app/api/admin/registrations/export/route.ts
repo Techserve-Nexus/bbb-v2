@@ -37,7 +37,8 @@ export async function GET(req: NextRequest) {
       "Contact",
       "Chapter Name",
       "Category",
-      "Ticket Type",
+      "Referred By",
+      "Ticket Type(s)",
       "Payment Status",
       "Ticket Status",
       "Payment Reference",
@@ -72,7 +73,11 @@ export async function GET(req: NextRequest) {
         reg.contactNo || "",
         reg.chapterName || "",
         reg.category || "",
-        reg.ticketType || "",
+        reg.referredBy || "",
+        // Prefer the flattened list of ticket types (all selected tickets). Fallback to legacy `ticketType`.
+        (reg.ticketTypes && reg.ticketTypes.length > 0)
+          ? reg.ticketTypes.join(", ")
+          : reg.ticketType || "",
         reg.paymentStatus || "",
         reg.ticketStatus || "active",
         reg.paymentReference || "",
