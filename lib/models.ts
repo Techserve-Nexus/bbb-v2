@@ -25,6 +25,7 @@ const RegistrationSchema = new Schema<Registration>(
     contactNo: { type: String, required: true },
     email: { type: String, required: true },
     isGuest: { type: Boolean, default: false },
+    referredBy: { type: String },
     spouseName: { type: String },
     children: [ChildInfoSchema],
     personTickets: [PersonTicketSchema], // New field for per-person ticket selections

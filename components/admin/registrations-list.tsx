@@ -15,6 +15,7 @@ interface Registration {
   category: string
   ticketType: string
   isGuest?: boolean
+  referredBy?: string
   personTickets?: Array<{
     personType: "self" | "spouse" | "child"
     name: string
@@ -1057,6 +1058,12 @@ export default function RegistrationsList() {
                     <p className="text-sm text-gray-500">Category</p>
                     <p className="font-medium text-gray-900">{detailsRegistration.category}</p>
                   </div>
+                  {detailsRegistration.referredBy && (
+                    <div>
+                      <p className="text-sm text-gray-500">Referred By</p>
+                      <p className="font-medium text-gray-900">{detailsRegistration.referredBy}</p>
+                    </div>
+                  )}
                   {detailsRegistration.spouseName && (
                     <div>
                       <p className="text-sm text-gray-500">Spouse Name</p>

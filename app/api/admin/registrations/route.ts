@@ -137,6 +137,7 @@ export async function GET(req: NextRequest) {
       spouseName: reg.spouseName,
       children: reg.children,
       personTickets: reg.personTickets || [],
+      referredBy: reg.referredBy,
       participations: reg.participations,
       conclavGroups: reg.conclavGroups,
       qrCode: reg.qrCode,

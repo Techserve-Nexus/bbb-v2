@@ -24,6 +24,7 @@ interface FormData {
   contactNo: string
   email: string
   isGuest?: boolean
+  referredBy?: string
   spouseName?: string
   children: Array<{ name: string; age: "<12" | ">12" }>
 
@@ -48,6 +49,7 @@ export default function RegistrationForm() {
     contactNo: "",
     email: "",
     isGuest: false,
+    referredBy: "",
     spouseName: "",
     children: [
       { name: "", age: "<12" },
@@ -116,6 +118,11 @@ export default function RegistrationForm() {
       newErrors.email = "Please enter a valid email"
     }
 
+    // If registering as Guest, Referred By is required
+    if (formData.isGuest && !(formData.referredBy || "").trim()) {
+      newErrors.referredBy = "Please specify who referred you"
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -179,6 +186,7 @@ export default function RegistrationForm() {
         contactNo: formData.contactNo,
         email: formData.email,
         isGuest: formData.isGuest || false,
+        referredBy: formData.referredBy || undefined,
         spouseName: formData.spouseName || undefined,
         children: formData.children.filter(child => child.name.trim() !== ""),
         personTickets: formData.personTickets,
@@ -398,6 +406,7 @@ export default function RegistrationForm() {
                 category: "",
                 contactNo: "",
                 email: "",
+                referredBy: "",
                 spouseName: "",
                 children: [
                   { name: "", age: "<12" },
