@@ -1,7 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import useEmblaCarousel from "embla-carousel-react"
+import { useEffect, useRef, useState } from "react"
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Speaker } from "@/lib/types"
@@ -9,16 +8,7 @@ import type { Speaker } from "@/lib/types"
 export default function SpeakersSection() {
   const [speakers, setSpeakers] = useState<Speaker[]>([])
   const [loading, setLoading] = useState(true)
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: "start",
-    slidesToScroll: 1,
-    breakpoints: {
-      "(min-width: 1024px)": { slidesToScroll: 4 },
-      "(min-width: 768px)": { slidesToScroll: 2 },
-    },
-  })
-
+  const scrollRef = useRef<HTMLDivElement | null>(null)
   const [canScrollPrev, setCanScrollPrev] = useState(false)
   const [canScrollNext, setCanScrollNext] = useState(false)
 
@@ -26,22 +16,41 @@ export default function SpeakersSection() {
     fetchSpeakers()
   }, [])
 
+  // Update scroll button availability based on container scroll position
   useEffect(() => {
-    if (!emblaApi) return
+    const el = scrollRef.current
+    if (!el) return
 
-    const updateButtons = () => {
-      setCanScrollPrev(emblaApi.canScrollPrev())
-      setCanScrollNext(emblaApi.canScrollNext())
+    const update = () => {
+      setCanScrollPrev(el.scrollLeft > 0)
+      setCanScrollNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 1)
     }
 
-    emblaApi.on("select", updateButtons)
-    emblaApi.on("init", updateButtons)
-    emblaApi.on("reInit", updateButtons)
+    update()
+    el.addEventListener("scroll", update)
+    window.addEventListener("resize", update)
+
+    // Also observe size/content changes (images loading) using ResizeObserver
+    let ro: ResizeObserver | null = null
+    try {
+      ro = new ResizeObserver(() => update())
+      ro.observe(el)
+    } catch (e) {
+      // ResizeObserver may not be available in some runtimes; ignore
+    }
+
+    // Fallback: call update after short delays to catch late image loads
+    const t1 = setTimeout(update, 300)
+    const t2 = setTimeout(update, 1000)
 
     return () => {
-      emblaApi.off("select", updateButtons)
+      el.removeEventListener("scroll", update)
+      window.removeEventListener("resize", update)
+      if (ro) ro.disconnect()
+      clearTimeout(t1)
+      clearTimeout(t2)
     }
-  }, [emblaApi])
+  }, [speakers])
 
   const fetchSpeakers = async () => {
     try {
@@ -55,8 +64,17 @@ export default function SpeakersSection() {
     }
   }
 
-  const scrollPrev = () => emblaApi?.scrollPrev()
-  const scrollNext = () => emblaApi?.scrollNext()
+  const scrollPrev = () => {
+    const el = scrollRef.current
+    if (!el) return
+    el.scrollBy({ left: -Math.max(el.clientWidth * 0.7, 320), behavior: "smooth" })
+  }
+
+  const scrollNext = () => {
+    const el = scrollRef.current
+    if (!el) return
+    el.scrollBy({ left: Math.max(el.clientWidth * 0.7, 320), behavior: "smooth" })
+  }
 
   if (loading) {
     return (
@@ -101,14 +119,14 @@ export default function SpeakersSection() {
             ))}
           </div>
         ) : (
-          /* Carousel for more than 4 speakers */
-          <div className="relative">
-            <div className="overflow-hidden" ref={emblaRef}>
-              <div className="flex gap-6">
+          /* Carousel for more than 4 speakers (horizontal scroll like MC team) */
+          <div className="relative group">
+            <div className="overflow-hidden">
+              <div ref={scrollRef} className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
                 {speakers.map((speaker) => (
                   <div
                     key={speaker.id}
-                    className="flex-[0_0_100%] min-w-0 sm:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(25%-18px)]"
+                    className="shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] min-w-0"
                   >
                     <SpeakerCard speaker={speaker} />
                   </div>
@@ -116,30 +134,51 @@ export default function SpeakersSection() {
               </div>
             </div>
 
-            {/* Navigation Buttons */}
+            {/* Overlay left/right arrows (desktop only) */}
             {speakers.length > 4 && (
-              <div className="flex justify-center gap-4 mt-8">
-                <Button
-                  variant="outline"
-                  size="icon"
+              <>
+                <button
                   onClick={scrollPrev}
                   disabled={!canScrollPrev}
-                  className="rounded-full"
-                  aria-label="Previous speakers"
+                  aria-label="Scroll left"
+                  className={`hidden md:inline-flex items-center justify-center absolute left-3 top-1/2 z-10 bg-primary/90 text-white p-3 rounded-full shadow-lg transition-all duration-200 transform -translate-y-1/2 -translate-x-2 opacity-0 pointer-events-none group-hover:translate-x-0 group-hover:opacity-100 group-hover:pointer-events-auto hover:scale-110 ${!canScrollPrev ? "group-hover:opacity-40" : ""}`}
                 >
-                  <ChevronLeft size={20} />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
+                  <ChevronLeft size={18} />
+                </button>
+
+                <button
                   onClick={scrollNext}
                   disabled={!canScrollNext}
-                  className="rounded-full"
-                  aria-label="Next speakers"
+                  aria-label="Scroll right"
+                  className={`hidden md:inline-flex items-center justify-center absolute right-3 top-1/2 z-10 bg-primary/90 text-white p-3 rounded-full shadow-lg transition-all duration-200 transform -translate-y-1/2 translate-x-2 opacity-0 pointer-events-none group-hover:translate-x-0 group-hover:opacity-100 group-hover:pointer-events-auto hover:scale-110 ${!canScrollNext ? "group-hover:opacity-40" : ""}`}
                 >
-                  <ChevronRight size={20} />
-                </Button>
-              </div>
+                  <ChevronRight size={18} />
+                </button>
+
+                {/* Fallback centered buttons for small screens (kept for accessibility) */}
+                <div className="flex justify-center gap-4 mt-8 md:hidden">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={scrollPrev}
+                    disabled={!canScrollPrev}
+                    className="rounded-full"
+                    aria-label="Previous speakers"
+                  >
+                    <ChevronLeft size={20} />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={scrollNext}
+                    disabled={!canScrollNext}
+                    className="rounded-full"
+                    aria-label="Next speakers"
+                  >
+                    <ChevronRight size={20} />
+                  </Button>
+                </div>
+              </>
             )}
           </div>
         )}

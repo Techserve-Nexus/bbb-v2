@@ -43,7 +43,8 @@ export const uploadToCloudinary = async (
     }
   } catch (error) {
     console.error("Cloudinary upload error:", error)
-    throw new Error("Failed to upload image to Cloudinary")
+    const underlying = error instanceof Error ? error.message : String(error)
+    throw new Error(`Failed to upload image to Cloudinary: ${underlying}`)
   }
 }
 
@@ -55,7 +56,8 @@ export const deleteFromCloudinary = async (publicId: string): Promise<void> => {
     console.log("Image deleted from Cloudinary:", publicId)
   } catch (error) {
     console.error("Cloudinary delete error:", error)
-    throw new Error("Failed to delete image from Cloudinary")
+    const underlying = error instanceof Error ? error.message : String(error)
+    throw new Error(`Failed to delete image from Cloudinary: ${underlying}`)
   }
 }
 
