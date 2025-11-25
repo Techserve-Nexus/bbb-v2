@@ -140,6 +140,22 @@ export default function Step1BasicAndFamily({ formData, setFormData, errors }: S
                   </p>
                 </div>
               </label>
+              {/* Show Referred By when guest is selected */}
+              {formData.isGuest && (
+                <div className="mt-3">
+                  <label className="block text-sm font-semibold text-foreground mb-2">Referred by *</label>
+                  <input
+                    type="text"
+                    name="referredBy"
+                    value={formData.referredBy || ""}
+                    onChange={(e) => setFormData({ ...formData, referredBy: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none bg-background text-foreground placeholder-muted-foreground transition-colors"
+                    placeholder=""
+                  />
+                  {errors.referredBy && <p className="text-red-500 text-sm mt-2">{errors.referredBy}</p>}
+                  {/* Note: Validation message displayed by parent via errors.referredBy */}
+                </div>
+              )}
             </div>
           </div>
         </div>

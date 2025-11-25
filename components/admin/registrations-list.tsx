@@ -15,6 +15,7 @@ interface Registration {
   category: string
   ticketType: string
   isGuest?: boolean
+  referredBy?: string
   personTickets?: Array<{
     personType: "self" | "spouse" | "child"
     name: string
@@ -42,6 +43,7 @@ interface ColumnVisibility {
   name: boolean
   contact: boolean
   chapter: boolean
+  referredBy: boolean
   ticket: boolean
   payment: boolean
   ticketStatus: boolean
@@ -74,6 +76,7 @@ export default function RegistrationsList() {
     name: true,
     contact: true,
     chapter: true,
+    referredBy: true,
     ticket: true,
     payment: true,
     ticketStatus: true,
@@ -513,6 +516,15 @@ export default function RegistrationsList() {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
+                  checked={columnVisibility.referredBy}
+                  onChange={(e) => setColumnVisibility({ ...columnVisibility, referredBy: e.target.checked })}
+                  className="rounded"
+                />
+                <span className="text-sm">Referred By</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
                   checked={columnVisibility.chapter}
                   onChange={(e) => setColumnVisibility({ ...columnVisibility, chapter: e.target.checked })}
                   className="rounded"
@@ -589,6 +601,7 @@ export default function RegistrationsList() {
                   {columnVisibility.contact && <th className="px-4 py-3 text-left text-sm font-semibold">Contact</th>}
                   {columnVisibility.chapter && <th className="px-4 py-3 text-left text-sm font-semibold">Chapter</th>}
                   {columnVisibility.ticket && <th className="px-4 py-3 text-left text-sm font-semibold">Ticket</th>}
+                  {columnVisibility.referredBy && <th className="px-4 py-3 text-left text-sm font-semibold">Referred By</th>}
                   {columnVisibility.payment && <th className="px-4 py-3 text-left text-sm font-semibold">Payment</th>}
                   {columnVisibility.ticketStatus && <th className="px-4 py-3 text-left text-sm font-semibold">Ticket Status</th>}
                   {columnVisibility.date && <th className="px-4 py-3 text-left text-sm font-semibold">Date</th>}
@@ -653,6 +666,9 @@ export default function RegistrationsList() {
                           <span className="text-sm font-medium">{reg.ticketType}</span>
                         )}
                       </td>
+                    )}
+                    {columnVisibility.referredBy && (
+                      <td className="px-4 py-3 text-sm">{reg.referredBy || "-"}</td>
                     )}
                     {columnVisibility.payment && (
                       <td className="px-4 py-3">
@@ -1057,6 +1073,12 @@ export default function RegistrationsList() {
                     <p className="text-sm text-gray-500">Category</p>
                     <p className="font-medium text-gray-900">{detailsRegistration.category}</p>
                   </div>
+                  {detailsRegistration.referredBy && (
+                    <div>
+                      <p className="text-sm text-gray-500">Referred By</p>
+                      <p className="font-medium text-gray-900">{detailsRegistration.referredBy}</p>
+                    </div>
+                  )}
                   {detailsRegistration.spouseName && (
                     <div>
                       <p className="text-sm text-gray-500">Spouse Name</p>

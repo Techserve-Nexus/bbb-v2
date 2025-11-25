@@ -58,25 +58,48 @@ const getEmailFooter = () => {
 }
 
 // Email configuration for serverless environment
+const SMTP_HOST = process.env.SMTP_HOST || "smtp.gmail.com"
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587")
+const SMTP_USER = process.env.SMTP_USER
+const SMTP_PASSWORD = process.env.SMTP_PASSWORD
+
+// For port 465 use secure=true, otherwise secure=false (STARTTLS)
 const SMTP_CONFIG = {
-  host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: parseInt(process.env.SMTP_PORT || "587"),
-  secure: true, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
+  host: SMTP_HOST,
+  port: SMTP_PORT,
+  secure: SMTP_PORT === 465,
+  auth: SMTP_USER && SMTP_PASSWORD ? { user: SMTP_USER, pass: SMTP_PASSWORD } : undefined,
   // Important for serverless
   pool: false, // Disable connection pooling
   maxConnections: 1,
   maxMessages: 1,
+  // Allow insecure TLS for some providers if necessary (don't reject self-signed)
+  tls: { rejectUnauthorized: false },
 }
-console.log("SMTP Config:", SMTP_CONFIG);
+
+console.log("SMTP Config:", { host: SMTP_CONFIG.host, port: SMTP_CONFIG.port, secure: SMTP_CONFIG.secure, hasAuth: !!SMTP_CONFIG.auth })
 
 // Create transporter with timeout handling
 export const createTransporter = () => {
   try {
-    return nodemailer.createTransport(SMTP_CONFIG)
+    // Validate essential credentials early to give helpful errors in production
+    if (!SMTP_CONFIG.auth || !SMTP_CONFIG.auth.user || !SMTP_CONFIG.auth.pass) {
+      console.error("Email transporter missing SMTP credentials. Set SMTP_USER and SMTP_PASSWORD in env.")
+      throw new Error("Email service not configured: missing SMTP credentials")
+    }
+
+    const transporter = nodemailer.createTransport(SMTP_CONFIG)
+
+    // Optionally verify transporter connectivity immediately to surface config errors
+    transporter.verify((err, success) => {
+      if (err) {
+        console.error("Email transporter verification failed:", err)
+      } else {
+        console.log("Email transporter verified")
+      }
+    })
+
+    return transporter
   } catch (error) {
     console.error("Failed to create email transporter:", error)
     throw new Error("Email service configuration error")
@@ -115,9 +138,9 @@ export const sendEmail = async ({
   }
 
   try {
-    // Set timeout for serverless (max 10 seconds)
+    // Set timeout for serverless (max 15 seconds)
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Email send timeout")), 10000)
+      setTimeout(() => reject(new Error("Email send timeout")), 15000)
     )
 
     const sendPromise = transporter.sendMail(mailOptions)
@@ -127,13 +150,14 @@ export const sendEmail = async ({
     console.log("Email sent successfully:", { to, subject, messageId: (info as any).messageId })
     
     // Close connection (important for serverless)
-    transporter.close()
+    try { transporter.close() } catch (e) {}
     
     return { success: true, messageId: (info as any).messageId }
   } catch (error) {
     console.error("Email send error:", error)
-    transporter.close()
-    throw error
+    try { transporter.close() } catch (e) {}
+    // Re-throw with clearer message
+    throw new Error(error instanceof Error ? error.message : String(error))
   }
 }
 
