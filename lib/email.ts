@@ -1,6 +1,16 @@
 import nodemailer from "nodemailer"
 import emailConfig from "./email-config.json"
 
+// Event details to display in emails (highlighted)
+const EVENT_TITLE = 'Chaturanga Manthana 2025'
+const EVENT_DATE_AND_VENUE_HTML = `
+  <p style="margin:8px 0 0;">
+    <span style="display:inline-block;padding:8px 12px;background:#FFFBEB;border-radius:20px;border:1px solid #FFE4B5;color:#FF6B35;font-weight:700;font-size:14px;">
+      13th &amp; 14th December 2025 • Nandi Link Grounds, Bengaluru
+    </span>
+  </p>
+`
+
 // Helper function to replace placeholders in strings
 const replacePlaceholders = (text: string, data: Record<string, string>) => {
   return text.replace(/\{(\w+)\}/g, (match, key) => data[key] || match)
@@ -19,6 +29,7 @@ const getEmailHeader = (title: string) => {
           <p style="margin: 0; font-size: 18px; color: rgba(255,255,255,0.95); font-weight: 500;">
             ${emailConfig.organization.name}
           </p>
+          ${EVENT_DATE_AND_VENUE_HTML}
         </td>
       </tr>
     </table>
@@ -264,7 +275,8 @@ export const getRegistrationEmailTemplate = ({
   <div class="container">
     <div class="header">
       <h1>🎉 Registration Successful!</h1>
-      <p style="margin: 10px 0 0;">Chaturanga Manthana 2025</p>
+      <p style="margin: 10px 0 0; font-size:18px; font-weight:600;">${EVENT_TITLE}</p>
+      ${EVENT_DATE_AND_VENUE_HTML}
     </div>
     
     <div class="content">
@@ -362,9 +374,10 @@ export const getPaymentVerifiedEmailTemplate = ({
               <h1 style="margin: 0 0 10px; font-size: 32px; font-weight: 700; color: #ffffff;">
                 ❌ Payment Not Verified
               </h1>
-              <p style="margin: 0; font-size: 18px; color: rgba(255,255,255,0.95);">
-                Action Required
-              </p>
+                <p style="margin: 0; font-size: 18px; color: rgba(255,255,255,0.95);">
+                  Action Required
+                </p>
+                ${EVENT_DATE_AND_VENUE_HTML}
             </td>
           </tr>
           
@@ -456,7 +469,7 @@ export const getPaymentVerifiedEmailTemplate = ({
                 Need Help?
               </p>
               <p style="margin: 0; font-size: 14px; color: #a1a1aa;">
-                Email: <a href="mailto:techserve.developer@gmail.com" style="color: #FF6B35; text-decoration: none;">techserve.developer@gmail.com</a>
+                Email: <a href="mailto:bbbshreeparashurama@gmail.com" style="color: #FF6B35; text-decoration: none;">bbbshreeparashurama@gmail.com</a>
               </p>
               <p style="margin: 15px 0 0; font-size: 13px; color: #a1a1aa; border-top: 1px solid #e4e4e7; padding-top: 15px;">
                 &copy; 2025 Chaturanga Manthana. All rights reserved.
@@ -501,6 +514,7 @@ export const getPaymentVerifiedEmailTemplate = ({
               <p style="margin: 0; font-size: 18px; color: rgba(255,255,255,0.95);">
                 Your registration is confirmed!
               </p>
+              ${EVENT_DATE_AND_VENUE_HTML}
             </td>
           </tr>
           
@@ -614,7 +628,7 @@ export const getPaymentVerifiedEmailTemplate = ({
                 Questions or Concerns?
               </p>
               <p style="margin: 0; font-size: 14px; color: #a1a1aa;">
-                Contact us: <a href="mailto:techserve.developer@gmail.com" style="color: #FF6B35; text-decoration: none;">techserve.developer@gmail.com</a>
+                Contact us: <a href="mailto:bbbshreeparashurama@gmail.com" style="color: #FF6B35; text-decoration: none;">bbbshreeparashurama@gmail.com</a>
               </p>
               <p style="margin: 15px 0 0; font-size: 13px; color: #a1a1aa; border-top: 1px solid #e4e4e7; padding-top: 15px;">
                 &copy; 2025 Chaturanga Manthana. All rights reserved.
