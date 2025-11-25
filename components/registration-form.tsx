@@ -63,6 +63,7 @@ export default function RegistrationForm() {
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [validationAlert, setValidationAlert] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState("")
@@ -124,38 +125,94 @@ export default function RegistrationForm() {
     }
 
     setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return { valid: Object.keys(newErrors).length === 0, newErrors }
   }
 
   const validateStep2 = () => {
     const newErrors: Record<string, string> = {}
-    
+
     // Check if at least one person has selected at least one ticket
     const hasAnyTicket = formData.personTickets?.some(p => p.tickets && p.tickets.length > 0)
-    
+
     if (!hasAnyTicket) {
       newErrors.personTickets = "Please select at least one ticket for any person"
     }
-    
+
     setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return { valid: Object.keys(newErrors).length === 0, newErrors }
   }
 
   const validateStep3 = () => {
     const newErrors: Record<string, string> = {}
-    
+
     // Only validate screenshot for manual payment
     if (formData.paymentMethod === "manual" && !formData.paymentScreenshotUrl) {
       newErrors.paymentScreenshot = "Please upload payment screenshot"
     }
-    
+
     setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return { valid: Object.keys(newErrors).length === 0, newErrors }
+  }
+
+  // Auto-hide validation alert after a short time
+  useEffect(() => {
+    if (!validationAlert) return
+    const t = setTimeout(() => setValidationAlert(""), 4000)
+    return () => clearTimeout(t)
+  }, [validationAlert])
+
+  const focusFirstError = (newErrors: Record<string, string>) => {
+    const keys = Object.keys(newErrors)
+    if (!keys.length) return
+    const firstKey = keys[0]
+
+    // If error pertains to step 2 or 3, switch to that step first
+    if (firstKey === "personTickets") {
+      setCurrentStep(2)
+      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50)
+      return
+    }
+    if (firstKey === "paymentScreenshot") {
+      setCurrentStep(3)
+      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50)
+      return
+    }
+
+    // Default: focus input by name on step 1
+    setCurrentStep(1)
+    setTimeout(() => {
+      try {
+        const el = document.querySelector(`[name="${firstKey}"]`) as HTMLElement | null
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" })
+          ;(el as any).focus?.()
+        } else {
+          window.scrollTo({ top: 0, behavior: "smooth" })
+        }
+      } catch (e) {
+        // ignore
+      }
+    }, 80)
   }
 
   const handleNext = () => {
-    if (currentStep === 1 && !validateStep1()) return
-    if (currentStep === 2 && !validateStep2()) return
+    if (currentStep === 1) {
+      const { valid, newErrors } = validateStep1()
+      if (!valid) {
+        setValidationAlert("Please fix the highlighted fields to continue")
+        focusFirstError(newErrors)
+        return
+      }
+    }
+
+    if (currentStep === 2) {
+      const { valid, newErrors } = validateStep2()
+      if (!valid) {
+        setValidationAlert("Please select at least one ticket to continue")
+        focusFirstError(newErrors)
+        return
+      }
+    }
 
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1)
@@ -172,7 +229,12 @@ export default function RegistrationForm() {
 
   const handleSubmit = async () => {
     // Validate Step 3 (Payment)
-    if (!validateStep3()) return
+    const { valid, newErrors } = validateStep3()
+    if (!valid) {
+      setValidationAlert("Please fix the highlighted fields before submitting")
+      focusFirstError(newErrors)
+      return
+    }
 
     setIsSubmitting(true)
     setSubmitError("")
@@ -452,6 +514,12 @@ export default function RegistrationForm() {
           </div>
 
           {/* Error Message */}
+          {validationAlert && (
+            <div className="bg-yellow-50 border border-yellow-300 text-yellow-900 p-4 rounded-lg mb-4">
+              <p className="font-semibold">Please check:</p>
+              <p>{validationAlert}</p>
+            </div>
+          )}
           {submitError && (
             <div className="bg-red-50 border border-red-500 text-red-700 p-4 rounded-lg mb-6">
               <p className="font-semibold"> Error:</p>

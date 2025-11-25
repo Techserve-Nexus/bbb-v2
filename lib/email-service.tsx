@@ -140,7 +140,7 @@ export async function sendViasendGrid(to: string, registrationId: string, name: 
         },
       ],
       from: {
-        email: process.env.SENDGRID_FROM_EMAIL || "noreply@chessevent.com",
+        email: process.env.SENDGRID_FROM_EMAIL || "info@shreeparashurama.com",
         name: "Chaturanga Manthana 2025",
       },
       content: [
