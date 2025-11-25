@@ -101,10 +101,12 @@ export async function POST(
       })
     } catch (emailError) {
       console.error("❌ Error sending ticket email:", emailError)
+      const message = emailError instanceof Error ? emailError.message : String(emailError)
+      // Return the underlying error message to help diagnose live-site issues (admin-only endpoint)
       return NextResponse.json(
         {
           success: false,
-          error: "Failed to send ticket email. Please try again.",
+          error: `Failed to send ticket email. ${message}`,
         },
         { status: 500 }
       )

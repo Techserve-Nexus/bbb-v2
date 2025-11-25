@@ -49,29 +49,45 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
     try {
       // Convert to base64
       const reader = new FileReader()
-      reader.onload = async (event) => {
-        const base64 = event.target?.result as string
+      reader.onload = (event) => {
+        ;(async () => {
+          try {
+            const base64 = event.target?.result as string
 
-        // Upload to Cloudinary via our API
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image: base64 }),
-        })
+            // Upload to Cloudinary via our API
+            const response = await fetch("/api/upload", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ image: base64 }),
+            })
 
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.error || "Upload failed")
-        }
+            // Try to parse JSON safely
+            let data: any = null
+            try {
+              data = await response.json()
+            } catch (e) {
+              // ignore json parse errors
+            }
 
-        const data = await response.json()
-        
-        setFormData({
-          ...formData,
-          paymentScreenshot: base64,
-          paymentScreenshotUrl: data.url,
-        })
-        setUploading(false)
+            if (!response.ok) {
+              const serverMessage = data?.error || response.statusText || "Upload failed"
+              setError(`Upload failed: ${serverMessage}`)
+              setUploading(false)
+              return
+            }
+
+            setFormData({
+              ...formData,
+              paymentScreenshot: base64,
+              paymentScreenshotUrl: data?.url,
+            })
+          } catch (err) {
+            console.error("Upload error:", err)
+            setError("Failed to upload image. Please try again.")
+          } finally {
+            setUploading(false)
+          }
+        })()
       }
 
       reader.onerror = () => {
