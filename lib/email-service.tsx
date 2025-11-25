@@ -141,7 +141,15 @@ export async function sendViasendGrid(to: string, registrationId: string, name: 
       ],
       from: {
         email: process.env.SENDGRID_FROM_EMAIL || "info@shreeparashurama.com",
-        name: "Chaturanga Manthana 2025",
+        name: process.env.SENDGRID_FROM_NAME || "Chaturanga Manthana 2025",
+      },
+      // Add explicit reply_to to help ensure recipients see the desired reply address
+      reply_to: {
+        email: process.env.SENDGRID_REPLY_TO || "info@shreeparashurama.com",
+      },
+      // Optional: headers to indicate preferred reply-to
+      headers: {
+        "Reply-To": process.env.SENDGRID_REPLY_TO || "info@shreeparashurama.com",
       },
       content: [
         {

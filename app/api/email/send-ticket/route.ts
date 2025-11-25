@@ -40,8 +40,18 @@ export async function POST(req: NextRequest) {
     })
 
     // Send via configured email service
-    if (EMAIL_SERVICE === "sendgrid" && SENDGRID_API_KEY) {
+    if (EMAIL_SERVICE === "sendgrid") {
+      if (!SENDGRID_API_KEY) {
+        console.error("SendGrid selected but SENDGRID_API_KEY is not set")
+        return NextResponse.json({ error: "SendGrid not configured on server" }, { status: 500 })
+      }
+
       await sendViasendGrid(to, registrationId, name, htmlContent)
+    } else if (EMAIL_SERVICE === "smtp") {
+      // If using SMTP the client-side endpoint will be called which should use the SMTP transporter
+      // In serverless/dev env, we still log the email when SMTP not configured
+      console.log("EMAIL_SERVICE=smtp selected; ensure SMTP env vars are set on the server")
+      console.log("Email target:", to)
     } else {
       // Fallback to console log for development
       console.log("Email would be sent to:", to)

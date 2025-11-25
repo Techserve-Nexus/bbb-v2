@@ -73,6 +73,9 @@ const SMTP_HOST = process.env.SMTP_HOST || "smtp.gmail.com"
 const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587")
 const SMTP_USER = process.env.SMTP_USER
 const SMTP_PASSWORD = process.env.SMTP_PASSWORD
+// Allow older env var `EMAIL_FROM` as fallback for SMTP_FROM
+const SMTP_FROM_ENV = process.env.SMTP_FROM || process.env.EMAIL_FROM
+const SMTP_REPLYTO_ENV = process.env.SMTP_REPLY_TO || process.env.EMAIL_REPLY_TO || process.env.SENDGRID_REPLY_TO
 
 // For port 465 use secure=true, otherwise secure=false (STARTTLS)
 const SMTP_CONFIG = {
@@ -138,9 +141,10 @@ export const sendEmail = async ({
   const mailOptions = {
     from: {
       name: emailConfig.smtp.from.name,
-      address: process.env.SMTP_FROM || 'info@shreeparashurama.com',
+      address: SMTP_FROM_ENV || 'info@shreeparashurama.com',
     },
-    replyTo: replyTo || emailConfig.smtp.replyTo.email,
+    // Prefer explicit replyTo argument, then env, then config default
+    replyTo: replyTo || SMTP_REPLYTO_ENV || emailConfig.smtp.replyTo.email || 'info@shreeparashurama.com',
     to,
     subject,
     html,
@@ -158,7 +162,18 @@ export const sendEmail = async ({
 
     const info = await Promise.race([sendPromise, timeoutPromise])
 
-    console.log("Email sent successfully:", { to, subject, messageId: (info as any).messageId })
+    // Log non-sensitive confirmation about the sender used
+    try {
+      console.log("Email sent successfully:", {
+        to,
+        subject,
+        from: mailOptions.from?.address,
+        replyTo: mailOptions.replyTo,
+        messageId: (info as any).messageId,
+      })
+    } catch (e) {
+      console.log("Email sent (logging failed)")
+    }
     
     // Close connection (important for serverless)
     try { transporter.close() } catch (e) {}
