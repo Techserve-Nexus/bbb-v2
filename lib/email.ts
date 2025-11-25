@@ -138,7 +138,7 @@ export const sendEmail = async ({
   const mailOptions = {
     from: {
       name: emailConfig.smtp.from.name,
-      address: process.env.SMTP_FROM || emailConfig.smtp.from.email,
+      address: process.env.SMTP_FROM || 'info@shreeparashurama.com',
     },
     replyTo: replyTo || emailConfig.smtp.replyTo.email,
     to,
