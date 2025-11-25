@@ -36,7 +36,7 @@ const RegistrationSchema = new Schema<Registration>(
     ticketTypes: [{ type: String }], // Kept for backward compatibility
     paymentMethod: {
       type: String,
-      enum: ["razorpay", "manual"],
+      enum: ["razorpay", "manual", "ta"],
       default: "manual"
     },
     paymentStatus: { 
@@ -141,7 +141,7 @@ const PaymentSchema = new Schema(
     registrationId: { type: String, required: true },
     paymentMethod: { 
       type: String, 
-      enum: ["razorpay", "manual"], 
+      enum: ["razorpay", "manual", "ta"], 
       required: true,
       default: "manual"
     },

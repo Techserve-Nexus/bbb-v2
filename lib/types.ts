@@ -9,7 +9,7 @@ export interface Registration {
   isGuest?: boolean
   ticketType?: "Business_Conclave" | "Chess" // Keep for backward compatibility
   ticketTypes?: string[] // New field for multiple selections
-  paymentMethod?: "razorpay" | "manual"
+  paymentMethod?: "razorpay" | "manual" | "ta"
   paymentStatus: "pending" | "success" | "failed"
   paymentId?: string
   paymentReference?: string
