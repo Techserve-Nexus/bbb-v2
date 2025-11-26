@@ -349,6 +349,50 @@ export default function RegistrationsList() {
     setShowDetailsModal(true)
   }
 
+  // Download QR as PDF (client-side using jsPDF)
+  const downloadQrPdf = async (registrationId: string, imgSrc: string) => {
+    try {
+      const { jsPDF } = await import('jspdf')
+
+      // Load image
+      const img = new Image()
+      if (!imgSrc.startsWith('data:')) img.crossOrigin = 'anonymous'
+      img.src = imgSrc
+
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve()
+        img.onerror = (err) => reject(err)
+      })
+
+      // Desired (smaller) QR size in PDF points
+      const desiredSize = 180 // smaller size to reduce PDF dimensions
+
+      // Draw image into canvas resized to desiredSize (keeps QR content same)
+      const canvas = document.createElement('canvas')
+      canvas.width = desiredSize
+      canvas.height = desiredSize
+      const ctx = canvas.getContext('2d')
+      if (!ctx) throw new Error('Canvas not supported')
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(img, 0, 0, desiredSize, desiredSize)
+
+      const dataUrl = canvas.toDataURL('image/png')
+
+      // Create compact PDF with small padding
+      const padding = 20
+      const pdfWidth = desiredSize + padding * 2
+      const pdfHeight = desiredSize + padding * 2
+
+      const pdf = new jsPDF({ unit: 'pt', format: [pdfWidth, pdfHeight] })
+      pdf.addImage(dataUrl, 'PNG', padding, padding, desiredSize, desiredSize)
+      pdf.save(`qr-${registrationId}.pdf`)
+    } catch (err) {
+      console.error('Failed to generate PDF:', err)
+      window.open(imgSrc, '_blank')
+    }
+  }
+
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
       success: "bg-green-100 text-green-800",
@@ -1297,12 +1341,25 @@ export default function RegistrationsList() {
                     <div className="w-1 h-6 bg-teal-600 rounded"></div>
                     QR Code
                   </h3>
-                  <div className="bg-gray-50 p-4 rounded-lg flex justify-center">
-                    <img 
-                      src={detailsRegistration.qrCode} 
-                      alt="QR Code" 
-                      className="w-48 h-48 border-2 border-gray-300 rounded-lg"
-                    />
+                  <div className="bg-gray-50 p-4 rounded-lg flex items-center justify-center gap-6">
+                    <div>
+                      <img 
+                        src={detailsRegistration.qrCode} 
+                        alt="QR Code" 
+                        className="w-48 h-48 border-2 border-gray-300 rounded-lg"
+                      />
+                    </div>
+                    <div className="flex flex-col items-start">
+                      <p className="text-sm text-gray-600 mb-2">Download QR as PDF</p>
+                      <Button
+                        onClick={() => downloadQrPdf(detailsRegistration.registrationId, detailsRegistration.qrCode!)}
+                        size="sm"
+                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        <Download className="w-4 h-4" />
+                        Download
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
