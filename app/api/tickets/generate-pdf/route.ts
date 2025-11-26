@@ -19,9 +19,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Registration not found" }, { status: 404 })
     }
 
-    // Generate QR code
-    const { generateQRCodeBuffer } = await import("@/lib/qr-generator")
-    const qrBuffer = await generateQRCodeBuffer(registrationId)
+    // Generate QR code that encodes the full verification URL
+    const { generateTicketQRCode } = await import("@/lib/qr-generator")
+    const qrDataUrl = await generateTicketQRCode(registrationId)
+    const qrBuffer = Buffer.from(qrDataUrl.split(",")[1], "base64")
 
     // Create PDF (using simple HTML-based approach)
     const pdfHTML = generateTicketPDF(
