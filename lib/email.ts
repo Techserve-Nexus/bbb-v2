@@ -141,7 +141,32 @@ export const sendEmail = async ({
   attachments?: any[]
   replyTo?: string
 }) => {
-  const transporter = createTransporter()
+  // Try to create transporter; if SMTP is not configured and SendGrid is available, fallback.
+  let transporter
+  try {
+    transporter = createTransporter()
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('createTransporter failed:', msg)
+
+    // If SMTP missing and SENDGRID_API_KEY present, use SendGrid fallback
+    if (msg.includes('missing') && process.env.SENDGRID_API_KEY) {
+      console.log('SMTP not configured; using SendGrid fallback')
+      try {
+        const { sendViasendGrid } = await import('./email-service')
+        // sendViasendGrid expects (to, registrationId, name, htmlContent)
+        // Use subject as registrationId fallback when not available
+        await sendViasendGrid(to, subject || '', '', html)
+        return { success: true, message: 'sent-via-sendgrid-fallback' }
+      } catch (sgErr) {
+        console.error('SendGrid fallback failed:', sgErr)
+        throw new Error('SMTP not configured and SendGrid fallback failed')
+      }
+    }
+
+    // Otherwise rethrow
+    throw err
+  }
 
   const mailOptions = {
     from: {
