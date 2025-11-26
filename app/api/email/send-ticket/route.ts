@@ -58,7 +58,19 @@ export async function POST(req: NextRequest) {
         })
       } catch (err) {
         console.error("SMTP send failed:", err)
-        return NextResponse.json({ error: "SMTP send failed" }, { status: 500 })
+
+        // Fallback to SendGrid if configured (helps on hosts that block outbound SMTP)
+        if (process.env.SENDGRID_API_KEY) {
+          console.log("Attempting fallback to SendGrid since SMTP failed and SENDGRID_API_KEY is present")
+          try {
+            await sendViasendGrid(to, registrationId, name, htmlContent)
+          } catch (sgErr) {
+            console.error("Fallback SendGrid send failed:", sgErr)
+            return NextResponse.json({ error: "SMTP and SendGrid both failed" }, { status: 500 })
+          }
+        } else {
+          return NextResponse.json({ error: "SMTP send failed and no SendGrid key configured" }, { status: 500 })
+        }
       }
     } else {
       // Fallback to console log for development

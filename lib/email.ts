@@ -120,7 +120,8 @@ export const createTransporter = () => {
     return transporter
   } catch (error) {
     console.error("Failed to create email transporter:", error)
-    throw new Error("Email service configuration error")
+    const msg = error instanceof Error ? error.message : String(error)
+    throw new Error(`Email service configuration error: ${msg}`)
   }
 }
 
