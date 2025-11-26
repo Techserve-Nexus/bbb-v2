@@ -73,17 +73,36 @@ export async function POST(req: NextRequest) {
       // Convert data URL to buffer for inline attachment
       const qrCodeBuffer = qrCodeUrl ? Buffer.from(qrCodeUrl.split(',')[1], 'base64') : null
 
-      await sendEmail({
-        to: registration.email,
-        subject: `Your Event Ticket - ${registrationId}`,
-        html: emailHTML,
-        attachments: qrCodeBuffer ? [{
-          filename: 'qrcode.png',
-          content: qrCodeBuffer,
-          cid: 'qrcode', // This matches the cid in the HTML template
-          contentType: 'image/png'
-        }] : []
-      })
+      try {
+        await sendEmail({
+          to: registration.email,
+          subject: `Your Event Ticket - ${registrationId}`,
+          html: emailHTML,
+          attachments: qrCodeBuffer ? [{
+            filename: 'qrcode.png',
+            content: qrCodeBuffer,
+            cid: 'qrcode', // This matches the cid in the HTML template
+            contentType: 'image/png'
+          }] : []
+        })
+      } catch (err) {
+        console.error('Primary SMTP send failed for admin send-ticket:', err)
+
+        // Attempt fallback to SendGrid if configured
+        if (process.env.SENDGRID_API_KEY) {
+          console.log('Attempting SendGrid fallback for admin send-ticket')
+          try {
+            // Lazy import to avoid circular deps
+            const { sendViasendGrid } = await import('@/lib/email-service')
+            await sendViasendGrid(registration.email, registrationId, registration.name, emailHTML)
+          } catch (sgErr) {
+            console.error('SendGrid fallback failed for admin send-ticket:', sgErr)
+            return NextResponse.json({ error: 'Failed to send ticket email (SMTP+SendGrid)' }, { status: 500 })
+          }
+        } else {
+          return NextResponse.json({ error: 'Failed to send ticket email (SMTP)' }, { status: 500 })
+        }
+      }
 
       console.log("Ticket email sent to:", registration.email)
 
