@@ -339,7 +339,7 @@ export default function TicketVerificationPage() {
           {/* Footer Note */}
           <div className="mt-8 text-center text-sm text-muted-foreground">
             <p>For any queries, please contact event support</p>
-            <p className="mt-2">Email: support@bbbevent.com</p>
+            <p className="mt-2">Email: Info@shreeparashurama.com</p>
           </div>
         </div>
       </div>
