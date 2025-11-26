@@ -73,6 +73,9 @@ const SMTP_HOST = process.env.SMTP_HOST || "smtp.gmail.com"
 const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587")
 const SMTP_USER = process.env.SMTP_USER
 const SMTP_PASSWORD = process.env.SMTP_PASSWORD
+// Allow older env var `EMAIL_FROM` as fallback for SMTP_FROM
+const SMTP_FROM_ENV = process.env.SMTP_FROM || process.env.EMAIL_FROM
+const SMTP_REPLYTO_ENV = process.env.SMTP_REPLY_TO || process.env.EMAIL_REPLY_TO || process.env.SENDGRID_REPLY_TO
 
 // For port 465 use secure=true, otherwise secure=false (STARTTLS)
 const SMTP_CONFIG = {
@@ -94,9 +97,13 @@ console.log("SMTP Config:", { host: SMTP_CONFIG.host, port: SMTP_CONFIG.port, se
 export const createTransporter = () => {
   try {
     // Validate essential credentials early to give helpful errors in production
-    if (!SMTP_CONFIG.auth || !SMTP_CONFIG.auth.user || !SMTP_CONFIG.auth.pass) {
-      console.error("Email transporter missing SMTP credentials. Set SMTP_USER and SMTP_PASSWORD in env.")
-      throw new Error("Email service not configured: missing SMTP credentials")
+    const missing: string[] = []
+    if (!SMTP_CONFIG.auth || !SMTP_CONFIG.auth.user) missing.push('SMTP_USER')
+    if (!SMTP_CONFIG.auth || !SMTP_CONFIG.auth.pass) missing.push('SMTP_PASSWORD')
+
+    if (missing.length > 0) {
+      console.error(`Email transporter missing required env vars: ${missing.join(', ')}`)
+      throw new Error(`Email service not configured: missing ${missing.join(', ')}`)
     }
 
     const transporter = nodemailer.createTransport(SMTP_CONFIG)
@@ -113,7 +120,8 @@ export const createTransporter = () => {
     return transporter
   } catch (error) {
     console.error("Failed to create email transporter:", error)
-    throw new Error("Email service configuration error")
+    const msg = error instanceof Error ? error.message : String(error)
+    throw new Error(`Email service configuration error: ${msg}`)
   }
 }
 
@@ -133,14 +141,40 @@ export const sendEmail = async ({
   attachments?: any[]
   replyTo?: string
 }) => {
-  const transporter = createTransporter()
+  // Try to create transporter; if SMTP is not configured and SendGrid is available, fallback.
+  let transporter
+  try {
+    transporter = createTransporter()
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('createTransporter failed:', msg)
+
+    // If SMTP missing and SENDGRID_API_KEY present, use SendGrid fallback
+    if (msg.includes('missing') && process.env.SENDGRID_API_KEY) {
+      console.log('SMTP not configured; using SendGrid fallback')
+      try {
+        const { sendViasendGrid } = await import('./email-service')
+        // sendViasendGrid expects (to, registrationId, name, htmlContent)
+        // Use subject as registrationId fallback when not available
+        await sendViasendGrid(to, subject || '', '', html)
+        return { success: true, message: 'sent-via-sendgrid-fallback' }
+      } catch (sgErr) {
+        console.error('SendGrid fallback failed:', sgErr)
+        throw new Error('SMTP not configured and SendGrid fallback failed')
+      }
+    }
+
+    // Otherwise rethrow
+    throw err
+  }
 
   const mailOptions = {
     from: {
       name: emailConfig.smtp.from.name,
-      address: process.env.SMTP_FROM || 'info@shreeparashurama.com',
+      address: SMTP_FROM_ENV || 'info@shreeparashurama.com',
     },
-    replyTo: replyTo || emailConfig.smtp.replyTo.email,
+    // Prefer explicit replyTo argument, then env, then config default
+    replyTo: replyTo || SMTP_REPLYTO_ENV || emailConfig.smtp.replyTo.email || 'info@shreeparashurama.com',
     to,
     subject,
     html,
@@ -158,7 +192,18 @@ export const sendEmail = async ({
 
     const info = await Promise.race([sendPromise, timeoutPromise])
 
-    console.log("Email sent successfully:", { to, subject, messageId: (info as any).messageId })
+    // Log non-sensitive confirmation about the sender used
+    try {
+      console.log("Email sent successfully:", {
+        to,
+        subject,
+        from: mailOptions.from?.address,
+        replyTo: mailOptions.replyTo,
+        messageId: (info as any).messageId,
+      })
+    } catch (e) {
+      console.log("Email sent (logging failed)")
+    }
     
     // Close connection (important for serverless)
     try { transporter.close() } catch (e) {}

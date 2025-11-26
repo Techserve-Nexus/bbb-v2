@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import connectDB from "@/lib/db"
-import { sendViasendGrid } from "@/lib/email-service" // Declare the variable before using it
+import { sendViasendGrid } from "@/lib/email-service" // used for SendGrid path
+import { sendEmail } from "@/lib/email" // SMTP sending (nodemailer)
 import mongoose from "mongoose"
 
 const EMAIL_SERVICE = process.env.EMAIL_SERVICE || "sendgrid" // or 'ses'
@@ -40,8 +41,37 @@ export async function POST(req: NextRequest) {
     })
 
     // Send via configured email service
-    if (EMAIL_SERVICE === "sendgrid" && SENDGRID_API_KEY) {
+    if (EMAIL_SERVICE === "sendgrid") {
+      if (!SENDGRID_API_KEY) {
+        console.error("SendGrid selected but SENDGRID_API_KEY is not set")
+        return NextResponse.json({ error: "SendGrid not configured on server" }, { status: 500 })
+      }
+
       await sendViasendGrid(to, registrationId, name, htmlContent)
+    } else if (EMAIL_SERVICE === "smtp") {
+      // Send using the server-side SMTP transporter implemented in lib/email
+      try {
+        await sendEmail({
+          to,
+          subject: `Your Chaturanga Manthana Ticket - ${registrationId}`,
+          html: htmlContent,
+        })
+      } catch (err) {
+        console.error("SMTP send failed:", err)
+
+        // Fallback to SendGrid if configured (helps on hosts that block outbound SMTP)
+        if (process.env.SENDGRID_API_KEY) {
+          console.log("Attempting fallback to SendGrid since SMTP failed and SENDGRID_API_KEY is present")
+          try {
+            await sendViasendGrid(to, registrationId, name, htmlContent)
+          } catch (sgErr) {
+            console.error("Fallback SendGrid send failed:", sgErr)
+            return NextResponse.json({ error: "SMTP and SendGrid both failed" }, { status: 500 })
+          }
+        } else {
+          return NextResponse.json({ error: "SMTP send failed and no SendGrid key configured" }, { status: 500 })
+        }
+      }
     } else {
       // Fallback to console log for development
       console.log("Email would be sent to:", to)
