@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import connectDB from "@/lib/db"
-import { sendViasendGrid } from "@/lib/email-service" // Declare the variable before using it
+import { sendViasendGrid } from "@/lib/email-service" // used for SendGrid path
+import { sendEmail } from "@/lib/email" // SMTP sending (nodemailer)
 import mongoose from "mongoose"
 
 const EMAIL_SERVICE = process.env.EMAIL_SERVICE || "sendgrid" // or 'ses'
@@ -48,10 +49,17 @@ export async function POST(req: NextRequest) {
 
       await sendViasendGrid(to, registrationId, name, htmlContent)
     } else if (EMAIL_SERVICE === "smtp") {
-      // If using SMTP the client-side endpoint will be called which should use the SMTP transporter
-      // In serverless/dev env, we still log the email when SMTP not configured
-      console.log("EMAIL_SERVICE=smtp selected; ensure SMTP env vars are set on the server")
-      console.log("Email target:", to)
+      // Send using the server-side SMTP transporter implemented in lib/email
+      try {
+        await sendEmail({
+          to,
+          subject: `Your Chaturanga Manthana Ticket - ${registrationId}`,
+          html: htmlContent,
+        })
+      } catch (err) {
+        console.error("SMTP send failed:", err)
+        return NextResponse.json({ error: "SMTP send failed" }, { status: 500 })
+      }
     } else {
       // Fallback to console log for development
       console.log("Email would be sent to:", to)
