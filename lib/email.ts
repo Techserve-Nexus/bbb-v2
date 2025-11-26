@@ -97,9 +97,13 @@ console.log("SMTP Config:", { host: SMTP_CONFIG.host, port: SMTP_CONFIG.port, se
 export const createTransporter = () => {
   try {
     // Validate essential credentials early to give helpful errors in production
-    if (!SMTP_CONFIG.auth || !SMTP_CONFIG.auth.user || !SMTP_CONFIG.auth.pass) {
-      console.error("Email transporter missing SMTP credentials. Set SMTP_USER and SMTP_PASSWORD in env.")
-      throw new Error("Email service not configured: missing SMTP credentials")
+    const missing: string[] = []
+    if (!SMTP_CONFIG.auth || !SMTP_CONFIG.auth.user) missing.push('SMTP_USER')
+    if (!SMTP_CONFIG.auth || !SMTP_CONFIG.auth.pass) missing.push('SMTP_PASSWORD')
+
+    if (missing.length > 0) {
+      console.error(`Email transporter missing required env vars: ${missing.join(', ')}`)
+      throw new Error(`Email service not configured: missing ${missing.join(', ')}`)
     }
 
     const transporter = nodemailer.createTransport(SMTP_CONFIG)
