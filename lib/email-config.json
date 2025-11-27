@@ -3,8 +3,8 @@
     "name": "Chaturanga Manthana 2025",
     "shortName": "Chaturanga",
     "website": "https://shreeparashurama.com",
-    "supportEmail": "support@bbbchess.com",
-    "replyToEmail": "noreply@bbbchess.com"
+    "supportEmail": "info@shreeparashurama.com",
+    "replyToEmail": "info@shreeparashurama.com"
   },
   "branding": {
     "colors": {
@@ -66,8 +66,8 @@
     }
   },
   "ticketEmail": {
-    "subject": "🎟️ Your Event Ticket - {registrationId}",
-    "replyTo": "support@bbbchess.com",
+    "subject": "Your Event Ticket - {registrationId}",
+    "replyTo": "info@shreeparashurama.com",
     "heading": "Your Chaturanga Manthana Ticket",
     "subheading": "Thank you for registering! Here are your ticket details.",
     "qrCodeLabel": "Scan this QR code at the venue",
@@ -94,12 +94,12 @@
       "url": "{appUrl}/ticket/{registrationId}",
       "color": "#4A90E2"
     },
-    "helpText": "Need help? Contact us at support@bbbchess.com or visit our website."
+    "helpText": "Need help? Contact us at info@shreeparashurama.com or visit our website."
   },
   "paymentVerifiedEmail": {
     "approved": {
-      "subject": "✅ Payment Verified - {registrationId}",
-      "replyTo": "support@bbbchess.com",
+      "subject": "Payment Verified - {registrationId}",
+      "replyTo": "info@shreeparashurama.com",
       "heading": "Payment Approved!",
       "subheading": "Your payment has been successfully verified.",
       "messageColor": "#10B981",
@@ -110,13 +110,13 @@
       }
     },
     "rejected": {
-      "subject": "❌ Payment Verification Failed - {registrationId}",
-      "replyTo": "support@bbbchess.com",
+      "subject": "Payment Verification Failed - {registrationId}",
+      "replyTo": "info@shreeparashurama.com",
       "heading": "Payment Verification Failed",
       "subheading": "We couldn't verify your payment. Please review the details below.",
       "messageColor": "#EF4444",
       "ctaButton": {
-        "text": "Update Payment Details",
+        "text": "Reapply for Registration",
         "url": "{appUrl}/register",
         "color": "#EF4444"
       }
@@ -125,18 +125,20 @@
     "smtp": {
     "from": {
       "name": "Chaturanga Manthana",
-      "email": "noreply@bbbchess.com"
+      "email": "info@shreeparashurama.com"
     },
     "replyTo": {
       "name": "Chaturanga Support Team",
-      "email": "support@bbbchess.com"
+      "email": "info@shreeparashurama.com"
     }
   },
   "event": {
     "name": "Chaturanga Manthana 2025",
-    "date": "March 15-17, 2025",
-    "venue": "Grand Convention Center, Mumbai",
-    "contactNumber": "+91-XXXXX-XXXXX",
+    "date": "13th and 14th December 2025",
+    "venue": "NAt Nandi Link Grounds, Bengaluru",
+    "contactNumber": "+91-97414-77555",
     "websiteUrl": "https://shreeparashurama.com"
   }
 }
+
+
