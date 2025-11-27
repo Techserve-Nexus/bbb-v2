@@ -24,9 +24,11 @@ export const TICKET_OPTIONS = [
     tier: "Business Conclave",
     price: 1000,
     features: [
-      "Master Class from Industry Experts", 
-      "Business Connects", 
-      "Executive Lunch, High Tea & Dinner"
+      "Elite Industry Insights",
+      "High-Value Networking",
+      "Strategic Collaboration Opportunities",
+      "Executive Lunch",
+      "High Tea & Dinner"
     ],
   },
   {
