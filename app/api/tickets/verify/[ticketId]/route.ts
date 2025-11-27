@@ -21,16 +21,25 @@ export async function GET(
 
     await connectDB()
 
-    // Find ticket by registration ID
-    const ticket = await RegistrationModel.findOne({
-      registrationId: ticketId,
-    }).lean()
+    // Find ticket by registrationId first
+    let ticket = await RegistrationModel.findOne({ registrationId: ticketId }).lean()
+
+    // If not found, be tolerant and try matching by Mongo _id (24 hex chars)
+    // Some older QR images or exports may have encoded an objectId instead
+    if (!ticket) {
+      const objectIdPattern = /^[0-9a-fA-F]{24}$/
+      if (objectIdPattern.test(ticketId)) {
+        try {
+          ticket = await RegistrationModel.findById(ticketId).lean()
+        } catch (err) {
+          // ignore and fall through to not found
+          console.warn('Failed to lookup ticket by _id:', err)
+        }
+      }
+    }
 
     if (!ticket) {
-      return NextResponse.json(
-        { error: "Ticket not found" },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "Ticket not found" }, { status: 404 })
     }
 
     // Return ticket information

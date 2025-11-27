@@ -1334,35 +1334,52 @@ export default function RegistrationsList() {
                 </div>
               )}
 
-              {/* QR Code */}
-              {detailsRegistration.qrCode && (
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <div className="w-1 h-6 bg-teal-600 rounded"></div>
-                    QR Code
-                  </h3>
-                  <div className="bg-gray-50 p-4 rounded-lg flex items-center justify-center gap-6">
-                    <div>
+              {/* QR Code (always show download option; image may not exist yet) */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-teal-600 rounded"></div>
+                  QR Code
+                </h3>
+                <div className="bg-gray-50 p-4 rounded-lg flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="flex-shrink-0">
+                    {detailsRegistration.qrCode ? (
                       <img 
                         src={detailsRegistration.qrCode} 
                         alt="QR Code" 
                         className="w-48 h-48 border-2 border-gray-300 rounded-lg"
                       />
-                    </div>
-                    <div className="flex flex-col items-start">
-                      <p className="text-sm text-gray-600 mb-2">Download QR as PDF</p>
+                    ) : (
+                      <div className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-sm text-gray-500">
+                        QR not generated
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col items-start">
+                    <p className="text-sm text-gray-600 mb-2">Download QR as PDF</p>
+                    <div className="flex gap-2">
                       <Button
-                        onClick={() => downloadQrPdf(detailsRegistration.registrationId, detailsRegistration.qrCode!)}
+                        onClick={() => downloadQrPdf(detailsRegistration.registrationId, detailsRegistration.qrCode || "")}
                         size="sm"
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
                       >
                         <Download className="w-4 h-4" />
                         Download
                       </Button>
+
+                      {!detailsRegistration.qrCode && (
+                        <Button
+                          onClick={() => window.open(`/api/tickets/download?registrationId=${detailsRegistration.registrationId}`, "_blank")}
+                          size="sm"
+                          variant="outline"
+                        >
+                          Generate & Download
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
 
               {/* Timestamps */}
               <div>
