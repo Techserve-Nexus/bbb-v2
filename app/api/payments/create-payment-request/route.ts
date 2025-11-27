@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     const amountStr = parseFloat(amount.toString()).toFixed(2)
     
     // Get base URL for frontend redirect (needed for hash calculation)
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.shreeparashurama.com"
     const returnUrl = `${baseUrl}/api/payments/return`
     const returnUrlFailure = `${baseUrl}/api/payments/failure`
     const returnUrlCancel = `${baseUrl}/api/payments/failure`
@@ -84,9 +84,7 @@ export async function POST(req: NextRequest) {
     const defaultZipCode = "560001"
     const description = `Event Registration - ${registration.name} (${registrationId})`
     
-    // Clean phone number (remove any spaces, dashes, parentheses, country code prefix)
     let cleanPhone = (registration.contactNo || "").replace(/[\s\-\(\)]/g, "")
-    // Remove country code if present (e.g., +91, 91)
     if (cleanPhone.startsWith("+91")) {
       cleanPhone = cleanPhone.substring(3)
     } else if (cleanPhone.startsWith("91") && cleanPhone.length > 10) {
@@ -122,7 +120,7 @@ export async function POST(req: NextRequest) {
     }
     
     // Debug: Verify salt length and format (don't log actual value)
-    console.log("🔐 Salt validation:")
+    console.log("  - Salt validation:")
     console.log("  - Salt is set:", !!hashParams.salt)
     console.log("  - Salt length:", hashParams.salt.length)
     console.log("  - Salt has whitespace:", hashParams.salt !== hashParams.salt.trim())

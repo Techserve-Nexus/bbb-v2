@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   creator: 'BBB Event Organization',
   publisher: 'BBB Event',
   applicationName: 'BBB Event Registration',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://www.shreeparashurama.com'),
   
   openGraph: {
     type: 'website',

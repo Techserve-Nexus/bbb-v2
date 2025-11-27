@@ -50,6 +50,7 @@ export function submitPaymentForm(paymentParams: Record<string, string>, payment
   // Append form to body and submit
   document.body.appendChild(form)
   form.submit()
+  document.body.removeChild(form)
 }
 
 /**

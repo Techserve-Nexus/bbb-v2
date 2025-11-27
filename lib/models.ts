@@ -142,7 +142,7 @@ const PaymentSchema = new Schema(
     registrationId: { type: String, required: true },
     paymentMethod: { 
       type: String, 
-      enum: ["razorpay", "manual", "ta", "payment_gateway"], 
+      enum: ["razorpay", "manual", "payment_gateway"], 
       required: true,
       default: "manual"
     },

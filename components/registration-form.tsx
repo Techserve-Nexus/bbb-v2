@@ -257,8 +257,6 @@ export default function RegistrationForm() {
         paymentScreenshotUrl: formData.paymentMethod === "manual" ? formData.paymentScreenshotUrl : undefined,
       }
 
-      // alert("Submitting your registration. Please wait...")
-
       const response = await fetch("/api/registrations", {
         method: "POST",
         headers: {
@@ -266,7 +264,6 @@ export default function RegistrationForm() {
         },
         body: JSON.stringify(submissionData),
       })
-      // alert("Registration submitted. Processing response...")
       const data = await response.json()
 
       if (!response.ok) {
@@ -333,7 +330,8 @@ export default function RegistrationForm() {
 
       // Submit payment form to redirect to payment gateway
       submitPaymentForm(paymentData.paymentParams, paymentData.paymentUrl)
-
+      
+      setIsProcessingPayment(false)
       // Note: User will be redirected to payment gateway
       // After payment, they'll be redirected back to /api/payments/return
       // which will then redirect them to the ticket page

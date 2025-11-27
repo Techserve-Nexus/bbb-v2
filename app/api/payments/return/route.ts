@@ -118,7 +118,7 @@ async function processPaymentReturn(responseData: Record<string, any>, baseUrl: 
 
       await sendEmail({
         to: registration.email,
-        subject: `🎟️ Your Event Ticket - ${registration.registrationId}`,
+        subject: `Your Event Ticket - ${registration.registrationId}`,
         html: ticketEmailHTML,
         attachments: registration.qrCode
           ? [
@@ -132,7 +132,7 @@ async function processPaymentReturn(responseData: Record<string, any>, baseUrl: 
           : [],
       })
 
-      console.log("🎟️ Ticket email sent to:", registration.email)
+      console.log("Ticket email sent to:", registration.email)
     } catch (emailError) {
       console.error("Failed to send ticket email:", emailError)
     }
@@ -166,7 +166,7 @@ async function processPaymentReturn(responseData: Record<string, any>, baseUrl: 
  * According to documentation section 2.3, all response parameters are sent as query params
  */
 export async function GET(req: NextRequest) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.shreeparashurama.com"
   try {
     await connectDB()
 
@@ -198,7 +198,7 @@ export async function GET(req: NextRequest) {
  * with all response parameters as form data (application/x-www-form-urlencoded)
  */
 export async function POST(req: NextRequest) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.shreeparashurama.com"
   try {
     await connectDB()
 
@@ -236,7 +236,7 @@ export async function POST(req: NextRequest) {
     console.log("  - Response Message:", responseData.response_message || responseData.responseMessage || "N/A")
     console.log("  - Content-Type:", contentType)
 
-    return await processPaymentReturn(responseData, req.url)
+    return await processPaymentReturn(responseData, baseUrl)
   } catch (error) {
     console.error("Error processing payment return (POST):", error)
     return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=processing_error`, req.url))

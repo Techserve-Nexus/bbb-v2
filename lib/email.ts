@@ -393,7 +393,7 @@ export const getPaymentVerifiedEmailTemplate = ({
   status: "approved" | "rejected"
   reason?: string
 }) => {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.shreeparashurama.com"
   const ticketUrl = `${baseUrl}/ticket/${registrationId}`
   
   if (status === "rejected") {

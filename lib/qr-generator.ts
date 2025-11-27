@@ -7,7 +7,7 @@ import QRCode from "qrcode"
  */
 export async function generateTicketQRCode(ticketId: string): Promise<string> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.shreeparashurama.com"
     const verificationUrl = `${baseUrl}/ticket/${ticketId}`
     
     const qrCode = await QRCode.toDataURL(verificationUrl, {

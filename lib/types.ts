@@ -24,6 +24,7 @@ export interface Registration {
   ticketStatus?: "under_review" | "active" | "expired" | "used"
   createdAt: Date
   updatedAt: Date
+  referredBy?: string
 }
 
 export interface PersonTicket {
