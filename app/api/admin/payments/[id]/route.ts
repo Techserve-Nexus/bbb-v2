@@ -87,3 +87,51 @@ export async function GET(
     )
   }
 }
+
+/**
+ * DELETE /api/admin/payments/[id]
+ *
+ * Permanently delete a payment record
+ * Requires admin authentication
+ *
+ * @param id - Payment ID (MongoDB _id)
+ */
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    // Verify admin authentication
+    const auth = verifyAdminAuth(req)
+    if (!auth.authorized) {
+      return NextResponse.json({ error: auth.error }, { status: 401 })
+    }
+
+    await connectDB()
+
+    const { id } = await params
+
+    // Find and delete payment
+    const payment = await PaymentModel.findByIdAndDelete(id)
+
+    if (!payment) {
+      return NextResponse.json(
+        { success: false, error: "Payment not found" },
+        { status: 404 }
+      )
+    }
+
+    console.log(`🗑️ Payment ${id} deleted by admin`)
+
+    return NextResponse.json({
+      success: true,
+      message: "Payment deleted successfully",
+    })
+  } catch (error) {
+    console.error("❌ Error deleting payment:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to delete payment" },
+      { status: 500 }
+    )
+  }
+}
