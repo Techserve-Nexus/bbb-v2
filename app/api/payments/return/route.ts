@@ -11,13 +11,77 @@ import { generateTicketQRCode } from "@/lib/qr-generator"
 export const runtime = "nodejs"
 export const maxDuration = 30
 
+
+/**
+ * Get the proper base URL for redirects
+ * ALWAYS uses NEXT_PUBLIC_BASE_URL if set, otherwise falls back to other methods
+ */
+function getBaseUrl(req: NextRequest): string {
+  // PRIORITY 1: Always use NEXT_PUBLIC_BASE_URL if it's set
+  const nextPublicBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
+  if (nextPublicBaseUrl && nextPublicBaseUrl.trim()) {
+    let baseUrl = nextPublicBaseUrl.trim()
+    
+    // Ensure it has protocol
+    if (!baseUrl.startsWith("http://") && !baseUrl.startsWith("https://")) {
+      // Determine protocol from request or default to https for production
+      const protocol = req.headers.get("x-forwarded-proto") || 
+                      (req.url.startsWith("https") ? "https" : "https") // Default to https
+      baseUrl = `${protocol}://${baseUrl.replace(/^https?:\/\//, "")}`
+    }
+    
+    // Remove trailing slash
+    baseUrl = baseUrl.replace(/\/$/, "")
+    
+    console.log("🌐 Using NEXT_PUBLIC_BASE_URL:", baseUrl)
+    return baseUrl
+  }
+
+  // PRIORITY 2: Try VERCEL_URL (for Vercel deployments)
+  const vercelUrl = process.env.VERCEL_URL
+  if (vercelUrl && vercelUrl.trim()) {
+    let baseUrl = vercelUrl.trim()
+    if (!baseUrl.startsWith("http://") && !baseUrl.startsWith("https://")) {
+      const protocol = req.headers.get("x-forwarded-proto") || "https"
+      baseUrl = `${protocol}://${baseUrl}`
+    }
+    baseUrl = baseUrl.replace(/\/$/, "")
+    console.log("🌐 Using VERCEL_URL:", baseUrl)
+    return baseUrl
+  }
+
+  // PRIORITY 3: Construct from request headers (for production)
+  const host = req.headers.get("host")
+  const protocol = req.headers.get("x-forwarded-proto") || (req.url.startsWith("https") ? "https" : "http")
+  
+  if (host && !host.includes("localhost") && !host.includes("127.0.0.1")) {
+    const baseUrl = `${protocol}://${host}`
+    console.log("🌐 Using base URL from headers:", baseUrl)
+    return baseUrl
+  }
+
+  // PRIORITY 4: Extract from req.url
+  try {
+    const url = new URL(req.url)
+    const baseUrl = `${url.protocol}//${url.host}`
+    console.log("🌐 Using base URL from req.url:", baseUrl)
+    return baseUrl
+  } catch {
+    // Fallback to localhost with HTTP (standard for local development)
+    console.log("⚠️  No NEXT_PUBLIC_BASE_URL set, falling back to http://localhost:3000")
+    console.log("⚠️  Please set NEXT_PUBLIC_BASE_URL environment variable to your production domain")
+    return "http://localhost:3000"
+  }
+}
+
 /**
  * Process payment return - shared logic for both GET and POST
  * According to payment gateway documentation section 2.3:
  * - response_code: 0 = success, non-zero = error
  * - response_message: "Transaction Successful", "Transaction Failed", "Transaction Cancelled"
  */
-async function processPaymentReturn(responseData: Record<string, any>, baseUrl: string) {
+async function processPaymentReturn(responseData: Record<string, any>, req: NextRequest) {
+  const baseUrl = getBaseUrl(req)
   // Extract required parameters according to documentation section 2.3
   const transactionId = responseData.transaction_id?.toString() || null
   const orderId = responseData.order_id?.toString() || null
@@ -182,11 +246,12 @@ export async function GET(req: NextRequest) {
     console.log("  - Response Code:", responseData.response_code || responseData.responseCode || "N/A")
     console.log("  - Response Message:", responseData.response_message || responseData.responseMessage || "N/A")
 
-    return await processPaymentReturn(responseData, req.url)
+    return await processPaymentReturn(responseData, req)
 
   } catch (error) {
     console.error("Error processing payment return:", error)
-    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", req.url))
+    const baseUrl = getBaseUrl(req)
+    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", baseUrl))
   }
 }
 
@@ -223,7 +288,8 @@ export async function POST(req: NextRequest) {
         }
       } catch (e) {
         console.error("Failed to parse request body:", e)
-        return NextResponse.redirect(new URL("/payment/failed?error=invalid_request_format", req.url))
+        const baseUrl = getBaseUrl(req)
+        return NextResponse.redirect(new URL("/payment/failed?error=invalid_request_format", baseUrl))
       }
     }
 
@@ -233,10 +299,11 @@ export async function POST(req: NextRequest) {
     console.log("  - Response Message:", responseData.response_message || responseData.responseMessage || "N/A")
     console.log("  - Content-Type:", contentType)
 
-    return await processPaymentReturn(responseData, req.url)
+    return await processPaymentReturn(responseData, req)
   } catch (error) {
     console.error("Error processing payment return (POST):", error)
-    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", req.url))
+    const baseUrl = getBaseUrl(req)
+    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", baseUrl))
   }
 }
 

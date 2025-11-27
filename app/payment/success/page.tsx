@@ -12,25 +12,23 @@ export default function PaymentSuccessPage() {
   const router = useRouter()
   const registrationId = searchParams.get("registration_id")
   const orderId = searchParams.get("order_id")
-  const [countdown, setCountdown] = useState(5)
+  const [countdown, setCountdown] = useState(60)
 
   useEffect(() => {
-    // Auto-redirect to ticket page after 5 seconds
-    if (registrationId) {
-      const timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer)
-            router.push(`/ticket/${registrationId}`)
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
+    // Auto-redirect to home page after 1 minute
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          router.push("/")
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
 
-      return () => clearInterval(timer)
-    }
-  }, [registrationId, router])
+    return () => clearInterval(timer)
+  }, [router])
 
   return (
     <main className="bg-background min-h-screen flex flex-col">
@@ -89,7 +87,7 @@ export default function PaymentSuccessPage() {
                   </Link>
                   {countdown > 0 && (
                     <p className="text-sm text-gray-500 self-center">
-                      Redirecting in {countdown} seconds...
+                      Redirecting to home in {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}...
                     </p>
                   )}
                 </>
