@@ -37,7 +37,7 @@ const RegistrationSchema = new Schema<Registration>(
     ticketTypes: [{ type: String }], // Kept for backward compatibility
     paymentMethod: {
       type: String,
-      enum: ["razorpay", "manual", "ta"],
+      enum: ["razorpay", "manual", "ta", "payment_gateway"],
       default: "manual"
     },
     paymentStatus: { 
@@ -142,7 +142,7 @@ const PaymentSchema = new Schema(
     registrationId: { type: String, required: true },
     paymentMethod: { 
       type: String, 
-      enum: ["razorpay", "manual", "ta"], 
+      enum: ["razorpay", "manual", "ta", "payment_gateway"], 
       required: true,
       default: "manual"
     },
@@ -151,6 +151,12 @@ const PaymentSchema = new Schema(
     razorpayOrderId: { type: String, unique: true, sparse: true },
     razorpayPaymentId: { type: String },
     razorpaySignature: { type: String },
+    
+    // Payment Gateway fields (new gateway)
+    pgOrderId: { type: String, unique: true, sparse: true }, // order_id
+    pgTransactionId: { type: String }, // transaction_id from gateway
+    pgPaymentId: { type: String }, // payment_id from gateway
+    pgHash: { type: String }, // hash received from gateway
     
     // Manual payment fields
     paymentScreenshotUrl: { type: String },
