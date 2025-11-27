@@ -11,7 +11,8 @@ import {
   ChevronRight, 
   FileText,
   Eye,
-  X
+  X,
+  Trash
 } from "lucide-react"
 
 interface Payment {
@@ -80,6 +81,7 @@ export default function PaymentsManagement() {
 
   // Screenshot modal
   const [selectedScreenshot, setSelectedScreenshot] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchPayments()
@@ -407,6 +409,40 @@ export default function PaymentsManagement() {
                             <Eye className="w-4 h-4" />
                           </Button>
                         )}
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={async () => {
+                            const confirmDelete = confirm("Are you sure you want to delete this payment? This action cannot be undone.")
+                            if (!confirmDelete) return
+                            try {
+                              setDeletingId(payment.id)
+                              const adminEmail = localStorage.getItem("adminEmail")
+                              const adminPassword = localStorage.getItem("adminPassword")
+                              const res = await fetch(`/api/admin/payments/${payment.id}`, {
+                                method: "DELETE",
+                                headers: {
+                                  "x-admin-email": adminEmail || "",
+                                  "x-admin-password": adminPassword || "",
+                                },
+                              })
+                              const data = await res.json()
+                              if (!res.ok) {
+                                throw new Error(data.error || "Failed to delete payment")
+                              }
+                              alert(data.message || "Payment deleted")
+                              fetchPayments()
+                            } catch (err: any) {
+                              console.error("❌ Error deleting payment:", err)
+                              alert(err.message || "Failed to delete payment")
+                            } finally {
+                              setDeletingId(null)
+                            }
+                          }}
+                          title="Delete Payment"
+                        >
+                          <Trash className={`w-4 h-4 ${deletingId === payment.id ? "animate-spin" : ""}`} />
+                        </Button>
                       </div>
                     </td>
                   </tr>
