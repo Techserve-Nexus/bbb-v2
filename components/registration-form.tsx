@@ -7,6 +7,7 @@ import Step1BasicAndFamily from "./registration-steps/step1-basic-and-family"
 import Step2PerPersonTickets from "./registration-steps/step2-per-person-tickets"
 import Step3Payment from "./registration-steps/step4-payment"
 import { loadRazorpayScript } from "@/lib/razorpay"
+import { createPaymentRequest, submitPaymentForm } from "@/lib/payment-gateway-client"
 import { useRouter } from "next/navigation"
 
 interface PersonTicket {
@@ -32,7 +33,7 @@ interface FormData {
   personTickets: PersonTicket[]
   
   // Step 3 - Payment
-  paymentMethod: "razorpay" | "manual"
+  paymentMethod: "razorpay" | "manual" | "payment_gateway"
   paymentScreenshot?: string
   paymentScreenshotUrl?: string
 }
@@ -276,9 +277,11 @@ export default function RegistrationForm() {
       const regId = data.registrationId
       setRegistrationId(regId)
       
-      // If Razorpay payment, initiate payment flow
+      // Handle different payment methods
       if (formData.paymentMethod === "razorpay") {
         await handleRazorpayPayment(regId, data.amount || calculateTotalAmount(formData.personTickets))
+      } else if (formData.paymentMethod === "payment_gateway") {
+        await handlePaymentGatewayPayment(regId, data.amount || calculateTotalAmount(formData.personTickets))
       } else {
         // Manual payment - show success message
         setSubmitSuccess(true)
@@ -315,6 +318,31 @@ export default function RegistrationForm() {
       })
     })
     return total
+  }
+
+  const handlePaymentGatewayPayment = async (regId: string, amount: number) => {
+    try {
+      setIsProcessingPayment(true)
+
+      // Create payment request
+      const paymentData = await createPaymentRequest(amount, regId)
+
+      if (!paymentData.success) {
+        throw new Error(paymentData.error || "Failed to create payment request")
+      }
+
+      // Submit payment form to redirect to payment gateway
+      submitPaymentForm(paymentData.paymentParams, paymentData.paymentUrl)
+
+      // Note: User will be redirected to payment gateway
+      // After payment, they'll be redirected back to /api/payments/return
+      // which will then redirect them to the ticket page
+    } catch (error) {
+      console.error("Payment gateway error:", error)
+      setSubmitError(error instanceof Error ? error.message : "Payment initiation failed")
+      setIsSubmitting(false)
+      setIsProcessingPayment(false)
+    }
   }
 
   const handleRazorpayPayment = async (regId: string, amount: number) => {
