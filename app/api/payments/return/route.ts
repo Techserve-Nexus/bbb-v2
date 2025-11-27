@@ -138,7 +138,8 @@ async function processPaymentReturn(responseData: Record<string, any>, baseUrl: 
     }
 
     // Redirect to success page
-    return NextResponse.redirect(new URL(`${baseUrl}/payment/success?registration_id=${registrationId}&order_id=${orderId}`, baseUrl))
+    // return NextResponse.redirect(new URL(`${baseUrl}/payment/success?registration_id=${registrationId}&order_id=${orderId}`, baseUrl))
+    return NextResponse.redirect(new URL(`${baseUrl}/register?registration_id=${registrationId}&order_id=${orderId}`, baseUrl))
   } else {
     // Payment failed
     payment.status = "failed"
