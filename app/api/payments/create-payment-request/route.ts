@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     const amountStr = parseFloat(amount.toString()).toFixed(2)
     
     // Get base URL for frontend redirect (needed for hash calculation)
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL || "http://localhost:3000"
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
     const returnUrl = `${baseUrl}/api/payments/return`
     const returnUrlFailure = `${baseUrl}/api/payments/failure`
     const returnUrlCancel = `${baseUrl}/api/payments/failure`
