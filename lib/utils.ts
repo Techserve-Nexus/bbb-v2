@@ -35,10 +35,11 @@ export const TICKET_OPTIONS = [
     tier: "Chess",
     price: 500,
     features: [
-      "Professional platform", 
-      "FIDE-rated International Master", 
-      "Best of three games", 
-      "Special Prizes and Recognition"
+      "Timed Rapid Games",
+      "Adopted Swiss Tournament Format",
+      "Armageddon Knockouts",
+      "1-vs-20 Simul Exhibition",
+      "Expert-Level Officiating"
     ],
   },
 ]
