@@ -223,7 +223,7 @@ export default function Home() {
                   {
                     id: 3,
                     name: "Mohan K",
-                    role_in_sp: "General Secretary",
+                    role_in_sp: "Secretary",
                     photo: "/mc-team/mohan.jpg",
                     category: "Electricals & Electronic Products",
                     company_name: "Sri Nidhi Industrial Suppliers",
