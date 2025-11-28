@@ -8,7 +8,7 @@ import Step2PerPersonTickets from "./registration-steps/step2-per-person-tickets
 import Step3Payment from "./registration-steps/step4-payment"
 import { loadRazorpayScript } from "@/lib/razorpay"
 import { createPaymentRequest, submitPaymentForm } from "@/lib/payment-gateway-client"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 interface PersonTicket {
   personType: "self" | "spouse" | "child"
@@ -70,6 +70,128 @@ export default function RegistrationForm() {
   const [submitError, setSubmitError] = useState("")
   const [registrationId, setRegistrationId] = useState("")
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
+  const [checkingPaymentStatus, setCheckingPaymentStatus] = useState(false)
+
+  // Check for payment redirect query parameters and verify payment status
+  useEffect(() => {
+    const checkPaymentRedirect = async () => {
+      try {
+        const urlParams = new URLSearchParams(window.location.search)
+        const regId = urlParams.get("registration_id")
+        const orderId = urlParams.get("order_id")
+
+        if (regId && orderId) {
+          setCheckingPaymentStatus(true)
+          console.log("Payment redirect detected, verifying payment status...", { regId, orderId })
+
+          try {
+            // Wait a moment for payment processing to complete
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            
+            // Verify payment status by fetching ticket data
+            const response = await fetch(`/api/tickets/verify/${regId}`)
+            
+            // Check if response is OK
+            if (!response.ok) {
+              // Try to get error message from response
+              let errorMessage = `HTTP ${response.status}: ${response.statusText}`
+              try {
+                const contentType = response.headers.get("content-type")
+                if (contentType && contentType.includes("application/json")) {
+                  const errorData = await response.json()
+                  errorMessage = errorData.error || errorMessage
+                }
+              } catch (parseError) {
+                // If we can't parse JSON, use the status text
+                console.warn("Could not parse error response as JSON:", parseError)
+              }
+              
+              console.error("Failed to verify payment - API error:", {
+                status: response.status,
+                statusText: response.statusText,
+                error: errorMessage,
+                registrationId: regId,
+              })
+              
+              // If it's a 404, the ticket might not exist yet - wait a bit and try again
+              if (response.status === 404) {
+                console.log("Ticket not found yet, waiting 2 seconds and retrying...")
+                await new Promise(resolve => setTimeout(resolve, 2000))
+                
+                // Retry once
+                const retryResponse = await fetch(`/api/tickets/verify/${regId}`)
+                if (retryResponse.ok) {
+                  const retryData = await retryResponse.json()
+                  const retryTicket = retryData.ticket
+                  
+                  if (retryTicket && retryTicket.paymentStatus === "success") {
+                    console.log("Payment verified on retry, redirecting to ticket page")
+                    router.push(`/ticket/${regId}`)
+                    return
+                  }
+                }
+              }
+              
+              setSubmitError(`Unable to verify payment status (${errorMessage}). Please check your email or contact support.`)
+              // Clear query parameters from URL
+              window.history.replaceState({}, "", "/register")
+              return
+            }
+
+            // Parse response JSON
+            let data
+            try {
+              data = await response.json()
+            } catch (jsonError) {
+              console.error("Failed to parse response as JSON:", jsonError)
+              setSubmitError("Invalid response from server. Please contact support.")
+              window.history.replaceState({}, "", "/register")
+              return
+            }
+
+            const ticket = data?.ticket
+
+            if (!ticket) {
+              console.error("Ticket data not found in response:", data)
+              setSubmitError("Ticket information not found. Please contact support.")
+              window.history.replaceState({}, "", "/register")
+              return
+            }
+
+            if (ticket.paymentStatus === "success") {
+              // Payment successful - redirect to ticket page
+              console.log("Payment verified successfully, redirecting to ticket page")
+              router.push(`/ticket/${regId}`)
+              return
+            } else if (ticket.paymentStatus === "failed") {
+              // Payment failed - show error
+              setSubmitError("Payment verification failed. Please contact support or try again.")
+              // Clear query parameters from URL
+              window.history.replaceState({}, "", "/register")
+            } else {
+              // Payment pending
+              setSubmitError("Payment verification is pending. Please wait for confirmation or check your email.")
+              // Clear query parameters from URL
+              window.history.replaceState({}, "", "/register")
+            }
+          } catch (fetchError) {
+            console.error("Network error while verifying payment:", fetchError)
+            setSubmitError("Network error while verifying payment. Please check your connection and try again.")
+            window.history.replaceState({}, "", "/register")
+          }
+        }
+      } catch (error) {
+        console.error("Error checking payment redirect:", error)
+        setSubmitError("Error verifying payment status. Please contact support.")
+        // Clear query parameters from URL
+        window.history.replaceState({}, "", "/register")
+      } finally {
+        setCheckingPaymentStatus(false)
+      }
+    }
+
+    checkPaymentRedirect()
+  }, [router])
 
   // Check registration status on mount
   useEffect(() => {
@@ -445,11 +567,13 @@ export default function RegistrationForm() {
   return (
     <div className="max-w-3xl mx-auto">
       {/* Loading State */}
-      {checkingStatus ? (
+      {checkingStatus || checkingPaymentStatus ? (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-muted-foreground">Checking registration status...</p>
+            <p className="text-muted-foreground">
+              {checkingPaymentStatus ? "Verifying payment status..." : "Checking registration status..."}
+            </p>
           </div>
         </div>
       ) : !registrationEnabled ? (
