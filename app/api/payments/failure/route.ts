@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import connectDB from "@/lib/db"
 import { PaymentModel, RegistrationModel } from "@/lib/models"
 import { getBaseUrl } from "@/lib/utils"
+import { sendEmail, getPaymentVerifiedEmailTemplate } from "@/lib/email"
 
 export const runtime = "nodejs"
 export const maxDuration = 30
@@ -32,6 +33,30 @@ async function processPaymentFailure(params: {
         { registrationId: payment.registrationId },
         { paymentStatus: "failed" }
       )
+
+      // Send payment failure email to registrant (best-effort)
+      try {
+        const registration = await RegistrationModel.findOne({ registrationId: payment.registrationId })
+        if (registration && registration.email) {
+          const html = getPaymentVerifiedEmailTemplate({
+            name: registration.name,
+            registrationId: registration.registrationId,
+            ticketType: registration.ticketType,
+            status: "rejected",
+            reason: payment.verificationNotes || status || "Payment was declined",
+          })
+
+          await sendEmail({
+            to: registration.email,
+            subject: `Payment Verification Failed - ${registration.registrationId}`,
+            html,
+          })
+
+          console.log("📨 Payment failure email sent to:", registration.email)
+        }
+      } catch (emailErr) {
+        console.error("Failed to send payment failure email:", emailErr)
+      }
 
       console.log("❌ Payment marked as failed:", orderId)
     }
