@@ -186,7 +186,7 @@ export default function SponsorsPage() {
                         key={sponsor.id}
                         className="bg-background border border-border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-primary"
                       >
-                        <div className="bg-gradient-to-br from-primary/10 to-secondary/10 h-32 flex items-center justify-center p-4">
+                            <div className="bg-white h-32 flex items-center justify-center p-4 border-2 border-orange-500 rounded-t-lg transition-all duration-200 hover:border-b-2 hover:border-orange-500">
                           {sponsor.logo ? (
                             <img src={sponsor.logo} alt={sponsor.name} className="max-h-20 max-w-full object-contain" />
                           ) : (
