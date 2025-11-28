@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import connectDB from "@/lib/db"
 import { PaymentModel, RegistrationModel } from "@/lib/models"
+import { getBaseUrl } from "@/lib/utils"
 
 export const runtime = "nodejs"
 export const maxDuration = 30
@@ -68,15 +69,18 @@ export async function GET(req: NextRequest) {
     const transactionId = searchParams.get("transaction_id")
     const status = searchParams.get("status")
 
+    const baseUrl = getBaseUrl(req)
+
     return await processPaymentFailure({
       orderId,
       transactionId,
       status,
-      baseUrl: req.url,
+      baseUrl,
     })
   } catch (error) {
     console.error("Error processing payment failure:", error)
-    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", req.url))
+    const baseUrl = getBaseUrl(req)
+    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", baseUrl))
   }
 }
 
@@ -109,16 +113,19 @@ export async function POST(req: NextRequest) {
       status = body.status || null
     }
 
+    const baseUrl = getBaseUrl(req)
+
     return await processPaymentFailure({
       orderId,
       transactionId,
       status,
-      baseUrl: req.url,
+      baseUrl,
       isPostRequest: true,
     })
   } catch (error) {
     console.error("Error processing payment failure (POST):", error)
-    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", req.url))
+    const baseUrl = getBaseUrl(req)
+    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", baseUrl))
   }
 }
 
