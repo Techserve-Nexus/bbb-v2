@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { CheckCircle2, Download, Mail, ArrowRight } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import Link from "next/link"
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const registrationId = searchParams.get("registration_id")
@@ -112,6 +112,30 @@ export default function PaymentSuccessPage() {
       </div>
       <Footer />
     </main>
+  )
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={
+      <main className="bg-background min-h-screen flex flex-col">
+        <Navbar />
+        <div className="grow flex items-center justify-center py-12 px-4">
+          <div className="max-w-2xl w-full">
+            <div className="bg-white rounded-lg shadow-lg p-8 md:p-12 text-center">
+              <div className="animate-pulse">
+                <div className="h-16 w-16 bg-gray-200 rounded-full mx-auto mb-4"></div>
+                <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    }>
+      <PaymentSuccessContent />
+    </Suspense>
   )
 }
 

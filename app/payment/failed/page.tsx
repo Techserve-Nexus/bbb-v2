@@ -1,12 +1,13 @@
 "use client"
 
+import { Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { XCircle, AlertCircle, RefreshCw, ArrowLeft, HelpCircle } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import Link from "next/link"
 
-export default function PaymentFailedPage() {
+function PaymentFailedContent() {
   const searchParams = useSearchParams()
   const orderId = searchParams.get("order_id")
   const status = searchParams.get("status")
@@ -133,6 +134,30 @@ export default function PaymentFailedPage() {
       </div>
       <Footer />
     </main>
+  )
+}
+
+export default function PaymentFailedPage() {
+  return (
+    <Suspense fallback={
+      <main className="bg-background min-h-screen flex flex-col">
+        <Navbar />
+        <div className="grow flex items-center justify-center py-12 px-4">
+          <div className="max-w-2xl w-full">
+            <div className="bg-white rounded-lg shadow-lg p-8 md:p-12 text-center">
+              <div className="animate-pulse">
+                <div className="h-16 w-16 bg-gray-200 rounded-full mx-auto mb-4"></div>
+                <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    }>
+      <PaymentFailedContent />
+    </Suspense>
   )
 }
 
