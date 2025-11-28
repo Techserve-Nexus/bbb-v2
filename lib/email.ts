@@ -94,7 +94,7 @@ const SMTP_CONFIG = {
 console.log("SMTP Config:", { host: SMTP_CONFIG.host, port: SMTP_CONFIG.port, secure: SMTP_CONFIG.secure, hasAuth: !!SMTP_CONFIG.auth })
 
 // Create transporter with timeout handling
-export const createTransporter = () => {
+export const createTransporter = async () => {
   try {
     // Validate essential credentials early to give helpful errors in production
     const missing: string[] = []
@@ -108,14 +108,14 @@ export const createTransporter = () => {
 
     const transporter = nodemailer.createTransport(SMTP_CONFIG)
 
-    // Optionally verify transporter connectivity immediately to surface config errors
-    transporter.verify((err, success) => {
-      if (err) {
-        console.error("Email transporter verification failed:", err)
-      } else {
-        console.log("Email transporter verified")
-      }
-    })
+    // Await verification to surface connectivity/auth errors immediately
+    try {
+      await transporter.verify()
+      console.log("Email transporter verified")
+    } catch (verifyErr) {
+      console.error("Email transporter verification failed:", verifyErr)
+      throw verifyErr
+    }
 
     return transporter
   } catch (error) {
@@ -144,7 +144,7 @@ export const sendEmail = async ({
   // Try to create transporter; if SMTP is not configured and SendGrid is available, fallback.
   let transporter
   try {
-    transporter = createTransporter()
+    transporter = await createTransporter()
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     console.error('createTransporter failed:', msg)

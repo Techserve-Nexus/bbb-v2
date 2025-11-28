@@ -20,24 +20,35 @@ async function processPaymentFailure(params: {
   const { orderId, transactionId, status, baseUrl, isPostRequest = false } = params
 
   if (orderId) {
-    // Find and update payment record
-    const payment = await PaymentModel.findOne({ pgOrderId: orderId })
+    // Find and update payment record. Try multiple possible order id fields
+    let payment = await PaymentModel.findOne({ pgOrderId: orderId })
+    if (!payment) {
+      payment = await PaymentModel.findOne({ razorpayOrderId: orderId })
+    }
+
     if (payment) {
       payment.status = "failed"
       if (transactionId) payment.pgTransactionId = transactionId
       payment.verificationNotes = `Payment failed: ${status || "Unknown error"}`
       await payment.save()
 
-      // Update registration
+      // Update registration paymentStatus
       await RegistrationModel.findOneAndUpdate(
         { registrationId: payment.registrationId },
         { paymentStatus: "failed" }
       )
 
+      console.log("❌ Payment marked as failed:", orderId, "-> paymentId:", payment._id)
+
       // Send payment failure email to registrant (best-effort)
       try {
         const registration = await RegistrationModel.findOne({ registrationId: payment.registrationId })
-        if (registration && registration.email) {
+        if (!registration) {
+          console.log("⚠️ Registration not found for payment.registrationId:", payment.registrationId)
+        } else if (!registration.email) {
+          console.log("⚠️ Registration has no email, cannot send failure email for:", registration.registrationId)
+        } else {
+          console.log("ℹ️ Sending payment failure email to:", registration.email)
           const html = getPaymentVerifiedEmailTemplate({
             name: registration.name,
             registrationId: registration.registrationId,
@@ -57,8 +68,8 @@ async function processPaymentFailure(params: {
       } catch (emailErr) {
         console.error("Failed to send payment failure email:", emailErr)
       }
-
-      console.log("❌ Payment marked as failed:", orderId)
+    } else {
+      console.log("⚠️ No payment record found for order id:", orderId)
     }
   }
 
