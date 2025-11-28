@@ -24,19 +24,22 @@ export const TICKET_OPTIONS = [
     tier: "Business Conclave",
     price: 1000,
     features: [
-      "Executive Lunch", 
-      "High Tea & Dinner", 
-      // "Food for business conclave "
+      "Elite Industry Insights",
+      "High-Value Networking",
+      "Strategic Collaboration Opportunities",
+      "Executive Lunch",
+      "High Tea & Dinner"
     ],
   },
   {
     tier: "Chess",
     price: 500,
     features: [
-      "Professional platform", 
-      "FIDE-rated International Master", 
-      "Best of three games", 
-      "Special Prizes and Recognition"
+      "Timed Rapid Games",
+      "Adopted Swiss Tournament Format",
+      "Armageddon Knockouts",
+      "1-vs-20 Simul Exhibition",
+      "Expert-Level Officiating"
     ],
   },
 ]
