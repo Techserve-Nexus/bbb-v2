@@ -3,8 +3,8 @@
     "name": "Chaturanga Manthana 2025",
     "shortName": "Chaturanga",
     "website": "https://shreeparashurama.com",
-    "supportEmail": "info@shreeparashurama.com",
-    "replyToEmail": "info@shreeparashurama.com"
+    "supportEmail": "bbbshreeparashurama@gmail.com",
+    "replyToEmail": "bbbshreeparashurama@gmail.com"
   },
   "branding": {
     "colors": {
@@ -67,7 +67,7 @@
   },
   "ticketEmail": {
     "subject": "Your Event Ticket - {registrationId}",
-    "replyTo": "info@shreeparashurama.com",
+    "replyTo": "bbbshreeparashurama@gmail.com",
     "heading": "Your Chaturanga Manthana Ticket",
     "subheading": "Thank you for registering! Here are your ticket details.",
     "qrCodeLabel": "Scan this QR code at the venue",
@@ -94,12 +94,12 @@
       "url": "{appUrl}/ticket/{registrationId}",
       "color": "#4A90E2"
     },
-    "helpText": "Need help? Contact us at info@shreeparashurama.com or visit our website."
+    "helpText": "Need help? Contact us at bbbshreeparashurama@gmail.com or visit our website."
   },
   "paymentVerifiedEmail": {
     "approved": {
       "subject": "Payment Verified - {registrationId}",
-      "replyTo": "info@shreeparashurama.com",
+      "replyTo": "bbbshreeparashurama@gmail.com",
       "heading": "Payment Approved!",
       "subheading": "Your payment has been successfully verified.",
       "messageColor": "#10B981",
@@ -111,7 +111,7 @@
     },
     "rejected": {
       "subject": "Payment Verification Failed - {registrationId}",
-      "replyTo": "info@shreeparashurama.com",
+      "replyTo": "bbbshreeparashurama@gmail.com",
       "heading": "Payment Verification Failed",
       "subheading": "We couldn't verify your payment. Please review the details below.",
       "messageColor": "#EF4444",
@@ -125,11 +125,11 @@
     "smtp": {
     "from": {
       "name": "Chaturanga Manthana",
-      "email": "info@shreeparashurama.com"
+      "email": "bbbshreeparashurama@gmail.com"
     },
     "replyTo": {
       "name": "Chaturanga Support Team",
-      "email": "info@shreeparashurama.com"
+      "email": "bbbshreeparashurama@gmail.com"
     }
   },
   "event": {

@@ -171,10 +171,10 @@ export const sendEmail = async ({
   const mailOptions = {
     from: {
       name: emailConfig.smtp.from.name,
-      address: SMTP_FROM_ENV || 'info@shreeparashurama.com',
+      address: SMTP_FROM_ENV || 'bbbshreeparashurama@gmail.com',
     },
     // Prefer explicit replyTo argument, then env, then config default
-    replyTo: replyTo || SMTP_REPLYTO_ENV || emailConfig.smtp.replyTo.email || 'info@shreeparashurama.com',
+    replyTo: replyTo || SMTP_REPLYTO_ENV || emailConfig.smtp.replyTo.email || 'bbbshreeparashurama@gmail.com',
     to,
     subject,
     html,
