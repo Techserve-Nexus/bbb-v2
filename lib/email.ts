@@ -756,6 +756,24 @@ export const getTicketEmailTemplate = ({
             </td>
           </tr>
           
+          <!-- Registration Success Message -->
+          <tr>
+            <td style="padding: 0 40px 30px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
+                <tr>
+                  <td style="padding: 30px; text-align: center;">
+                    <h2 style="margin: 0 0 10px; font-size: 28px; font-weight: 700; color: #ffffff;">
+                      🎉 Registration Successful!
+                    </h2>
+                    <p style="margin: 0; font-size: 16px; color: rgba(255,255,255,0.95); line-height: 1.6;">
+                      Thank you for registering for ${EVENT_TITLE}. Your registration has been confirmed and your payment has been verified successfully.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
           <!-- Ticket Card -->
           <tr>
             <td style="padding: 0 40px 40px;">
