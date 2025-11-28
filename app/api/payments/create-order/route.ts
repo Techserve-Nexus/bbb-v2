@@ -18,6 +18,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
+    // Validate minimum amount (Razorpay requires minimum ₹1)
+    const MINIMUM_AMOUNT = 1
+    const amountNum = parseFloat(amount.toString())
+    if (isNaN(amountNum) || amountNum < MINIMUM_AMOUNT) {
+      return NextResponse.json(
+        { 
+          error: `Amount must be at least ₹${MINIMUM_AMOUNT}. Current amount: ₹${amountNum}`,
+          code: "MINIMUM_AMOUNT_ERROR"
+        },
+        { status: 400 }
+      )
+    }
+
     if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
       return NextResponse.json({ error: "Razorpay credentials not configured" }, { status: 500 })
     }

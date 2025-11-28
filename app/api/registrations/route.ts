@@ -2,7 +2,6 @@ import connectDB from "@/lib/db"
 import { RegistrationModel, SettingsModel } from "@/lib/models"
 import { type NextRequest, NextResponse } from "next/server"
 import { generateRegistrationId } from "@/lib/utils"
-import { sendEmail, getRegistrationEmailTemplate } from "@/lib/email"
 
 export const runtime = "nodejs"
 export const maxDuration = 30 // Max 30 seconds
@@ -124,32 +123,8 @@ export async function POST(req: NextRequest) {
     })
     console.log("Created registration:", registration)
 
-    // Send registration confirmation email
-    try {
-      const ticketSummary = personTickets.length > 0
-        ? personTickets.map((p: any) => `${p.name}: ${p.tickets.join(", ")}`).join(" | ")
-        : ticketTypes.join(", ")
-      
-      const emailHTML = getRegistrationEmailTemplate({
-        name,
-        registrationId,
-        ticketType: ticketSummary,
-        email,
-        contactNo,
-        chapterName,
-      })
-
-      await sendEmail({
-        to: email,
-        subject: `Registration Successful - ${registrationId}`,
-        html: emailHTML,
-      })
-
-      console.log("Registration email sent to:", email)
-    } catch (emailError) {
-      console.error("Failed to send registration email:", emailError)
-      // Don't fail the registration if email fails
-    }
+    // Note: No email sent here - ticket email will be sent only after payment is successful
+    // See: /api/payments/return (payment success handler)
 
     return NextResponse.json({
       success: true,

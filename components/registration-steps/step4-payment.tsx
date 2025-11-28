@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 
 interface Step4PaymentProps {
   formData: {
-    paymentMethod: "razorpay" | "manual"
+    paymentMethod: "razorpay" | "manual" | "payment_gateway"
     paymentScreenshot?: string
     paymentScreenshotUrl?: string
   }
@@ -18,7 +18,7 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState("")
 
-  const handlePaymentMethodChange = (method: "razorpay" | "manual") => {
+  const handlePaymentMethodChange = (method: "razorpay" | "manual" | "payment_gateway") => {
     setFormData({
       ...formData,
       paymentMethod: method,
@@ -113,17 +113,36 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
 
   return (
     <div className="space-y-8">
-      <div>
+      <div className="text-center">
         <h2 className="text-3xl font-bold mb-3">Payment</h2>
         <p className="text-muted-foreground">Select your payment method and complete the payment</p>
       </div>
 
       {/* Payment Method Selection */}
-      <div className="space-y-4">
-        <h3 className="text-xl font-semibold">Select Payment Method</h3>
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-          {/* Manual Payment Option */}
+      <div className="space-y-6">
+        {/* <h3 className="text-xl font-semibold text-center">Select Payment Method</h3> */}
+        <div className="flex justify-center">
+          {/* Payment Gateway Option */}
           <button
+            type="button"
+            onClick={() => handlePaymentMethodChange("payment_gateway")}
+            className={`p-8 rounded-lg border-2 transition-all w-full max-w-sm ${
+              formData.paymentMethod === "payment_gateway"
+                ? "border-primary bg-primary/5 shadow-md"
+                : "border-border hover:border-primary/50"
+            }`}
+          >
+            <CreditCard className={`w-12 h-12 mx-auto mb-4 ${
+              formData.paymentMethod === "payment_gateway" ? "text-primary" : "text-muted-foreground"
+            }`} />
+            <h4 className="font-semibold text-lg mb-2 text-center">Online Payment</h4>
+            <p className="text-sm text-muted-foreground text-center">
+              Pay online instantly with card/UPI/Net Banking
+            </p>
+          </button>
+
+          {/* Manual Payment Option - COMMENTED OUT */}
+          {/* <button
             type="button"
             onClick={() => handlePaymentMethodChange("manual")}
             className={`p-6 rounded-lg border-2 transition-all ${
@@ -135,11 +154,11 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
             <QrCode className={`w-12 h-12 mx-auto mb-3 ${
               formData.paymentMethod === "manual" ? "text-primary" : "text-muted-foreground"
             }`} />
-            <h4 className="font-semibold text-lg mb-2"> / UPI</h4>
-            <p className="text-sm text-muted-foreground">QR Code
+            <h4 className="font-semibold text-lg mb-2">QR Code / UPI</h4>
+            <p className="text-sm text-muted-foreground">
               Pay via UPI and upload screenshot
             </p>
-          </button>
+          </button> */}
 
           {/* Razorpay Option - COMMENTED OUT FOR DEPLOYMENT */}
           {/* <button
@@ -162,10 +181,9 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
         </div>
       </div>
 
-      {/* Manual Payment Section */}
-      {formData.paymentMethod === "manual" && (
+      {/* Manual Payment Section - COMMENTED OUT */}
+      {/* {formData.paymentMethod === "manual" && (
         <>
-          {/* QR Code Section */}
           <div className="bg-muted p-8 rounded-lg text-center">
             <h3 className="text-xl font-semibold mb-4">Scan to Pay</h3>
             <div className="bg-white p-4 inline-block rounded-lg shadow-md">
@@ -186,7 +204,6 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
             </div>
           </div>
 
-          {/* Upload Section */}
           <div>
             <h3 className="text-xl font-semibold mb-4">Upload Payment Screenshot</h3>
             <p className="text-sm text-muted-foreground mb-4">
@@ -249,7 +266,6 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
             )}
           </div>
 
-          {/* Important Note */}
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
             <p className="text-sm font-semibold text-yellow-800 mb-2">⚠️ Important</p>
             <ul className="text-sm text-yellow-700 space-y-1 ml-4 list-disc">
@@ -260,6 +276,26 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
             </ul>
           </div>
         </>
+      )} */}
+
+      {/* Payment Gateway Section */}
+      {formData.paymentMethod === "payment_gateway" && (
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-lg text-center">
+          <CreditCard className="w-16 h-16 mx-auto mb-4 text-primary" />
+          <h3 className="text-2xl font-bold mb-3">Online Payment</h3>
+          <p className="text-muted-foreground mb-6">
+            Complete your payment instantly. You'll be redirected to the payment gateway after clicking "Complete Registration" below.
+          </p>
+          <div className="bg-white p-4 rounded-lg shadow-sm inline-block">
+            <p className="text-sm text-muted-foreground mb-1">Accepted Payment Methods</p>
+            <p className="font-semibold">Credit Card • Debit Card • UPI • Net Banking • Wallets</p>
+          </div>
+          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-sm text-blue-800">
+              ✅ Instant confirmation • 🔒 Secure payment • 📧 Automatic ticket generation
+            </p>
+          </div>
+        </div>
       )}
 
       {/* Razorpay Payment Section - COMMENTED OUT FOR DEPLOYMENT */}
@@ -283,7 +319,7 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
       )} */}
 
       {/* Event Details */}
-      <div className="p-6 bg-primary/10 rounded-lg border-2 border-primary/20">
+      <div className="p-6 bg-primary/10 rounded-lg border-2 border-primary/20 text-center">
         <h3 className="text-lg font-bold text-foreground mb-2">Chaturanga Manthana 2025</h3>
         <div className="space-y-1 text-foreground">
           <p className="text-sm font-semibold">13th and 14th December 2025</p>

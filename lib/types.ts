@@ -9,7 +9,7 @@ export interface Registration {
   isGuest?: boolean
   ticketType?: "Business_Conclave" | "Chess" // Keep for backward compatibility
   ticketTypes?: string[] // New field for multiple selections
-  paymentMethod?: "razorpay" | "manual" | "ta"
+  paymentMethod?: "razorpay" | "manual" | "ta" | "payment_gateway"
   paymentStatus: "pending" | "success" | "failed"
   paymentId?: string
   paymentReference?: string
@@ -36,12 +36,18 @@ export interface PersonTicket {
 export interface Payment {
   id: string
   registrationId: string
-  paymentMethod: "razorpay" | "manual"
+  paymentMethod: "razorpay" | "manual" | "payment_gateway"
   
   // Razorpay fields
   razorpayOrderId?: string
   razorpayPaymentId?: string
   razorpaySignature?: string
+  
+  // Payment Gateway fields
+  pgOrderId?: string
+  pgTransactionId?: string
+  pgPaymentId?: string
+  pgHash?: string
   
   // Manual payment fields
   paymentScreenshotUrl?: string
