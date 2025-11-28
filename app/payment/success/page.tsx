@@ -79,7 +79,7 @@ export default function PaymentSuccessPage() {
               {registrationId && (
                 <>
                   <Link
-                    href={/ticket/${registrationId}}
+                    href={`/ticket/${registrationId}`}
                     className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
                   >
                     <Download className="w-5 h-5" />
@@ -114,3 +114,4 @@ export default function PaymentSuccessPage() {
     </main>
   )
 }
+
