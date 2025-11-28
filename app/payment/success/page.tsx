@@ -14,25 +14,23 @@ function PaymentSuccessContent() {
 
   const registrationId = searchParams.get("registration_id")
   const orderId = searchParams.get("order_id")
-
-  const [countdown, setCountdown] = useState(5)
+  const [countdown, setCountdown] = useState(60)
 
   useEffect(() => {
-    if (registrationId) {
-      const timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer)
-            router.push(`/ticket/${registrationId}`)
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
+    // Auto-redirect to home page after 1 minute
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          router.push("/")
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
 
-      return () => clearInterval(timer)
-    }
-  }, [registrationId, router])
+    return () => clearInterval(timer)
+  }, [router])
 
   return (
     <div className="grow flex items-center justify-center py-12 px-4">
@@ -78,17 +76,32 @@ function PaymentSuccessContent() {
             </div>
           </div>
 
-          {/* Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {registrationId && (
-              <>
-                <Link
-                  href={`/ticket/${registrationId}`}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
-                >
-                  <Download className="w-5 h-5" />
-                  View Ticket
-                </Link>
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              {registrationId && (
+                <>
+                  <Link
+                    href={`/ticket/${registrationId}`}
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    <Download className="w-5 h-5" />
+                    View Ticket
+                  </Link>
+                  {countdown > 0 && (
+                    <p className="text-sm text-gray-500 self-center">
+                      Redirecting to home in {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}...
+                    </p>
+                  )}
+                </>
+              )}
+              <Link
+                href="/"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+              >
+                Back to Home
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
 
                 {countdown > 0 && (
                   <p className="text-sm text-gray-500 self-center">

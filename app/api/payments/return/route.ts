@@ -7,6 +7,7 @@ import {
 } from "@/lib/payment-gateway"
 import { sendEmail, getTicketEmailTemplate } from "@/lib/email"
 import { generateTicketQRCode } from "@/lib/qr-generator"
+import { getBaseUrl } from "@/lib/utils"
 
 export const runtime = "nodejs"
 export const maxDuration = 30
@@ -17,7 +18,8 @@ export const maxDuration = 30
  * - response_code: 0 = success, non-zero = error
  * - response_message: "Transaction Successful", "Transaction Failed", "Transaction Cancelled"
  */
-async function processPaymentReturn(responseData: Record<string, any>, baseUrl: string) {
+async function processPaymentReturn(responseData: Record<string, any>, req: NextRequest) {
+  const baseUrl = getBaseUrl(req)
   // Extract required parameters according to documentation section 2.3
   const transactionId = responseData.transaction_id?.toString() || null
   const orderId = responseData.order_id?.toString() || null
@@ -184,11 +186,12 @@ export async function GET(req: NextRequest) {
     console.log("  - Response Code:", responseData.response_code || responseData.responseCode || "N/A")
     console.log("  - Response Message:", responseData.response_message || responseData.responseMessage || "N/A")
 
-    return await processPaymentReturn(responseData, req.url)
+    return await processPaymentReturn(responseData, req)
 
   } catch (error) {
     console.error("Error processing payment return:", error)
-    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=processing_error`, req.url))
+    const baseUrl = getBaseUrl(req)
+    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", baseUrl))
   }
 }
 
@@ -226,7 +229,8 @@ export async function POST(req: NextRequest) {
         }
       } catch (e) {
         console.error("Failed to parse request body:", e)
-        return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=invalid_request_format`, req.url))
+        const baseUrl = getBaseUrl(req)
+        return NextResponse.redirect(new URL("/payment/failed?error=invalid_request_format", baseUrl))
       }
     }
 
@@ -236,10 +240,11 @@ export async function POST(req: NextRequest) {
     console.log("  - Response Message:", responseData.response_message || responseData.responseMessage || "N/A")
     console.log("  - Content-Type:", contentType)
 
-    return await processPaymentReturn(responseData, req.url)
+    return await processPaymentReturn(responseData, req)
   } catch (error) {
     console.error("Error processing payment return (POST):", error)
-    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=processing_error`, req.url))
+    const baseUrl = getBaseUrl(req)
+    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", baseUrl))
   }
 }
 
