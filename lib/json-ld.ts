@@ -75,9 +75,9 @@ export function generateOrganizationJsonLd() {
     ],
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+91-XXXXXXXXXX',
+      telephone: '+91-9019923915',
       contactType: 'Customer Support',
-      email: 'contact@bbbevent.com',
+      email: 'info@shreeparashurama.com',
       availableLanguage: ['English', 'Hindi'],
     },
   }
