@@ -128,7 +128,7 @@ export default function Step2PerPersonTickets({ formData, setFormData, errors }:
           const personTickets = formData.personTickets?.[personIndex]?.tickets || []
           
           return (
-            <div key={personIndex} className="border-2 border-border rounded-lg p-6 bg-background">
+            <div key={personIndex} id={`person-ticket-${personIndex}`} data-person-index={personIndex} className="border-2 border-border rounded-lg p-6 bg-background">
               <div className="mb-4">
                 <h3 className="text-xl font-bold text-foreground">{person.name}</h3>
                 <p className="text-sm text-muted-foreground">

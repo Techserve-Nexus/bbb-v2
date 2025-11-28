@@ -64,6 +64,7 @@ export default function RegistrationForm() {
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [missingTicketSelectionIndices, setMissingTicketSelectionIndices] = useState<number[] | null>(null)
   const [validationAlert, setValidationAlert] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
@@ -254,12 +255,42 @@ export default function RegistrationForm() {
   const validateStep2 = () => {
     const newErrors: Record<string, string> = {}
 
-    // Check if at least one person has selected at least one ticket
-    const hasAnyTicket = formData.personTickets?.some(p => p.tickets && p.tickets.length > 0)
-
-    if (!hasAnyTicket) {
-      newErrors.personTickets = "Please select at least one ticket for any person"
+    // Build the list of persons that require ticket selection in the same order
+    // as the UI: self, spouse (if provided), then children (based on guest/member rules)
+    const persons: Array<{ personType: string; name: string; age?: string }> = []
+    persons.push({ personType: "self", name: formData.name || "You" })
+    if (formData.spouseName && formData.spouseName.trim()) {
+      persons.push({ personType: "spouse", name: formData.spouseName })
     }
+    formData.children.forEach((child: any) => {
+      if (child.name && child.name.trim()) {
+        if (formData.isGuest || child.age === ">12") {
+          persons.push({ personType: "child", name: child.name, age: child.age })
+        }
+      }
+    })
+
+    // Now ensure each person in the persons list has at least one ticket selected
+    const missingIndices: number[] = []
+    const missingNames: string[] = []
+    for (let i = 0; i < persons.length; i++) {
+      const ticketEntry = formData.personTickets?.[i]
+      const hasTickets = ticketEntry && ticketEntry.tickets && ticketEntry.tickets.length > 0
+      if (!hasTickets) {
+        missingIndices.push(i)
+        missingNames.push(persons[i].name || `${persons[i].personType}`)
+      }
+    }
+
+    if (missingNames.length > 0) {
+      if (missingNames.length === 1) {
+        newErrors.personTickets = `Please select ticket(s) for ${missingNames[0]}`
+      } else {
+        newErrors.personTickets = `Please select tickets for: ${missingNames.join(", ")}`
+      }
+    }
+
+    setMissingTicketSelectionIndices(missingIndices.length ? missingIndices : null)
 
     setErrors(newErrors)
     return { valid: Object.keys(newErrors).length === 0, newErrors }
@@ -292,7 +323,25 @@ export default function RegistrationForm() {
     // If error pertains to step 2 or 3, switch to that step first
     if (firstKey === "personTickets") {
       setCurrentStep(2)
-      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50)
+      // If we have indices for missing selections, try to scroll to the first missing person's card
+      setTimeout(() => {
+        try {
+          if (missingTicketSelectionIndices && missingTicketSelectionIndices.length > 0) {
+            const idx = missingTicketSelectionIndices[0]
+            const el = document.getElementById(`person-ticket-${idx}`)
+            if (el) {
+              el.scrollIntoView({ behavior: "smooth", block: "center" })
+              // focus first interactive element inside the card if present
+              const focusable = el.querySelector('button, [tabindex], input, select, [role="button"]') as HTMLElement | null
+              if (focusable) focusable.focus()
+              return
+            }
+          }
+          window.scrollTo({ top: 0, behavior: "smooth" })
+        } catch (e) {
+          window.scrollTo({ top: 0, behavior: "smooth" })
+        }
+      }, 80)
       return
     }
     if (firstKey === "paymentScreenshot") {
