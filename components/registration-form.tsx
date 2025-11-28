@@ -8,7 +8,7 @@ import Step2PerPersonTickets from "./registration-steps/step2-per-person-tickets
 import Step3Payment from "./registration-steps/step4-payment"
 import { loadRazorpayScript } from "@/lib/razorpay"
 import { createPaymentRequest, submitPaymentForm } from "@/lib/payment-gateway-client"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 interface PersonTicket {
   personType: "self" | "spouse" | "child"
@@ -64,12 +64,135 @@ export default function RegistrationForm() {
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [missingTicketSelectionIndices, setMissingTicketSelectionIndices] = useState<number[] | null>(null)
   const [validationAlert, setValidationAlert] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState("")
   const [registrationId, setRegistrationId] = useState("")
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
+  const [checkingPaymentStatus, setCheckingPaymentStatus] = useState(false)
+
+  // Check for payment redirect query parameters and verify payment status
+  useEffect(() => {
+    const checkPaymentRedirect = async () => {
+      try {
+        const urlParams = new URLSearchParams(window.location.search)
+        const regId = urlParams.get("registration_id")
+        const orderId = urlParams.get("order_id")
+
+        if (regId && orderId) {
+          setCheckingPaymentStatus(true)
+          console.log("Payment redirect detected, verifying payment status...", { regId, orderId })
+
+          try {
+            // Wait a moment for payment processing to complete
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            
+            // Verify payment status by fetching ticket data
+            const response = await fetch(`/api/tickets/verify/${regId}`)
+            
+            // Check if response is OK
+            if (!response.ok) {
+              // Try to get error message from response
+              let errorMessage = `HTTP ${response.status}: ${response.statusText}`
+              try {
+                const contentType = response.headers.get("content-type")
+                if (contentType && contentType.includes("application/json")) {
+                  const errorData = await response.json()
+                  errorMessage = errorData.error || errorMessage
+                }
+              } catch (parseError) {
+                // If we can't parse JSON, use the status text
+                console.warn("Could not parse error response as JSON:", parseError)
+              }
+              
+              console.error("Failed to verify payment - API error:", {
+                status: response.status,
+                statusText: response.statusText,
+                error: errorMessage,
+                registrationId: regId,
+              })
+              
+              // If it's a 404, the ticket might not exist yet - wait a bit and try again
+              if (response.status === 404) {
+                console.log("Ticket not found yet, waiting 2 seconds and retrying...")
+                await new Promise(resolve => setTimeout(resolve, 2000))
+                
+                // Retry once
+                const retryResponse = await fetch(`/api/tickets/verify/${regId}`)
+                if (retryResponse.ok) {
+                  const retryData = await retryResponse.json()
+                  const retryTicket = retryData.ticket
+                  
+                  if (retryTicket && retryTicket.paymentStatus === "success") {
+                    console.log("Payment verified on retry, redirecting to ticket page")
+                    router.push(`/ticket/${regId}`)
+                    return
+                  }
+                }
+              }
+              
+              setSubmitError(`Unable to verify payment status (${errorMessage}). Please check your email or contact support.`)
+              // Clear query parameters from URL
+              window.history.replaceState({}, "", "/register")
+              return
+            }
+
+            // Parse response JSON
+            let data
+            try {
+              data = await response.json()
+            } catch (jsonError) {
+              console.error("Failed to parse response as JSON:", jsonError)
+              setSubmitError("Invalid response from server. Please contact support.")
+              window.history.replaceState({}, "", "/register")
+              return
+            }
+
+            const ticket = data?.ticket
+
+            if (!ticket) {
+              console.error("Ticket data not found in response:", data)
+              setSubmitError("Ticket information not found. Please contact support.")
+              window.history.replaceState({}, "", "/register")
+              return
+            }
+
+            if (ticket.paymentStatus === "success") {
+              // Payment successful - redirect to ticket page
+              console.log("Payment verified successfully, redirecting to ticket page")
+              router.push(`/ticket/${regId}`)
+              return
+            } else if (ticket.paymentStatus === "failed") {
+              // Payment failed - show error
+              setSubmitError("Payment verification failed. Please contact support or try again.")
+              // Clear query parameters from URL
+              window.history.replaceState({}, "", "/register")
+            } else {
+              // Payment pending
+              setSubmitError("Payment verification is pending. Please wait for confirmation or check your email.")
+              // Clear query parameters from URL
+              window.history.replaceState({}, "", "/register")
+            }
+          } catch (fetchError) {
+            console.error("Network error while verifying payment:", fetchError)
+            setSubmitError("Network error while verifying payment. Please check your connection and try again.")
+            window.history.replaceState({}, "", "/register")
+          }
+        }
+      } catch (error) {
+        console.error("Error checking payment redirect:", error)
+        setSubmitError("Error verifying payment status. Please contact support.")
+        // Clear query parameters from URL
+        window.history.replaceState({}, "", "/register")
+      } finally {
+        setCheckingPaymentStatus(false)
+      }
+    }
+
+    checkPaymentRedirect()
+  }, [router])
 
   // Check registration status on mount
   useEffect(() => {
@@ -132,12 +255,42 @@ export default function RegistrationForm() {
   const validateStep2 = () => {
     const newErrors: Record<string, string> = {}
 
-    // Check if at least one person has selected at least one ticket
-    const hasAnyTicket = formData.personTickets?.some(p => p.tickets && p.tickets.length > 0)
-
-    if (!hasAnyTicket) {
-      newErrors.personTickets = "Please select at least one ticket for any person"
+    // Build the list of persons that require ticket selection in the same order
+    // as the UI: self, spouse (if provided), then children (based on guest/member rules)
+    const persons: Array<{ personType: string; name: string; age?: string }> = []
+    persons.push({ personType: "self", name: formData.name || "You" })
+    if (formData.spouseName && formData.spouseName.trim()) {
+      persons.push({ personType: "spouse", name: formData.spouseName })
     }
+    formData.children.forEach((child: any) => {
+      if (child.name && child.name.trim()) {
+        if (formData.isGuest || child.age === ">12") {
+          persons.push({ personType: "child", name: child.name, age: child.age })
+        }
+      }
+    })
+
+    // Now ensure each person in the persons list has at least one ticket selected
+    const missingIndices: number[] = []
+    const missingNames: string[] = []
+    for (let i = 0; i < persons.length; i++) {
+      const ticketEntry = formData.personTickets?.[i]
+      const hasTickets = ticketEntry && ticketEntry.tickets && ticketEntry.tickets.length > 0
+      if (!hasTickets) {
+        missingIndices.push(i)
+        missingNames.push(persons[i].name || `${persons[i].personType}`)
+      }
+    }
+
+    if (missingNames.length > 0) {
+      if (missingNames.length === 1) {
+        newErrors.personTickets = `Please select ticket(s) for ${missingNames[0]}`
+      } else {
+        newErrors.personTickets = `Please select tickets for: ${missingNames.join(", ")}`
+      }
+    }
+
+    setMissingTicketSelectionIndices(missingIndices.length ? missingIndices : null)
 
     setErrors(newErrors)
     return { valid: Object.keys(newErrors).length === 0, newErrors }
@@ -170,7 +323,25 @@ export default function RegistrationForm() {
     // If error pertains to step 2 or 3, switch to that step first
     if (firstKey === "personTickets") {
       setCurrentStep(2)
-      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50)
+      // If we have indices for missing selections, try to scroll to the first missing person's card
+      setTimeout(() => {
+        try {
+          if (missingTicketSelectionIndices && missingTicketSelectionIndices.length > 0) {
+            const idx = missingTicketSelectionIndices[0]
+            const el = document.getElementById(`person-ticket-${idx}`)
+            if (el) {
+              el.scrollIntoView({ behavior: "smooth", block: "center" })
+              // focus first interactive element inside the card if present
+              const focusable = el.querySelector('button, [tabindex], input, select, [role="button"]') as HTMLElement | null
+              if (focusable) focusable.focus()
+              return
+            }
+          }
+          window.scrollTo({ top: 0, behavior: "smooth" })
+        } catch (e) {
+          window.scrollTo({ top: 0, behavior: "smooth" })
+        }
+      }, 80)
       return
     }
     if (firstKey === "paymentScreenshot") {
@@ -443,11 +614,13 @@ export default function RegistrationForm() {
   return (
     <div className="max-w-3xl mx-auto">
       {/* Loading State */}
-      {checkingStatus ? (
+      {checkingStatus || checkingPaymentStatus ? (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-muted-foreground">Checking registration status...</p>
+            <p className="text-muted-foreground">
+              {checkingPaymentStatus ? "Verifying payment status..." : "Checking registration status..."}
+            </p>
           </div>
         </div>
       ) : !registrationEnabled ? (

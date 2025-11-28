@@ -7,6 +7,7 @@ import {
 } from "@/lib/payment-gateway"
 import { sendEmail, getTicketEmailTemplate } from "@/lib/email"
 import { generateTicketQRCode } from "@/lib/qr-generator"
+import { getBaseUrl } from "@/lib/utils"
 
 export const runtime = "nodejs"
 export const maxDuration = 30
@@ -17,7 +18,8 @@ export const maxDuration = 30
  * - response_code: 0 = success, non-zero = error
  * - response_message: "Transaction Successful", "Transaction Failed", "Transaction Cancelled"
  */
-async function processPaymentReturn(responseData: Record<string, any>, baseUrl: string) {
+async function processPaymentReturn(responseData: Record<string, any>, req: NextRequest) {
+  const baseUrl = getBaseUrl(req)
   // Extract required parameters according to documentation section 2.3
   const transactionId = responseData.transaction_id?.toString() || null
   const orderId = responseData.order_id?.toString() || null
@@ -39,7 +41,8 @@ async function processPaymentReturn(responseData: Record<string, any>, baseUrl: 
     console.error("  - currency:", currency ? "✓" : "✗")
     console.error("  - response_code:", responseCode ? "✓" : "✗")
     console.error("  - hash:", hash ? "✓" : "✗")
-    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=missing_params`, baseUrl))
+    // Use 303 See Other to convert POST to GET and avoid Server Actions validation
+    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=missing_params`, baseUrl), { status: 303 })
   }
 
   // Verify hash using all response fields (excluding hash itself)
@@ -47,7 +50,8 @@ async function processPaymentReturn(responseData: Record<string, any>, baseUrl: 
 
   if (!hashValid) {
     console.error("❌ Hash verification failed for order:", orderId)
-    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=hash_mismatch&order_id=` + orderId, baseUrl))
+    // Use 303 See Other to convert POST to GET and avoid Server Actions validation
+    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=hash_mismatch&order_id=` + orderId, baseUrl), { status: 303 })
   }
 
   console.log("✅ Payment return hash verified for order:", orderId)
@@ -56,7 +60,8 @@ async function processPaymentReturn(responseData: Record<string, any>, baseUrl: 
   const payment = await PaymentModel.findOne({ pgOrderId: orderId })
   if (!payment) {
     console.error("❌ Payment record not found for order:", orderId)
-    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=payment_not_found&order_id=` + orderId, baseUrl))
+    // Use 303 See Other to convert POST to GET and avoid Server Actions validation
+    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=payment_not_found&order_id=` + orderId, baseUrl), { status: 303 })
   }
 
   const registrationId = payment.registrationId
@@ -72,6 +77,16 @@ async function processPaymentReturn(responseData: Record<string, any>, baseUrl: 
     legacyStatus?.toLowerCase() === "success"
 
   if (isSuccess) {
+    // Check if payment is already processed to avoid duplicate processing
+    const isAlreadyProcessed = payment.status === "success"
+    
+    if (isAlreadyProcessed) {
+      console.log("ℹ️ Payment already processed, skipping duplicate processing for order:", orderId)
+      // Still redirect to success page even if already processed
+      // Use 303 See Other to convert POST to GET and avoid Server Actions validation
+      return NextResponse.redirect(new URL(`${baseUrl}/register?registration_id=${registrationId}&order_id=${orderId}`, baseUrl), { status: 303 })
+    }
+
     // Update payment record
     payment.status = "success"
     payment.pgTransactionId = transactionId
@@ -86,8 +101,9 @@ async function processPaymentReturn(responseData: Record<string, any>, baseUrl: 
     // Update registration
     const registration = await RegistrationModel.findOne({ registrationId })
     if (!registration) {
-      console.error(" Registration not found:", registrationId)
-      return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=registration_not_found`))
+      console.error("❌ Registration not found:", registrationId)
+      // Use 303 See Other to convert POST to GET and avoid Server Actions validation
+      return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=registration_not_found`, baseUrl), { status: 303 })
     }
 
     // Generate QR code if not exists
@@ -97,7 +113,7 @@ async function processPaymentReturn(responseData: Record<string, any>, baseUrl: 
       console.log("✅ QR code generated for:", registrationId)
     }
 
-    // Update registration
+    // Update registration with payment success details
     registration.paymentStatus = "success"
     registration.paymentMethod = "payment_gateway"
     registration.paymentId = payment._id.toString()
@@ -105,41 +121,76 @@ async function processPaymentReturn(responseData: Record<string, any>, baseUrl: 
     registration.ticketStatus = "active"
     await registration.save()
 
-    console.log("✅ Registration updated:", registrationId, "- Payment status: success")
+    console.log("✅ Registration updated:", registrationId, "- Payment status: success, Ticket status: active")
 
-    // Send ticket email
+    // Send ticket email only when payment is fully successful and DB is updated
     try {
+      // Get ticket type summary for email
+      const ticketTypeSummary = registration.personTickets && registration.personTickets.length > 0
+        ? registration.personTickets.map((p: any) => `${p.name}: ${p.tickets?.join(", ") || ""}`).join(" | ")
+        : registration.ticketType || registration.ticketTypes?.join(", ") || "Event Ticket"
+
       const ticketEmailHTML = getTicketEmailTemplate({
         name: registration.name,
         registrationId: registration.registrationId,
-        ticketType: registration.ticketType || "Event Ticket",
+        ticketType: ticketTypeSummary,
         qrCodeUrl: registration.qrCode,
       })
+
+      // Prepare QR code attachment if available
+      let qrCodeAttachment: any[] = []
+      if (registration.qrCode) {
+        try {
+          // Handle both data URL format (data:image/png;base64,...) and plain base64
+          let base64Content = registration.qrCode
+          if (registration.qrCode.includes(",")) {
+            base64Content = registration.qrCode.split(",")[1]
+          } else if (registration.qrCode.startsWith("data:")) {
+            // Extract base64 from data URL
+            const base64Match = registration.qrCode.match(/base64,(.+)$/)
+            if (base64Match) {
+              base64Content = base64Match[1]
+            }
+          }
+
+          qrCodeAttachment = [
+            {
+              filename: "ticket-qr-code.png",
+              content: base64Content,
+              encoding: "base64",
+              cid: "qrcode",
+            },
+          ]
+        } catch (qrError) {
+          console.error("❌ Failed to process QR code for email attachment:", qrError)
+          // Continue without QR code attachment
+        }
+      }
 
       await sendEmail({
         to: registration.email,
         subject: `Your Event Ticket - ${registration.registrationId}`,
         html: ticketEmailHTML,
-        attachments: registration.qrCode
-          ? [
-              {
-                filename: "ticket-qr-code.png",
-                content: registration.qrCode.split(",")[1],
-                encoding: "base64",
-                cid: "qrcode",
-              },
-            ]
-          : [],
+        attachments: qrCodeAttachment,
       })
 
-      console.log("Ticket email sent to:", registration.email)
+      console.log("✅ Ticket email sent successfully to:", registration.email, "- Registration ID:", registrationId)
     } catch (emailError) {
-      console.error("Failed to send ticket email:", emailError)
+      console.error("❌ Failed to send ticket email:", emailError)
+      console.error("❌ Email error details:", {
+        error: emailError instanceof Error ? emailError.message : String(emailError),
+        stack: emailError instanceof Error ? emailError.stack : undefined,
+        registrationId,
+        email: registration.email,
+      })
+      // Log error but don't fail the payment - payment is already successful
+      // Admin can resend email manually if needed
     }
 
     // Redirect to success page
-    // return NextResponse.redirect(new URL(`${baseUrl}/payment/success?registration_id=${registrationId}&order_id=${orderId}`, baseUrl))
-    return NextResponse.redirect(new URL(`${baseUrl}/register?registration_id=${registrationId}&order_id=${orderId}`, baseUrl))
+    // Use 303 See Other to convert POST to GET and avoid Server Actions validation
+    // return NextResponse.redirect(new URL(`${baseUrl}/payment/success?registration_id=${registrationId}&order_id=${orderId}`, baseUrl), { status: 303 })
+    return NextResponse.redirect(new URL(`${baseUrl}/register?registration_id=${registrationId}&order_id=${orderId}`, baseUrl), { status: 303 })
   } else {
     // Payment failed
     payment.status = "failed"
@@ -156,7 +207,8 @@ async function processPaymentReturn(responseData: Record<string, any>, baseUrl: 
     )
 
     console.log("❌ Payment failed for order:", orderId, "- Response Code:", responseCode, "- Message:", responseMessage || errorDesc)
-    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?order_id=${orderId}&response_code=${responseCode || ""}&error=${encodeURIComponent(errorDesc)}`, baseUrl))
+    // Use 303 See Other to convert POST to GET and avoid Server Actions validation
+    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?order_id=${orderId}&response_code=${responseCode || ""}&error=${encodeURIComponent(errorDesc)}`, baseUrl), { status: 303 })
   }
 }
 
@@ -184,11 +236,13 @@ export async function GET(req: NextRequest) {
     console.log("  - Response Code:", responseData.response_code || responseData.responseCode || "N/A")
     console.log("  - Response Message:", responseData.response_message || responseData.responseMessage || "N/A")
 
-    return await processPaymentReturn(responseData, req.url)
+    return await processPaymentReturn(responseData, req)
 
   } catch (error) {
     console.error("Error processing payment return:", error)
-    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=processing_error`, req.url))
+    const baseUrl = getBaseUrl(req)
+    // Use 303 See Other to convert POST to GET and avoid Server Actions validation
+    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", baseUrl), { status: 303 })
   }
 }
 
@@ -226,20 +280,24 @@ export async function POST(req: NextRequest) {
         }
       } catch (e) {
         console.error("Failed to parse request body:", e)
-        return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=invalid_request_format`, req.url))
+        const baseUrl = getBaseUrl(req)
+        // Use 303 See Other to convert POST to GET and avoid Server Actions validation
+        return NextResponse.redirect(new URL("/payment/failed?error=invalid_request_format", baseUrl), { status: 303 })
       }
     }
 
     // Log received parameters for debugging
-    console.log("📥 Payment return (POST) received for order:", responseData.order_id)
+    console.log("  - Payment return (POST) received for order:", responseData.order_id)
     console.log("  - Response Code:", responseData.response_code || responseData.responseCode || "N/A")
     console.log("  - Response Message:", responseData.response_message || responseData.responseMessage || "N/A")
     console.log("  - Content-Type:", contentType)
 
-    return await processPaymentReturn(responseData, baseUrl)
+    return await processPaymentReturn(responseData, req)
   } catch (error) {
     console.error("Error processing payment return (POST):", error)
-    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=processing_error`, req.url))
+    const baseUrl = getBaseUrl(req)
+    // Use 303 See Other to convert POST to GET and avoid Server Actions validation
+    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", baseUrl), { status: 303 })
   }
 }
 

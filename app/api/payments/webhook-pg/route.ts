@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
         console.log("✅ QR code generated via webhook for:", registrationId)
       }
 
-      // Update registration
+      // Update registration with payment success details
       registration.paymentStatus = "success"
       registration.paymentMethod = "payment_gateway" as any
       registration.paymentId = payment._id.toString()
@@ -120,36 +120,70 @@ export async function POST(req: NextRequest) {
       registration.ticketStatus = "active"
       await registration.save()
 
-      console.log("✅ Registration updated via webhook:", registrationId, "- Method: payment_gateway")
+      console.log("✅ Registration updated via webhook:", registrationId, "- Payment status: success, Ticket status: active")
 
-      // Send ticket email
+      // Send ticket email only when payment is fully successful and DB is updated
       try {
+        // Get ticket type summary for email
+        const ticketTypeSummary = registration.personTickets && registration.personTickets.length > 0
+          ? registration.personTickets.map((p: any) => `${p.name}: ${p.tickets?.join(", ") || ""}`).join(" | ")
+          : registration.ticketType || registration.ticketTypes?.join(", ") || "Event Ticket"
+
         const ticketEmailHTML = getTicketEmailTemplate({
           name: registration.name,
           registrationId: registration.registrationId,
-          ticketType: registration.ticketType || "Event Ticket",
+          ticketType: ticketTypeSummary,
           qrCodeUrl: registration.qrCode,
         })
+
+        // Prepare QR code attachment if available
+        let qrCodeAttachment: any[] = []
+        if (registration.qrCode) {
+          try {
+            // Handle both data URL format (data:image/png;base64,...) and plain base64
+            let base64Content = registration.qrCode
+            if (registration.qrCode.includes(",")) {
+              base64Content = registration.qrCode.split(",")[1]
+            } else if (registration.qrCode.startsWith("data:")) {
+              // Extract base64 from data URL
+              const base64Match = registration.qrCode.match(/base64,(.+)$/)
+              if (base64Match) {
+                base64Content = base64Match[1]
+              }
+            }
+
+            qrCodeAttachment = [
+              {
+                filename: "ticket-qr-code.png",
+                content: base64Content,
+                encoding: "base64",
+                cid: "qrcode",
+              },
+            ]
+          } catch (qrError) {
+            console.error("❌ Failed to process QR code for email attachment:", qrError)
+            // Continue without QR code attachment
+          }
+        }
 
         await sendEmail({
           to: registration.email,
           subject: `🎟️ Your Event Ticket - ${registration.registrationId}`,
           html: ticketEmailHTML,
-          attachments: registration.qrCode
-            ? [
-                {
-                  filename: "ticket-qr-code.png",
-                  content: registration.qrCode.split(",")[1],
-                  encoding: "base64",
-                  cid: "qrcode",
-                },
-              ]
-            : [],
+          attachments: qrCodeAttachment,
         })
 
-        console.log("🎟️ Ticket email sent via webhook to:", registration.email)
+        console.log("✅ Ticket email sent successfully via webhook to:", registration.email, "- Registration ID:", registrationId)
       } catch (emailError) {
-        console.error("Failed to send ticket email via webhook:", emailError)
+        console.error("❌ Failed to send ticket email via webhook:", emailError)
+        console.error("❌ Email error details:", {
+          error: emailError instanceof Error ? emailError.message : String(emailError),
+          stack: emailError instanceof Error ? emailError.stack : undefined,
+          registrationId,
+          email: registration.email,
+        })
+        // Log error but don't fail the payment - payment is already successful
+        // Admin can resend email manually if needed
       }
     } else {
       // Payment failed

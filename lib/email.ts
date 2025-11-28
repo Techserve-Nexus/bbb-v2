@@ -94,7 +94,7 @@ const SMTP_CONFIG = {
 console.log("SMTP Config:", { host: SMTP_CONFIG.host, port: SMTP_CONFIG.port, secure: SMTP_CONFIG.secure, hasAuth: !!SMTP_CONFIG.auth })
 
 // Create transporter with timeout handling
-export const createTransporter = () => {
+export const createTransporter = async () => {
   try {
     // Validate essential credentials early to give helpful errors in production
     const missing: string[] = []
@@ -108,14 +108,14 @@ export const createTransporter = () => {
 
     const transporter = nodemailer.createTransport(SMTP_CONFIG)
 
-    // Optionally verify transporter connectivity immediately to surface config errors
-    transporter.verify((err, success) => {
-      if (err) {
-        console.error("Email transporter verification failed:", err)
-      } else {
-        console.log("Email transporter verified")
-      }
-    })
+    // Await verification to surface connectivity/auth errors immediately
+    try {
+      await transporter.verify()
+      console.log("Email transporter verified")
+    } catch (verifyErr) {
+      console.error("Email transporter verification failed:", verifyErr)
+      throw verifyErr
+    }
 
     return transporter
   } catch (error) {
@@ -144,7 +144,7 @@ export const sendEmail = async ({
   // Try to create transporter; if SMTP is not configured and SendGrid is available, fallback.
   let transporter
   try {
-    transporter = createTransporter()
+    transporter = await createTransporter()
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     console.error('createTransporter failed:', msg)
@@ -171,10 +171,10 @@ export const sendEmail = async ({
   const mailOptions = {
     from: {
       name: emailConfig.smtp.from.name,
-      address: SMTP_FROM_ENV || 'info@shreeparashurama.com',
+      address: SMTP_FROM_ENV || 'bbbshreeparashurama@gmail.com',
     },
     // Prefer explicit replyTo argument, then env, then config default
-    replyTo: replyTo || SMTP_REPLYTO_ENV || emailConfig.smtp.replyTo.email || 'info@shreeparashurama.com',
+    replyTo: replyTo || SMTP_REPLYTO_ENV || emailConfig.smtp.replyTo.email || 'bbbshreeparashurama@gmail.com',
     to,
     subject,
     html,
@@ -753,6 +753,24 @@ export const getTicketEmailTemplate = ({
               <p style="margin: 0 0 30px; font-size: 16px; color: #52525b; line-height: 1.6;">
                 ${config.subheading}
               </p>
+            </td>
+          </tr>
+          
+          <!-- Registration Success Message -->
+          <tr>
+            <td style="padding: 0 40px 30px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
+                <tr>
+                  <td style="padding: 30px; text-align: center;">
+                    <h2 style="margin: 0 0 10px; font-size: 28px; font-weight: 700; color: #ffffff;">
+                      🎉 Registration Successful!
+                    </h2>
+                    <p style="margin: 0; font-size: 16px; color: rgba(255,255,255,0.95); line-height: 1.6;">
+                      Thank you for registering for ${EVENT_TITLE}. Your registration has been confirmed and your payment has been verified successfully.
+                    </p>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           

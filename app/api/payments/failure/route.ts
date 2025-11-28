@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import connectDB from "@/lib/db"
 import { PaymentModel, RegistrationModel } from "@/lib/models"
+import { getBaseUrl } from "@/lib/utils"
+import { sendEmail, getPaymentVerifiedEmailTemplate } from "@/lib/email"
 
 export const runtime = "nodejs"
 export const maxDuration = 30
@@ -18,21 +20,56 @@ async function processPaymentFailure(params: {
   const { orderId, transactionId, status, baseUrl, isPostRequest = false } = params
 
   if (orderId) {
-    // Find and update payment record
-    const payment = await PaymentModel.findOne({ pgOrderId: orderId })
+    // Find and update payment record. Try multiple possible order id fields
+    let payment = await PaymentModel.findOne({ pgOrderId: orderId })
+    if (!payment) {
+      payment = await PaymentModel.findOne({ razorpayOrderId: orderId })
+    }
+
     if (payment) {
       payment.status = "failed"
       if (transactionId) payment.pgTransactionId = transactionId
       payment.verificationNotes = `Payment failed: ${status || "Unknown error"}`
       await payment.save()
 
-      // Update registration
+      // Update registration paymentStatus
       await RegistrationModel.findOneAndUpdate(
         { registrationId: payment.registrationId },
         { paymentStatus: "failed" }
       )
 
-      console.log("❌ Payment marked as failed:", orderId)
+      console.log("❌ Payment marked as failed:", orderId, "-> paymentId:", payment._id)
+
+      // Send payment failure email to registrant (best-effort)
+      try {
+        const registration = await RegistrationModel.findOne({ registrationId: payment.registrationId })
+        if (!registration) {
+          console.log("⚠️ Registration not found for payment.registrationId:", payment.registrationId)
+        } else if (!registration.email) {
+          console.log("⚠️ Registration has no email, cannot send failure email for:", registration.registrationId)
+        } else {
+          console.log("ℹ️ Sending payment failure email to:", registration.email)
+          const html = getPaymentVerifiedEmailTemplate({
+            name: registration.name,
+            registrationId: registration.registrationId,
+            ticketType: registration.ticketType,
+            status: "rejected",
+            reason: payment.verificationNotes || status || "Payment was declined",
+          })
+
+          await sendEmail({
+            to: registration.email,
+            subject: `Payment Verification Failed - ${registration.registrationId}`,
+            html,
+          })
+
+          console.log("📨 Payment failure email sent to:", registration.email)
+        }
+      } catch (emailErr) {
+        console.error("Failed to send payment failure email:", emailErr)
+      }
+    } else {
+      console.log("⚠️ No payment record found for order id:", orderId)
     }
   }
 
@@ -68,15 +105,18 @@ export async function GET(req: NextRequest) {
     const transactionId = searchParams.get("transaction_id")
     const status = searchParams.get("status")
 
+    const baseUrl = getBaseUrl(req)
+
     return await processPaymentFailure({
       orderId,
       transactionId,
       status,
-      baseUrl: req.url,
+      baseUrl,
     })
   } catch (error) {
     console.error("Error processing payment failure:", error)
-    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", req.url))
+    const baseUrl = getBaseUrl(req)
+    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", baseUrl))
   }
 }
 
@@ -109,16 +149,19 @@ export async function POST(req: NextRequest) {
       status = body.status || null
     }
 
+    const baseUrl = getBaseUrl(req)
+
     return await processPaymentFailure({
       orderId,
       transactionId,
       status,
-      baseUrl: req.url,
+      baseUrl,
       isPostRequest: true,
     })
   } catch (error) {
     console.error("Error processing payment failure (POST):", error)
-    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", req.url))
+    const baseUrl = getBaseUrl(req)
+    return NextResponse.redirect(new URL("/payment/failed?error=processing_error", baseUrl))
   }
 }
 
