@@ -34,14 +34,14 @@ async function processPaymentReturn(responseData: Record<string, any>, req: Next
 
   // Check for required parameters
   if (!transactionId || !orderId || !amount || !currency) {
-    console.error("❌ Missing required parameters in payment return")
+    console.error("  - Missing required parameters in payment return")
     console.error("  - transaction_id:", transactionId ? "✓" : "✗")
     console.error("  - order_id:", orderId ? "✓" : "✗")
     console.error("  - amount:", amount ? "✓" : "✗")
     console.error("  - currency:", currency ? "✓" : "✗")
     console.error("  - response_code:", responseCode ? "✓" : "✗")
     console.error("  - hash:", hash ? "✓" : "✗")
-    return NextResponse.redirect(new URL("/payment/failed?error=missing_params", baseUrl))
+    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=missing_params`, baseUrl))
   }
 
   // Verify hash using all response fields (excluding hash itself)
@@ -49,7 +49,7 @@ async function processPaymentReturn(responseData: Record<string, any>, req: Next
 
   if (!hashValid) {
     console.error("❌ Hash verification failed for order:", orderId)
-    return NextResponse.redirect(new URL("/payment/failed?error=hash_mismatch&order_id=" + orderId, baseUrl))
+    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=hash_mismatch&order_id=` + orderId, baseUrl))
   }
 
   console.log("✅ Payment return hash verified for order:", orderId)
@@ -58,7 +58,7 @@ async function processPaymentReturn(responseData: Record<string, any>, req: Next
   const payment = await PaymentModel.findOne({ pgOrderId: orderId })
   if (!payment) {
     console.error("❌ Payment record not found for order:", orderId)
-    return NextResponse.redirect(new URL("/payment/failed?error=payment_not_found&order_id=" + orderId, baseUrl))
+    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=payment_not_found&order_id=` + orderId, baseUrl))
   }
 
   const registrationId = payment.registrationId
@@ -88,8 +88,8 @@ async function processPaymentReturn(responseData: Record<string, any>, req: Next
     // Update registration
     const registration = await RegistrationModel.findOne({ registrationId })
     if (!registration) {
-      console.error("❌ Registration not found:", registrationId)
-      return NextResponse.redirect(new URL("/payment/failed?error=registration_not_found&order_id=" + orderId, baseUrl))
+      console.error(" Registration not found:", registrationId)
+      return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?error=registration_not_found`))
     }
 
     // Generate QR code if not exists
@@ -140,7 +140,8 @@ async function processPaymentReturn(responseData: Record<string, any>, req: Next
     }
 
     // Redirect to success page
-    return NextResponse.redirect(new URL(`/payment/success?registration_id=${registrationId}&order_id=${orderId}`, baseUrl))
+    // return NextResponse.redirect(new URL(`${baseUrl}/payment/success?registration_id=${registrationId}&order_id=${orderId}`, baseUrl))
+    return NextResponse.redirect(new URL(`${baseUrl}/register?registration_id=${registrationId}&order_id=${orderId}`, baseUrl))
   } else {
     // Payment failed
     payment.status = "failed"
@@ -157,7 +158,7 @@ async function processPaymentReturn(responseData: Record<string, any>, req: Next
     )
 
     console.log("❌ Payment failed for order:", orderId, "- Response Code:", responseCode, "- Message:", responseMessage || errorDesc)
-    return NextResponse.redirect(new URL(`/payment/failed?order_id=${orderId}&response_code=${responseCode || ""}&error=${encodeURIComponent(errorDesc)}`, baseUrl))
+    return NextResponse.redirect(new URL(`${baseUrl}/payment/failed?order_id=${orderId}&response_code=${responseCode || ""}&error=${encodeURIComponent(errorDesc)}`, baseUrl))
   }
 }
 
@@ -167,6 +168,7 @@ async function processPaymentReturn(responseData: Record<string, any>, req: Next
  * According to documentation section 2.3, all response parameters are sent as query params
  */
 export async function GET(req: NextRequest) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
   try {
     await connectDB()
 
@@ -199,6 +201,7 @@ export async function GET(req: NextRequest) {
  * with all response parameters as form data (application/x-www-form-urlencoded)
  */
 export async function POST(req: NextRequest) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
   try {
     await connectDB()
 
