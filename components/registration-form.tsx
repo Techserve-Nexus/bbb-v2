@@ -58,7 +58,7 @@ export default function RegistrationForm() {
       { name: "", age: "<12" },
     ],
     personTickets: [],
-    paymentMethod: "manual",
+    paymentMethod: "payment_gateway",
     paymentScreenshot: undefined,
     paymentScreenshotUrl: undefined,
   })
@@ -298,12 +298,7 @@ export default function RegistrationForm() {
 
   const validateStep3 = () => {
     const newErrors: Record<string, string> = {}
-
-    // Only validate screenshot for manual payment
-    if (formData.paymentMethod === "manual" && !formData.paymentScreenshotUrl) {
-      newErrors.paymentScreenshot = "Please upload payment screenshot"
-    }
-
+    // No validation needed for online payment
     setErrors(newErrors)
     return { valid: Object.keys(newErrors).length === 0, newErrors }
   }
@@ -677,7 +672,7 @@ export default function RegistrationForm() {
                   { name: "", age: "<12" },
                 ],
                 personTickets: [],
-                paymentMethod: "manual",
+                paymentMethod: "payment_gateway",
                 paymentScreenshot: undefined,
                 paymentScreenshotUrl: undefined,
               })
@@ -766,8 +761,7 @@ export default function RegistrationForm() {
                 onClick={handleSubmit} 
                 disabled={
                   isSubmitting || 
-                  isProcessingPayment ||
-                  (formData.paymentMethod === "manual" && !formData.paymentScreenshotUrl)
+                  isProcessingPayment
                 }
                 className="bg-primary hover:bg-secondary text-primary-foreground"
               >
