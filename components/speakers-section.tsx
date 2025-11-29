@@ -108,80 +108,38 @@ export default function SpeakersSection() {
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">Our Speakers</h2>
           <p className="text-muted-foreground mt-2">Learn from industry leaders and experts</p>
         </div>
-
-        {!useCarousel ? (
-          /* Grid layout for 4 or fewer speakers */
-          <div className={`grid ${getGridClass()} gap-6 justify-items-center max-w-5xl mx-auto`}>
-            {speakers.map((speaker) => (
-              <div key={speaker.id} className="w-full max-w-sm">
-                <SpeakerCard speaker={speaker} />
-              </div>
-            ))}
-          </div>
-        ) : (
-          /* Carousel for more than 4 speakers (horizontal scroll like MC team) */
-          <div className="relative group">
-            <div className="overflow-hidden">
-              <div ref={scrollRef} className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
-                {speakers.map((speaker) => (
-                  <div
-                    key={speaker.id}
-                    className="shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] min-w-0"
-                  >
-                    <SpeakerCard speaker={speaker} />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Overlay left/right arrows (desktop only) */}
-            {speakers.length > 4 && (
-              <>
-                <button
-                  onClick={scrollPrev}
-                  disabled={!canScrollPrev}
-                  aria-label="Scroll left"
-                  className={`hidden md:inline-flex items-center justify-center absolute left-3 top-1/2 z-10 bg-primary/90 text-white p-3 rounded-full shadow-lg transition-all duration-200 transform -translate-y-1/2 -translate-x-2 opacity-0 pointer-events-none group-hover:translate-x-0 group-hover:opacity-100 group-hover:pointer-events-auto hover:scale-110 ${!canScrollPrev ? "group-hover:opacity-40" : ""}`}
-                >
-                  <ChevronLeft size={18} />
-                </button>
-
-                <button
-                  onClick={scrollNext}
-                  disabled={!canScrollNext}
-                  aria-label="Scroll right"
-                  className={`hidden md:inline-flex items-center justify-center absolute right-3 top-1/2 z-10 bg-primary/90 text-white p-3 rounded-full shadow-lg transition-all duration-200 transform -translate-y-1/2 translate-x-2 opacity-0 pointer-events-none group-hover:translate-x-0 group-hover:opacity-100 group-hover:pointer-events-auto hover:scale-110 ${!canScrollNext ? "group-hover:opacity-40" : ""}`}
-                >
-                  <ChevronRight size={18} />
-                </button>
-
-                {/* Fallback centered buttons for small screens (kept for accessibility) */}
-                <div className="flex justify-center gap-4 mt-8 md:hidden">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={scrollPrev}
-                    disabled={!canScrollPrev}
-                    className="rounded-full"
-                    aria-label="Previous speakers"
-                  >
-                    <ChevronLeft size={20} />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={scrollNext}
-                    disabled={!canScrollNext}
-                    className="rounded-full"
-                    aria-label="Next speakers"
-                  >
-                    <ChevronRight size={20} />
-                  </Button>
+        <div className="relative group">
+          <div ref={scrollRef} className="flex gap-8 min-w-[1020px] overflow-x-auto pb-2 scrollbar-hide scroll-smooth">
+            {speakers.length === 0 ? (
+              <div className="text-center text-muted-foreground w-full">No speakers found.</div>
+            ) : (
+              speakers.map((speaker) => (
+                <div key={speaker.id} className="min-w-[340px] max-w-sm w-full">
+                  <SpeakerCard speaker={speaker} />
                 </div>
-              </>
+              ))
             )}
           </div>
-        )}
+          {/* Left/Right arrows on hover for carousel navigation */}
+          {speakers.length > 3 && (
+            <>
+              <button
+                onClick={scrollPrev}
+                aria-label="Scroll left"
+                className="hidden md:flex items-center justify-center absolute left-2 top-1/2 z-10 bg-primary/90 text-white p-2 rounded-full shadow-lg transition-all duration-200 transform -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto hover:scale-110"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                onClick={scrollNext}
+                aria-label="Scroll right"
+                className="hidden md:flex items-center justify-center absolute right-2 top-1/2 z-10 bg-primary/90 text-white p-2 rounded-full shadow-lg transition-all duration-200 transform -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto hover:scale-110"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </section>
   )

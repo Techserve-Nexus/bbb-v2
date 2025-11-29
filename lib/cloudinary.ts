@@ -23,7 +23,7 @@ export const uploadToCloudinary = async (
 
     // Upload with timeout
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Cloudinary upload timeout")), 15000)
+      setTimeout(() => reject(new Error("Cloudinary upload timeout")), 30000)
     )
 
     const uploadPromise = cloudinaryInstance.uploader.upload(base64Image, {
