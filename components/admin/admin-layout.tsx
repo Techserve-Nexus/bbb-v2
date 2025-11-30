@@ -39,10 +39,10 @@ export default function AdminLayout({ children, activeTab, setActiveTab }: Admin
     { id: "sponsors", label: "Sponsors", icon: Handshake },
     { id: "sponsor-requests", label: "Sponsor Requests", icon: Handshake },
     { id: "speakers", label: "Speakers", icon: Mic },
-    // { id: "sponsor-requests", label: "Sponsor Requests", icon: Handshake },
-    // { id: "visitors", label: "Visitors", icon: Eye },
     { id: "banners", label: "Banners", icon: ImageIcon },
     { id: "settings", label: "Settings", icon: Settings },
+    { id: "chair-team", label: "Chair Team", icon: Crown },
+    { id: "mc-team", label: "MC Team", icon: Eye },
   ]
 
   return (
