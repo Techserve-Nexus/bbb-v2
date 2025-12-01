@@ -419,10 +419,11 @@ export default function RegistrationForm() {
       const regId = data.registrationId
       setRegistrationId(regId)
       
+      console.log("Registration successful:", data)
+      console.log("Redirecting to payment gateway with amount:", data.amount || calculateTotalAmount(formData.personTickets))
+      
       // Directly redirect to payment gateway
       await handlePaymentGatewayPayment(regId, data.amount || calculateTotalAmount(formData.personTickets))
-      
-      console.log("Registration successful:", data)
     } catch (error) {
       console.error("Registration error:", error)
       setSubmitError(error instanceof Error ? error.message : "Failed to submit registration")
@@ -455,13 +456,22 @@ export default function RegistrationForm() {
 
   const handlePaymentGatewayPayment = async (regId: string, amount: number) => {
     try {
+      console.log("🔄 Starting payment gateway flow...")
+      console.log("Registration ID:", regId)
+      console.log("Amount:", amount)
+      
       // Create payment request
       const paymentData = await createPaymentRequest(amount, regId)
+      
+      console.log("✅ Payment request created successfully")
+      console.log("Payment URL:", paymentData.paymentUrl)
 
       if (!paymentData.success) {
         throw new Error(paymentData.error || "Failed to create payment request")
       }
 
+      console.log("🚀 Submitting payment form and redirecting to payment gateway...")
+      
       // Submit payment form to redirect to payment gateway
       submitPaymentForm(paymentData.paymentParams, paymentData.paymentUrl)
 
@@ -469,7 +479,7 @@ export default function RegistrationForm() {
       // After payment, they'll be redirected back to /api/payments/return
       // which will then redirect them to the ticket page
     } catch (error) {
-      console.error("Payment gateway error:", error)
+      console.error("❌ Payment gateway error:", error)
       setSubmitError(error instanceof Error ? error.message : "Payment initiation failed")
       setIsSubmitting(false)
     }
