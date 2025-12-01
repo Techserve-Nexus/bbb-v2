@@ -106,9 +106,9 @@ export default function ChairTeamManagement() {
     if (formData.phone && !/^\d{10}$/.test(formData.phone)) {
       errors.phone = "Phone number must be 10 digits"
     }
-    // Email validation: basic format
-    if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) {
-      errors.email = "Invalid email address"
+    // Email validation: must end with @gmail.com
+    if (formData.email && !/^\S+@gmail\.com$/.test(formData.email)) {
+      errors.email = "Email must end with @gmail.com"
     }
     setFormErrors(errors)
     if (Object.keys(errors).length > 0) {
