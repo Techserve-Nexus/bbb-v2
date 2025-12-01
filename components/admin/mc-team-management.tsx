@@ -28,6 +28,7 @@ export default function MCTeamManagement() {
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [formErrors, setFormErrors] = useState<{ phone?: string; email?: string }>({})
 
   useEffect(() => {
     fetchMembers()
@@ -101,6 +102,19 @@ export default function MCTeamManagement() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    let errors: { phone?: string; email?: string } = {}
+    // Phone validation: must be 10 digits
+    if (formData.phone && !/^\d{10}$/.test(formData.phone)) {
+      errors.phone = "Phone number must be 10 digits"
+    }
+    // Email validation: basic format
+    if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) {
+      errors.email = "Invalid email address"
+    }
+    setFormErrors(errors)
+    if (Object.keys(errors).length > 0) {
+      return
+    }
     if (!formData.name || !formData.designation || (!editingId && !formData.photo) || formData.order === undefined || formData.order === null || formData.order === "") {
       alert("Please fill in all required fields")
       return
@@ -319,11 +333,13 @@ export default function MCTeamManagement() {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-foreground mb-2">Phone</label>
-                <input type="text" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="9448030064" />
+                <input type="text" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className={`w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${formErrors.phone ? 'border-red-500' : ''}`} placeholder="9448030064" />
+                {formErrors.phone && <p className="text-xs text-red-600 mt-1">{formErrors.phone}</p>}
               </div>
               <div>
                 <label className="block text-sm font-semibold text-foreground mb-2">Email</label>
-                <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="aniphal@gmail.com" />
+                <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className={`w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${formErrors.email ? 'border-red-500' : ''}`} placeholder="aniphal@gmail.com" />
+                {formErrors.email && <p className="text-xs text-red-600 mt-1">{formErrors.email}</p>}
               </div>
               <div>
                 <label className="block text-sm font-semibold text-foreground mb-2">Order</label>
