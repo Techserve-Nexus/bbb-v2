@@ -5,7 +5,6 @@ import { ChevronRight, ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Step1BasicAndFamily from "./registration-steps/step1-basic-and-family"
 import Step2PerPersonTickets from "./registration-steps/step2-per-person-tickets"
-import Step3Payment from "./registration-steps/step4-payment"
 import { loadRazorpayScript } from "@/lib/razorpay"
 import { createPaymentRequest, submitPaymentForm } from "@/lib/payment-gateway-client"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -31,11 +30,6 @@ interface FormData {
 
   // Step 2 - Per Person Ticket Selection
   personTickets: PersonTicket[]
-  
-  // Step 3 - Payment
-  paymentMethod: "razorpay" | "manual" | "payment_gateway"
-  paymentScreenshot?: string
-  paymentScreenshotUrl?: string
 }
 
 export default function RegistrationForm() {
@@ -58,9 +52,6 @@ export default function RegistrationForm() {
       { name: "", age: "<12" },
     ],
     personTickets: [],
-    paymentMethod: "payment_gateway",
-    paymentScreenshot: undefined,
-    paymentScreenshotUrl: undefined,
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -70,7 +61,6 @@ export default function RegistrationForm() {
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState("")
   const [registrationId, setRegistrationId] = useState("")
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
   const [checkingPaymentStatus, setCheckingPaymentStatus] = useState(false)
 
   // Check for payment redirect query parameters and verify payment status
@@ -296,13 +286,6 @@ export default function RegistrationForm() {
     return { valid: Object.keys(newErrors).length === 0, newErrors }
   }
 
-  const validateStep3 = () => {
-    const newErrors: Record<string, string> = {}
-    // No validation needed for online payment
-    setErrors(newErrors)
-    return { valid: Object.keys(newErrors).length === 0, newErrors }
-  }
-
   // Auto-hide validation alert after a short time
   useEffect(() => {
     if (!validationAlert) return
@@ -337,11 +320,6 @@ export default function RegistrationForm() {
           window.scrollTo({ top: 0, behavior: "smooth" })
         }
       }, 80)
-      return
-    }
-    if (firstKey === "paymentScreenshot") {
-      setCurrentStep(3)
-      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50)
       return
     }
 
@@ -381,7 +359,7 @@ export default function RegistrationForm() {
       }
     }
 
-    if (currentStep < 3) {
+    if (currentStep < 2) {
       setCurrentStep(currentStep + 1)
       window.scrollTo(0, 0)
     }
@@ -395,10 +373,10 @@ export default function RegistrationForm() {
   }
 
   const handleSubmit = async () => {
-    // Validate Step 3 (Payment)
-    const { valid, newErrors } = validateStep3()
+    // Validate Step 2 (Tickets) before submitting
+    const { valid, newErrors } = validateStep2()
     if (!valid) {
-      setValidationAlert("Please fix the highlighted fields before submitting")
+      setValidationAlert("Please select at least one ticket to continue")
       focusFirstError(newErrors)
       return
     }
@@ -419,8 +397,6 @@ export default function RegistrationForm() {
         spouseName: formData.spouseName || undefined,
         children: formData.children.filter(child => child.name.trim() !== ""),
         personTickets: formData.personTickets,
-        paymentMethod: formData.paymentMethod,
-        paymentScreenshotUrl: formData.paymentMethod === "manual" ? formData.paymentScreenshotUrl : undefined,
       }
 
       // alert("Submitting your registration. Please wait...")
@@ -443,19 +419,11 @@ export default function RegistrationForm() {
       const regId = data.registrationId
       setRegistrationId(regId)
       
-      // Handle different payment methods
-      if (formData.paymentMethod === "razorpay") {
-        await handleRazorpayPayment(regId, data.amount || calculateTotalAmount(formData.personTickets))
-      } else if (formData.paymentMethod === "payment_gateway") {
-        await handlePaymentGatewayPayment(regId, data.amount || calculateTotalAmount(formData.personTickets))
-      } else {
-        // Manual payment - show success message
-        setSubmitSuccess(true)
-        localStorage.removeItem("registrationForm")
-        // alert(`Registration successful! Your Registration ID is ${regId}. Please check your email for further instructions.`)
-      }
-      
       console.log("Registration successful:", data)
+      console.log("Redirecting to payment gateway with amount:", data.amount || calculateTotalAmount(formData.personTickets))
+      
+      // Directly redirect to payment gateway
+      await handlePaymentGatewayPayment(regId, data.amount || calculateTotalAmount(formData.personTickets))
     } catch (error) {
       console.error("Registration error:", error)
       setSubmitError(error instanceof Error ? error.message : "Failed to submit registration")
@@ -488,15 +456,22 @@ export default function RegistrationForm() {
 
   const handlePaymentGatewayPayment = async (regId: string, amount: number) => {
     try {
-      setIsProcessingPayment(true)
-
+      console.log("🔄 Starting payment gateway flow...")
+      console.log("Registration ID:", regId)
+      console.log("Amount:", amount)
+      
       // Create payment request
       const paymentData = await createPaymentRequest(amount, regId)
+      
+      console.log("✅ Payment request created successfully")
+      console.log("Payment URL:", paymentData.paymentUrl)
 
       if (!paymentData.success) {
         throw new Error(paymentData.error || "Failed to create payment request")
       }
 
+      console.log("🚀 Submitting payment form and redirecting to payment gateway...")
+      
       // Submit payment form to redirect to payment gateway
       submitPaymentForm(paymentData.paymentParams, paymentData.paymentUrl)
 
@@ -504,17 +479,14 @@ export default function RegistrationForm() {
       // After payment, they'll be redirected back to /api/payments/return
       // which will then redirect them to the ticket page
     } catch (error) {
-      console.error("Payment gateway error:", error)
+      console.error("❌ Payment gateway error:", error)
       setSubmitError(error instanceof Error ? error.message : "Payment initiation failed")
       setIsSubmitting(false)
-      setIsProcessingPayment(false)
     }
   }
 
   const handleRazorpayPayment = async (regId: string, amount: number) => {
     try {
-      setIsProcessingPayment(true)
-
       // Load Razorpay script
       const scriptLoaded = await loadRazorpayScript()
       if (!scriptLoaded) {
@@ -572,7 +544,6 @@ export default function RegistrationForm() {
             // console.log("✅ Payment verified successfully:", verifyData)
             setSubmitSuccess(true)
             setIsSubmitting(false)
-            setIsProcessingPayment(false)
             localStorage.removeItem("registrationForm")
 
             // Redirect to ticket page after 2 seconds
@@ -583,12 +554,10 @@ export default function RegistrationForm() {
             // console.error("Payment verification error:", verifyError)
             setSubmitError(verifyError instanceof Error ? verifyError.message : "Payment verification failed")
             setIsSubmitting(false)
-            setIsProcessingPayment(false)
           }
         },
         modal: {
           ondismiss: () => {
-            setIsProcessingPayment(false)
             setIsSubmitting(false)
             setSubmitError("Payment cancelled. You can retry payment from your registration email.")
           },
@@ -604,7 +573,6 @@ export default function RegistrationForm() {
       console.error("Razorpay payment error:", error)
       setSubmitError(error instanceof Error ? error.message : "Payment initiation failed")
       setIsSubmitting(false)
-      setIsProcessingPayment(false)
     }
   }
 
@@ -672,9 +640,6 @@ export default function RegistrationForm() {
                   { name: "", age: "<12" },
                 ],
                 personTickets: [],
-                paymentMethod: "payment_gateway",
-                paymentScreenshot: undefined,
-                paymentScreenshotUrl: undefined,
               })
             }}
             className="bg-primary hover:bg-secondary text-primary-foreground"
@@ -687,7 +652,7 @@ export default function RegistrationForm() {
           {/* Progress Bar */}
           <div className="mb-12">
             <div className="flex justify-between items-center mb-4">
-              {[1, 2, 3].map((step) => (
+              {[1, 2].map((step) => (
                 <div
                   key={step}
                   className={`flex-1 h-1 mx-1 rounded-full transition-all ${
@@ -702,9 +667,6 @@ export default function RegistrationForm() {
               </span>
               <span className={currentStep === 2 ? "text-primary font-semibold" : "text-muted-foreground"}>
                 Select Tickets
-              </span>
-              <span className={currentStep === 3 ? "text-primary font-semibold" : "text-muted-foreground"}>
-                Payment
               </span>
             </div>
           </div>
@@ -727,7 +689,6 @@ export default function RegistrationForm() {
           <div className="bg-background border border-border rounded-lg p-8 md:p-12 mb-8">
             {currentStep === 1 && <Step1BasicAndFamily formData={formData} setFormData={setFormData} errors={errors} />}
             {currentStep === 2 && <Step2PerPersonTickets formData={formData} setFormData={setFormData} errors={errors} />}
-            {currentStep === 3 && <Step3Payment formData={formData} setFormData={setFormData} />}
           </div>
 
           {/* Navigation Buttons */}
@@ -745,9 +706,9 @@ export default function RegistrationForm() {
               Previous
             </Button>
 
-            <div className="text-sm text-muted-foreground self-center">Step {currentStep} of 3</div>
+            <div className="text-sm text-muted-foreground self-center">Step {currentStep} of 2</div>
 
-            {currentStep < 3 ? (
+            {currentStep < 2 ? (
               <Button 
                 onClick={handleNext} 
                 disabled={isSubmitting}
@@ -759,19 +720,10 @@ export default function RegistrationForm() {
             ) : (
               <Button 
                 onClick={handleSubmit} 
-                disabled={
-                  isSubmitting || 
-                  isProcessingPayment
-                }
+                disabled={isSubmitting}
                 className="bg-primary hover:bg-secondary text-primary-foreground"
               >
-                {isProcessingPayment 
-                  ? "Processing Payment..." 
-                  : isSubmitting 
-                    ? "Submitting..." 
-                    : formData.paymentMethod === "razorpay"
-                      ? "Proceed to Payment"
-                      : "Complete Registration"}
+                {isSubmitting ? "Submitting..." : "Complete Registration"}
               </Button>
             )}
           </div>

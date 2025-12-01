@@ -36,13 +36,13 @@ export default function AdminLayout({ children, activeTab, setActiveTab }: Admin
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "registrations", label: "Registrations", icon: FileText },
     { id: "payments", label: "Payments", icon: CreditCard },
-    { id: "sponsors", label: "Sponsors", icon: Handshake },
-    { id: "sponsor-requests", label: "Sponsor Requests", icon: Handshake },
-    { id: "speakers", label: "Speakers", icon: Mic },
     { id: "banners", label: "Banners", icon: ImageIcon },
-    { id: "settings", label: "Settings", icon: Settings },
     { id: "chair-team", label: "Chair Team", icon: Crown },
     { id: "mc-team", label: "MC Team", icon: Eye },
+    { id: "speakers", label: "Speakers", icon: Mic },
+    { id: "sponsors", label: "Sponsors", icon: Handshake },
+    { id: "sponsor-requests", label: "Sponsor Requests", icon: Handshake },
+    { id: "settings", label: "Settings", icon: Settings },
   ]
 
   return (

@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       personTickets = [],
       ticketTypes = [], // Keep for backward compatibility
       ticketType, // Keep for backward compatibility
-      paymentMethod = "manual",
+      paymentMethod = "payment_gateway", // Default to payment gateway
       paymentScreenshotUrl,
     } = body
 
@@ -54,11 +54,6 @@ export async function POST(req: NextRequest) {
     const hasTickets = personTickets.some((p: any) => p.tickets && p.tickets.length > 0)
     if (!hasTickets && (!ticketTypes || ticketTypes.length === 0)) {
       return NextResponse.json({ error: "Please select at least one ticket" }, { status: 400 })
-    }
-
-    // For manual payment, screenshot is required
-    if (paymentMethod === "manual" && !paymentScreenshotUrl) {
-      return NextResponse.json({ error: "Payment screenshot is required for manual payment" }, { status: 400 })
     }
 
     // Calculate total amount from tickets with Guest/Member logic
@@ -117,9 +112,9 @@ export async function POST(req: NextRequest) {
         : ticketTypes[0],
       amount: totalAmount,
       paymentMethod,
-      paymentStatus: paymentMethod === "razorpay" ? "pending" : "pending",
+      paymentStatus: "pending",
       ticketStatus: "under_review",
-      paymentScreenshotUrl: paymentMethod === "manual" ? paymentScreenshotUrl : undefined,
+      paymentScreenshotUrl: undefined,
     })
     console.log("Created registration:", registration)
 
@@ -131,9 +126,7 @@ export async function POST(req: NextRequest) {
       registrationId: registration.registrationId,
       amount: totalAmount,
       paymentMethod,
-      message: paymentMethod === "razorpay" 
-        ? "Registration created. Please complete payment." 
-        : "Registration created successfully. Payment pending verification.",
+      message: "Registration created. Please complete payment.",
     })
   } catch (error: any) {
     console.error("Error creating registration:", error?.message || error )
