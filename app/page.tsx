@@ -15,11 +15,70 @@ import LiveStats from "@/components/live-stats"
 import JoinUsSection from "@/components/join-us-section"
 import { generateEventJsonLd, generateOrganizationJsonLd, generateWebsiteJsonLd } from "@/lib/json-ld"
 import { Mail, Phone, Building2, User } from "lucide-react"
+import { useState } from "react"
+
+type ChairTeamMember = {
+  _id?: string;
+  id?: string;
+  name: string;
+  photo: string;
+  designation: string;
+  firm?: string;
+  phone?: string;
+  email?: string;
+  order?: number;
+  isActive?: boolean;
+};
+
+type MCTeamMember = {
+  _id?: string;
+  id?: string;
+  name: string;
+  photo: string;
+  designation: string;
+  firm?: string;
+  phone?: string;
+  email?: string;
+  order?: number;
+  isActive?: boolean;
+};
 
 export default function Home() {
   const eventJsonLd = generateEventJsonLd()
   const orgJsonLd = generateOrganizationJsonLd()
   const websiteJsonLd = generateWebsiteJsonLd()
+
+  const [chairTeam, setChairTeam] = useState<ChairTeamMember[]>([])
+  const [mcTeam, setMcTeam] = useState<MCTeamMember[]>([])
+
+  useEffect(() => {
+    // Fetch Chair Team
+    fetch("/api/admin/chair-team")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setChairTeam(data)
+        } else if (Array.isArray(data?.members)) {
+          setChairTeam(data.members)
+        } else {
+          setChairTeam([])
+        }
+      })
+      .catch(() => setChairTeam([]))
+    // Fetch MC Team
+    fetch("/api/admin/mc-team")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setMcTeam(data)
+        } else if (Array.isArray(data?.members)) {
+          setMcTeam(data.members)
+        } else {
+          setMcTeam([])
+        }
+      })
+      .catch(() => setMcTeam([]))
+  }, [])
 
   // Track visitor on page load
   useEffect(() => {
@@ -45,230 +104,37 @@ export default function Home() {
         console.error("Failed to track visitor:", error)
       }
     }
-
     trackVisitor()
   }, [])
 
   return (
     <>
-      {/* JSON-LD Structured Data for SEO */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-      />
-
-      <main className="bg-background">
+      <main>
         <Navbar />
-
         <Hero />
-
         <About />
-
-        {/* Chaturanga Manthana Chair Team (landing page) */}
-        <section className="py-16 px-4 md:px-6 bg-muted/30">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground">Chaturanga Manthana Chair Team</h2>
-              <p className="text-muted-foreground mt-2">Chair team overseeing the Chaturanga Manthana event.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  id: 1,
-                  name: "Sudarshan B R",
-                  role_in_sp: "",
-                  photo: "/mc-team/suradsan.jpg",
-                  category: "Electrical & Electronic Products",
-                  company_name: "Sudarshan Enterprises",
-                  phone: "9886766132",
-                  email: "sudarshanbr7@gmail.com",
-                  Description: "Sudarshan Enterprises is a trusted electrical products distributor in Bangalore, dealing in wires, LT & HT power and control cables, glands, lugs, insulated plugs & sockets, capacitors, APFC relays, thyristor systems, reactors, LED light fittings, switches, sockets, accessories, fans, and home automation systems."
-                },
-                {
-                  id: 2,
-                  name: "Pavana Kumar B R",
-                  role_in_sp: "",
-                  photo: "/mc-team/pawan.jpg",
-                  category: "Project Management Consultancy",
-                  company_name: "TDE Build Tech",
-                  phone: "9880280484",
-                  email: "hello@tdebuildtech.com ",
-                  Description: "As a Project Management and Construction Solutions partner, they provide vendor coordination, supervision, quality checks, and smooth execution for construction projects. Their mission is to simplify construction with effective vendor management, strict quality control, and cost optimization while delivering excellence."
-                },
-                {
-                  id: 3,
-                  name: "Satyaram Bhat",
-                  role_in_sp: "",
-                  photo: "/mc-team/satyam-bhatt.jpg",
-                  category: "Academic Tutorials",
-                  company_name: "Bhat and Bhat Tutorials Pvt. Ltd.",
-                  phone: "8050383969",
-                  email: "md.bhatandbhat@gmail.com",
-                  Description: "Bhat and Bhat Tutorials is a leading Bengaluru-based education institute with four branches offering offline and online coaching for school, PU, degree, and competitive exams. Known for consistent results and expert faculty, the institute provides structured programs, personalized mentoring, and modern learning resources."
-                }
-              ].map((member) => (
-                <div
-                  key={member.id}
-                  className="bg-background rounded-xl border border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden group"
-                >
-                  {/* Photo Section */}
-                  <div className="relative w-full aspect-square bg-linear-to-br from-primary/10 to-secondary/10 overflow-hidden">
-                    {member.photo ? (
-                      <img
-                        src={member.photo}
-                        alt={member.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <User size={64} className="text-primary/30" />
-                      </div>
-                    )}
-                    {/* Category Badge */}
-                    {member.category && (
-                      <div className="absolute top-3 right-3 bg-primary/90 backdrop-blur-sm text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-                        {member.category}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Info Section */}
-                  <div className="p-5 space-y-3">
-                    <div>
-                      <h3 className="text-lg font-bold text-foreground line-clamp-1">
-                        {member.name}
-                      </h3>
-                      <p className="text-sm text-primary font-semibold mt-1 line-clamp-1">
-                        {member.role_in_sp}
-                      </p>
-                    </div>
-
-                    {member.company_name && (
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Building2 size={14} className="shrink-0" />
-                        <span className="line-clamp-1">{member.company_name}</span>
-                      </div>
-                    )}
-
-                    {member.Description && (
-                      <p className="text-xs text-muted-foreground line-clamp-2">
-                        {member.Description}
-                      </p>
-                    )}
-
-                    {/* Contact Info */}
-                    <div className="pt-2 space-y-1 border-t border-border">
-                      {member.phone && (
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
-                          <Phone size={12} className="shrink-0" />
-                          <a href={`tel:${member.phone}`} className="line-clamp-1">
-                            {member.phone}
-                          </a>
-                        </div>
-                      )}
-                      {member.email && (
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
-                          <Mail size={12} className="shrink-0" />
-                          <a href={`mailto:${member.email}`} className="line-clamp-1">
-                            {member.email}
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* MC Team (landing page) */}
-        <section className="py-16 px-4 md:px-6 bg-background">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground">MC Team</h2>
-              <p className="text-muted-foreground mt-2">Core MC team managing chapter operations.</p>
-            </div>
-            <TeamCarousel
-              items={
-                [
-                  {
-                    id: 1,
-                    name: "B V Krishna",
-                    role_in_sp: "President",
-                    photo: "/mc-team/BV.jpg",
-                    category: "Advocate",
-                    company_name: "Law & Options",
-                    phone: "944803064",
-                    email: "aniphal@gmail.com",
-                    Description: "Law Firm, Advocates"
-                  },
-                  {
-                    id: 2,
-                    name: "Guruprasad U",
-                    role_in_sp: "Treasurer",
-                    photo: "/mc-team/GURU.jpg",
-                    category: "Air Conditioning",
-                    company_name: "Waftonn Solutions",
-                    phone: "9741477555",
-                    email: "guruprasad@waftonn.in",
-                    Description: "Waftonn MEP Solutions is an HVAC turnkey solutions provider offering design, supply, installation, testing, commissioning, and maintenance services. Authorized Channel Partner of Toshiba Carrier and Hitachi."
-                  },
-                  {
-                    id: 3,
-                    name: "Mohan K",
-                    role_in_sp: "Secretary",
-                    photo: "/mc-team/mohan.jpg",
-                    category: "Electricals & Electronic Products",
-                    company_name: "Sri Nidhi Industrial Suppliers",
-                    phone: "9845373148",
-                    email: "snis2003@gmail.com",
-                    Description: "SNIS provides industrial automation solutions, offering cable entry systems and programming ports. Serves industries including Iron & Steel, Cement, Power, Water Treatment, Paper, Rubber, and more."
-                  },
-                  {
-                    id: 4,
-                    name: "Medini Rao",
-                    role_in_sp: "Chapter director, Shree Parashurama",
-                    photo: "/mc-team/Medini.jpg",
-                    category: "",
-                    company_name: "Zest Kitchens",
-                    phone: "",
-                    email: "",
-                    Description: ""
-                  },
-                ]
-              }
-              cardHeight="h-56 md:h-64 lg:h-72"
-            />
-          </div>
-        </section>
-
+        <TeamCarousel
+          members={chairTeam}
+          title="Chaturanga Manthana Chair Team"
+          description="Chair team overseeing the Chaturanga Manthana event."
+          bgClass="bg-muted/30"
+        />
+        <TeamCarousel
+          members={mcTeam}
+          title="MC Team"
+          description="Core MC team managing chapter operations."
+          bgClass="bg-background"
+        />
         {/* Speakers Section */}
         <SpeakersSection />
-
         {/* Join Us Section */}
         <JoinUsSection />
-
         <Sponsors />
-
         <TicketPricing />
-
         <ParticipantsCounter />
-
         {/* <LiveStats /> */}
-
         {/* <Testimonials /> */}
-        
         <CallToAction />
-
         {/* Location Map Section */}
         <section className="md:px-6 bg-orange-500/30">
           <div className="max-w-7xl mx-auto">
@@ -290,7 +156,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
         <Footer />
       </main>
     </>

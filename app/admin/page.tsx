@@ -11,6 +11,8 @@ import VisitorsAnalytics from "@/components/admin/visitors-analytics"
 import BannerManagement from "@/components/admin/banner-management"
 import AdminSettings from "@/components/admin/admin-settings"
 import SpeakersManagement from "@/components/admin/speakers-management"
+import ChairTeamManagement from "@/components/admin/chair-team-management"
+import MCTeamManagement from "@/components/admin/mc-team-management"
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard")
@@ -23,6 +25,8 @@ export default function AdminPage() {
       {activeTab === "sponsors" && <SponsorsManagement />}
       {activeTab === "sponsor-requests" && <SponsorRequestsList />}
       {activeTab === "speakers" && <SpeakersManagement />}
+      {activeTab === "chair-team" && <ChairTeamManagement />}
+      {activeTab === "mc-team" && <MCTeamManagement />}
       {activeTab === "visitors" && <VisitorsAnalytics />}
       {activeTab === "banners" && <BannerManagement />}
       {activeTab === "settings" && <AdminSettings />}

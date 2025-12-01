@@ -228,6 +228,41 @@ const SpeakerSchema = new Schema(
   }
 )
 
+// Chair Team Schema
+const ChairTeamSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    photo: { type: String, required: true },
+    designation: { type: String, required: true },
+    firm: { type: String, required: false },
+    phone: { type: String, required: false },
+    email: { type: String, required: false },
+    order: { type: Number, required: true, default: 0 },
+    isActive: { type: Boolean, default: true },
+  },
+  {
+    timestamps: true,
+  }
+)
+
+// MC Team Schema
+const MCTeamSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    photo: { type: String, required: true },
+    designation: { type: String, required: true },
+    firm: { type: String, required: false },
+    description: { type: String, required: false },
+    phone: { type: String, required: false },
+    email: { type: String, required: false },
+    order: { type: Number, required: true, default: 0 },
+    isActive: { type: Boolean, default: true },
+  },
+  {
+    timestamps: true,
+  }
+)
+
 // Models
 export const RegistrationModel: Model<Registration> =
   mongoose.models.Registration || mongoose.model<Registration>("Registration", RegistrationSchema)
@@ -252,6 +287,19 @@ export const BannerModel: Model<Banner> =
 
 export const SpeakerModel =
   mongoose.models.Speaker || mongoose.model("Speaker", SpeakerSchema)
+
+
+if (mongoose.models.ChairTeam) {
+  delete mongoose.models.ChairTeam;
+}
+export const ChairTeamModel = mongoose.model("ChairTeam", ChairTeamSchema);
+
+if (mongoose.models.MCTeam) {
+  delete mongoose.models.MCTeam;
+}
+
+export const MCTeamModel =
+  mongoose.models.MCTeam || mongoose.model("MCTeam", MCTeamSchema)
 
 export const SettingsModel: Model<Settings> =
   mongoose.models.Settings || mongoose.model<Settings>("Settings", SettingsSchema)
