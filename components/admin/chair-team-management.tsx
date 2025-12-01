@@ -106,9 +106,9 @@ export default function ChairTeamManagement() {
     if (formData.phone && !/^\d{10}$/.test(formData.phone)) {
       errors.phone = "Phone number must be 10 digits"
     }
-    // Email validation: must end with @gmail.com
-    if (formData.email && !/^\S+@gmail\.com$/.test(formData.email)) {
-      errors.email = "Email must end with @gmail.com"
+    // Email validation: accept all valid email formats
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = "Please enter a valid email address"
     }
     setFormErrors(errors)
     if (Object.keys(errors).length > 0) {
@@ -329,7 +329,7 @@ export default function ChairTeamManagement() {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-foreground mb-2">Email</label>
-                <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className={`w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${formErrors.email ? 'border-red-500' : ''}`} placeholder="aniphal@gmail.com" />
+                <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className={`w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${formErrors.email ? 'border-red-500' : ''}`} placeholder="example@company.com" />
                 {formErrors.email && <p className="text-xs text-red-600 mt-1">{formErrors.email}</p>}
               </div>
               <div>
