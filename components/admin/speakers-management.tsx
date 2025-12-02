@@ -164,7 +164,7 @@ export default function SpeakersManagement() {
       resetForm()
       fetchSpeakers()
     } catch (err: any) {
-      console.error("❌ Error saving speaker:", err)
+      console.error("Error saving speaker:", err)
       alert(err.message || "Failed to save speaker")
     } finally {
       setSaving(false)
@@ -245,7 +245,7 @@ export default function SpeakersManagement() {
 
       fetchSpeakers()
     } catch (err: any) {
-      console.error("❌ Error toggling speaker:", err)
+      console.error("Error toggling speaker:", err)
       alert(err.message || "Failed to update speaker")
     }
   }
