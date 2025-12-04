@@ -39,12 +39,12 @@ export default function ShreeMembersPage() {
     }
   }
 
-  // Extract YouTube video ID from URL
+  // Extract YouTube video ID from URL (supports regular videos and Shorts)
   const getYouTubeEmbedId = (url: string): string | null => {
     if (!url) return null
     
     const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
     ]
     
     for (const pattern of patterns) {

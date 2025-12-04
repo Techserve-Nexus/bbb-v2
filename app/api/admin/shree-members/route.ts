@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     
     return NextResponse.json({ members })
   } catch (error: any) {
-    console.error("❌ Error fetching shree members:", error)
+    console.error("Error fetching shree members:", error)
     return NextResponse.json(
       { error: "Failed to fetch shree members" },
       { status: 500 }
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
       message: "Shree member added successfully" 
     })
   } catch (error: any) {
-    console.error("❌ Error creating shree member:", error)
+    console.error("Error creating shree member:", error)
     return NextResponse.json(
       { error: "Failed to create shree member" },
       { status: 500 }
@@ -167,7 +167,7 @@ export async function PATCH(req: NextRequest) {
       message: "Shree member updated successfully" 
     })
   } catch (error: any) {
-    console.error("❌ Error updating shree member:", error)
+    console.error("Error updating shree member:", error)
     return NextResponse.json(
       { error: "Failed to update shree member" },
       { status: 500 }
@@ -212,7 +212,7 @@ export async function DELETE(req: NextRequest) {
       message: "Shree member deleted successfully" 
     })
   } catch (error: any) {
-    console.error("❌ Error deleting shree member:", error)
+    console.error("Error deleting shree member:", error)
     return NextResponse.json(
       { error: "Failed to delete shree member" },
       { status: 500 }
@@ -223,6 +223,7 @@ export async function DELETE(req: NextRequest) {
 /**
  * Helper function to validate YouTube URL
  * Accepts various YouTube URL formats and extracts video ID
+ * Supports: regular videos, shorts, embed URLs, and youtu.be
  */
 function isValidYouTubeUrl(url: string): boolean {
   if (!url) return true // Empty is valid
@@ -231,6 +232,7 @@ function isValidYouTubeUrl(url: string): boolean {
     /^https?:\/\/(www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
     /^https?:\/\/(www\.)?youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
     /^https?:\/\/youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /^https?:\/\/(www\.)?youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
   ]
   
   return patterns.some(pattern => pattern.test(url))

@@ -132,7 +132,7 @@ export default function ShreeMembersManagement() {
     if (!url) return null
     
     const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
     ]
     
     for (const pattern of patterns) {
@@ -160,7 +160,7 @@ export default function ShreeMembersManagement() {
 
     // Validate YouTube URL if provided
     if (formData.youtubeUrl && !extractYouTubeId(formData.youtubeUrl)) {
-      alert("Please enter a valid YouTube URL (e.g., https://www.youtube.com/watch?v=... or https://youtu.be/...)")
+      alert("Please enter a valid YouTube URL (supports watch, shorts, youtu.be)")
       return
     }
 
@@ -457,10 +457,10 @@ export default function ShreeMembersManagement() {
                   value={formData.youtubeUrl}
                   onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
                   className="w-full px-3 py-2 border rounded-md"
-                  placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                  placeholder="https://www.youtube.com/watch?v=... or https://youtube.com/shorts/..."
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Video will play on hover over the member's photo
+                  Video will play on hover (supports regular videos & Shorts)
                 </p>
                 {formData.youtubeUrl && extractYouTubeId(formData.youtubeUrl) && (
                   <div className="mt-2 p-2 bg-green-50 dark:bg-green-950 rounded border border-green-200 dark:border-green-800">

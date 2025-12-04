@@ -15,6 +15,7 @@ export type TeamMember = {
   email?: string;
   order?: number;
   isActive?: boolean;
+  description?: string;
 };
 
 interface TeamCarouselProps {
@@ -46,16 +47,16 @@ const TeamCarousel: React.FC<TeamCarouselProps> = ({ members, title, description
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">{title}</h2>
           {description && <p className="text-muted-foreground mt-2">{description}</p>}
         </div>
-        <div className="relative group">
-          <div ref={scrollContainerRef} className="flex gap-8 min-w-[1020px] overflow-x-auto pb-2 scrollbar-hide scroll-smooth">
+        <div className="relative group overflow-hidden">
+          <div ref={scrollContainerRef} className="flex gap-4 md:gap-6 lg:gap-8 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
             {visibleMembers.length === 0 ? (
               <div className="text-center text-muted-foreground w-full">No members found.</div>
             ) : (
               visibleMembers.map((member) => (
-                <div key={member._id || member.id} className="bg-background rounded-xl border border-border min-w-[340px] max-w-sm w-full hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden group">
+                <div key={member._id || member.id} className="bg-background rounded-xl border border-border min-w-[280px] sm:min-w-[320px] md:min-w-[340px] max-w-sm shrink-0 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden group/card">
                   <div className="relative w-full aspect-square bg-linear-to-br from-primary/10 to-secondary/10 overflow-hidden">
                     {member.photo ? (
-                      <img src={member.photo} alt={member.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                      <img src={member.photo} alt={member.name} className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-300" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <User size={64} className="text-primary/30" />
