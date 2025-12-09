@@ -24,6 +24,7 @@ export interface Registration {
   ticketStatus?: "under_review" | "active" | "expired" | "used"
   createdAt: Date
   updatedAt: Date
+  referredBy?: string
 }
 
 export interface PersonTicket {
@@ -150,3 +151,31 @@ export interface Settings {
   createdAt?: Date
   updatedAt?: Date
 }
+
+
+export interface ChairTeamMember {
+  _id?: string;
+  id?: string;
+  name: string;
+  photo: string;
+  designation: string;
+  firm?: string;
+  phone?: string;
+  email?: string;
+  order?: number;
+  isActive?: boolean;
+};
+
+export interface MCTeamMember {
+  _id?: string;
+  id?: string;
+  name: string;
+  photo: string;
+  designation: string;
+  firm?: string;
+  phone?: string;
+  email?: string;
+  order?: number;
+  isActive?: boolean;
+};
+
