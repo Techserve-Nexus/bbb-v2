@@ -111,9 +111,18 @@ export const createTransporter = async () => {
     // Await verification to surface connectivity/auth errors immediately
     try {
       await transporter.verify()
-      console.log("Email transporter verified")
+      console.log("✅ Email transporter verified successfully")
     } catch (verifyErr) {
-      console.error("Email transporter verification failed:", verifyErr)
+      console.error("❌❌❌ Email transporter verification FAILED ❌❌❌")
+      console.error("Verification error:", verifyErr)
+      console.error("SMTP Configuration:", {
+        host: SMTP_CONFIG.host,
+        port: SMTP_CONFIG.port,
+        secure: SMTP_CONFIG.secure,
+        user: SMTP_CONFIG.auth?.user || "MISSING",
+        hasPassword: !!SMTP_CONFIG.auth?.pass,
+      })
+      console.error("⚠️ Check: 1) Gmail App Password validity, 2) 2FA enabled, 3) Account not locked")
       throw verifyErr
     }
 
@@ -210,7 +219,14 @@ export const sendEmail = async ({
     
     return { success: true, messageId: (info as any).messageId }
   } catch (error) {
-    console.error("Email send error:", error)
+    console.error("❌❌❌ Email send error ❌❌❌")
+    console.error("Error details:", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      to,
+      subject,
+      from: mailOptions.from,
+    })
     try { transporter.close() } catch (e) {}
     // Re-throw with clearer message
     throw new Error(error instanceof Error ? error.message : String(error))
