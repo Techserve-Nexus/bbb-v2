@@ -214,9 +214,12 @@ export default function RegistrationForm() {
     }
   }, [])
 
-  // Save to localStorage whenever formData changes
+  // Save to localStorage whenever formData changes (but don't save empty initial state)
   useEffect(() => {
-    localStorage.setItem("registrationForm", JSON.stringify(formData))
+    // Only save if user has entered some data (check if name or email is filled)
+    if (formData.name || formData.email) {
+      localStorage.setItem("registrationForm", JSON.stringify(formData))
+    }
   }, [formData])
 
   const validateStep1 = () => {
@@ -421,6 +424,9 @@ export default function RegistrationForm() {
       
       console.log("Registration successful:", data)
       console.log("Redirecting to payment gateway with amount:", data.amount || calculateTotalAmount(formData.personTickets))
+      
+      // Clear localStorage after successful registration submission
+      localStorage.removeItem("registrationForm")
       
       // Directly redirect to payment gateway
       await handlePaymentGatewayPayment(regId, data.amount || calculateTotalAmount(formData.personTickets))
