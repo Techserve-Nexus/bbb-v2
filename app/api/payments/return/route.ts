@@ -84,7 +84,7 @@ async function processPaymentReturn(responseData: Record<string, any>, req: Next
       console.log("ℹ️ Payment already processed, skipping duplicate processing for order:", orderId)
       // Still redirect to success page even if already processed
       // Use 303 See Other to convert POST to GET and avoid Server Actions validation
-      return NextResponse.redirect(new URL(`${baseUrl}/register?registration_id=${registrationId}&order_id=${orderId}`, baseUrl), { status: 303 })
+      return NextResponse.redirect(new URL(`${baseUrl}/payment/success?registration_id=${registrationId}&order_id=${orderId}`, baseUrl), { status: 303 })
     }
 
     // Update payment record
@@ -189,8 +189,7 @@ async function processPaymentReturn(responseData: Record<string, any>, req: Next
 
     // Redirect to success page
     // Use 303 See Other to convert POST to GET and avoid Server Actions validation
-    // return NextResponse.redirect(new URL(`${baseUrl}/payment/success?registration_id=${registrationId}&order_id=${orderId}`, baseUrl), { status: 303 })
-    return NextResponse.redirect(new URL(`${baseUrl}/register?registration_id=${registrationId}&order_id=${orderId}`, baseUrl), { status: 303 })
+    return NextResponse.redirect(new URL(`${baseUrl}/payment/success?registration_id=${registrationId}&order_id=${orderId}`, baseUrl), { status: 303 })
   } else {
     // Payment failed
     payment.status = "failed"
