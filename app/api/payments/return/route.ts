@@ -67,14 +67,32 @@ async function processPaymentReturn(responseData: Record<string, any>, req: Next
   const registrationId = payment.registrationId
 
   // Determine payment status:
-  // - response_code === "0" or 0 means success (as per documentation)
-  // - Also support legacy status field for backward compatibility
-  const isSuccess = 
-    responseCode === "0" || 
-    responseCode === 0 || 
-    responseMessage?.toLowerCase().includes("success") ||
-    legacyStatus?.toUpperCase() === "SUCCESS" ||
-    legacyStatus?.toLowerCase() === "success"
+  // - response_code === "0" or 0 means success (as per EazzBuzz documentation)
+  // - Response code takes PRIORITY over message/status to avoid conflicts
+  // - Only check message/status if response_code is missing
+  let isSuccess = false
+  
+  if (responseCode === "0" || responseCode === 0) {
+    // Explicit success response code - this is the primary indicator
+    isSuccess = true
+  } else if (responseCode && (responseCode !== "0" && responseCode !== 0)) {
+    // Explicit failure response code - definitely failed
+    isSuccess = false
+  } else if (!responseCode) {
+    // No response_code provided, check legacy fields
+    isSuccess = 
+      responseMessage?.toLowerCase().includes("success") ||
+      legacyStatus?.toUpperCase() === "SUCCESS" ||
+      legacyStatus?.toLowerCase() === "success"
+  }
+  
+  console.log("💳 Payment Status Determination:", {
+    orderId,
+    responseCode,
+    responseMessage,
+    legacyStatus,
+    determinedStatus: isSuccess ? "SUCCESS" : "FAILED"
+  })
 
   if (isSuccess) {
     // Check if payment is already processed to avoid duplicate processing
@@ -84,7 +102,7 @@ async function processPaymentReturn(responseData: Record<string, any>, req: Next
       console.log("ℹ️ Payment already processed, skipping duplicate processing for order:", orderId)
       // Still redirect to success page even if already processed
       // Use 303 See Other to convert POST to GET and avoid Server Actions validation
-      return NextResponse.redirect(new URL(`${baseUrl}/register?registration_id=${registrationId}&order_id=${orderId}`, baseUrl), { status: 303 })
+      return NextResponse.redirect(new URL(`${baseUrl}/payment/success?registration_id=${registrationId}&order_id=${orderId}`, baseUrl), { status: 303 })
     }
 
     // Update payment record
@@ -176,21 +194,25 @@ async function processPaymentReturn(responseData: Record<string, any>, req: Next
 
       console.log("✅ Ticket email sent successfully to:", registration.email, "- Registration ID:", registrationId)
     } catch (emailError) {
-      console.error("❌ Failed to send ticket email:", emailError)
+      console.error("❌❌❌ CRITICAL: Failed to send ticket email ❌❌❌")
       console.error("❌ Email error details:", {
         error: emailError instanceof Error ? emailError.message : String(emailError),
         stack: emailError instanceof Error ? emailError.stack : undefined,
         registrationId,
         email: registration.email,
+        smtp_host: process.env.SMTP_HOST,
+        smtp_port: process.env.SMTP_PORT,
+        smtp_user: process.env.SMTP_USER ? "CONFIGURED" : "MISSING",
+        smtp_password: process.env.SMTP_PASSWORD ? "CONFIGURED" : "MISSING",
       })
+      console.error("⚠️ Payment successful but email failed. Admin must resend manually.")
       // Log error but don't fail the payment - payment is already successful
       // Admin can resend email manually if needed
     }
 
     // Redirect to success page
     // Use 303 See Other to convert POST to GET and avoid Server Actions validation
-    // return NextResponse.redirect(new URL(`${baseUrl}/payment/success?registration_id=${registrationId}&order_id=${orderId}`, baseUrl), { status: 303 })
-    return NextResponse.redirect(new URL(`${baseUrl}/register?registration_id=${registrationId}&order_id=${orderId}`, baseUrl), { status: 303 })
+    return NextResponse.redirect(new URL(`${baseUrl}/payment/success?registration_id=${registrationId}&order_id=${orderId}`, baseUrl), { status: 303 })
   } else {
     // Payment failed
     payment.status = "failed"
