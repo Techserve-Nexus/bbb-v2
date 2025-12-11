@@ -10,7 +10,7 @@ export const maxDuration = 30
 
 /**
  * Unified Payment Verification API
- * Handles both Manual and Razorpay payments
+ * Handles both Manual and Payment Gateway payments
  */
 export async function POST(req: NextRequest) {
   try {
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     const {
       registrationId,
       action, // "approve" | "reject"
-      
+
       // For manual payments - admin fills these during verification
       upiId,
       transactionId,
@@ -62,14 +62,14 @@ export async function POST(req: NextRequest) {
     if (action === "approve") {
       // Use amount from registration (already calculated with guest/member logic)
       let amount = (registration as any).amount || 0
-      
+
       // Fallback: Calculate if amount is 0 (for old registrations without amount field)
       if (amount === 0 && registration.personTickets && registration.personTickets.length > 0) {
         const TICKET_PRICES: Record<string, number> = {
           Business_Conclave: 1000,
           Chess: 500,
         }
-        
+
         console.log("⚠️ Registration has no amount, calculating from personTickets...")
         registration.personTickets.forEach((person: any) => {
           const { personType, age, tickets } = person
@@ -80,13 +80,13 @@ export async function POST(req: NextRequest) {
             }
           })
         })
-        
+
         // Update registration with calculated amount
         ;(registration as any).amount = amount
         await registration.save()
         console.log("✅ Calculated and saved amount:", amount)
       }
-      
+
       console.log("💰 Payment verification - Amount:", amount, "| Method:", paymentMethod)
 
       // Create or update payment record
@@ -104,8 +104,8 @@ export async function POST(req: NextRequest) {
         paymentData.transactionId = transactionId || ""
         paymentData.verifiedBy = authResult.email
         paymentData.verificationNotes = verificationNotes || ""
-      } else if (paymentMethod === "razorpay") {
-        // For Razorpay, details already exist from payment webhook
+      } else if (paymentMethod === "payment_gateway") {
+        // For Payment Gateway, details already exist from payment webhook
         // Just update status if needed
         const existingPayment = await PaymentModel.findOne({ registrationId })
         if (existingPayment) {
@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
             existingPayment.verificationNotes = verificationNotes
           }
           await existingPayment.save()
-          
+
           // Update registration
           registration.paymentStatus = "success"
           registration.ticketStatus = "active" // Activate ticket on payment approval

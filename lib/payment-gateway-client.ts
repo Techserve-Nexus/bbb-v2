@@ -28,28 +28,49 @@ export async function createPaymentRequest(amount: number, registrationId: strin
  * According to documentation: Content-Type should be application/x-www-form-urlencoded
  */
 export function submitPaymentForm(paymentParams: Record<string, string>, paymentUrl: string) {
-  // Create a form element
-  const form = document.createElement("form")
-  form.method = "POST"
-  form.action = paymentUrl
-  form.style.display = "none"
-  form.enctype = "application/x-www-form-urlencoded" // Set content type as per documentation
-
-  // Add all parameters as hidden inputs
-  // Filter out undefined/null values and convert all to strings
-  Object.entries(paymentParams).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      const input = document.createElement("input")
-      input.type = "hidden"
-      input.name = key
-      input.value = String(value).trim() // Ensure value is a string and trimmed
-      form.appendChild(input)
+  try {
+    // Validate payment URL
+    if (!paymentUrl || typeof paymentUrl !== 'string') {
+      throw new Error("Invalid payment URL")
     }
-  })
 
-  // Append form to body and submit
-  document.body.appendChild(form)
-  form.submit()
+    // Validate URL format
+    try {
+      new URL(paymentUrl)
+    } catch (e) {
+      throw new Error("Invalid payment URL format")
+    }
+
+    // Create a form element
+    const form = document.createElement("form")
+    form.method = "POST"
+    form.action = paymentUrl
+    form.style.display = "none"
+    form.enctype = "application/x-www-form-urlencoded" // Set content type as per documentation
+
+    // Add all parameters as hidden inputs
+    // Filter out undefined/null values and convert all to strings
+    Object.entries(paymentParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        const input = document.createElement("input")
+        input.type = "hidden"
+        input.name = key
+        input.value = String(value).trim() // Ensure value is a string and trimmed
+        form.appendChild(input)
+      }
+    })
+
+    // Append form to body and submit
+    document.body.appendChild(form)
+
+    console.log("📤 Submitting payment form to:", paymentUrl)
+
+    // Submit the form
+    form.submit()
+  } catch (error) {
+    console.error("❌ Failed to submit payment form:", error)
+    throw new Error(error instanceof Error ? error.message : "Failed to redirect to payment gateway")
+  }
 }
 
 /**
@@ -69,4 +90,3 @@ export async function checkPaymentStatus(orderId?: string, transactionId?: strin
 
   return response.json()
 }
-

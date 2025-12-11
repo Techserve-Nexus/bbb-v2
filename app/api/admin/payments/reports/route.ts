@@ -8,10 +8,10 @@ export const maxDuration = 30
 
 /**
  * GET /api/admin/payments/reports
- * 
+ *
  * Generate payment reports with filtering
  * Requires admin authentication
- * 
+ *
  * Query params:
  * - dateFrom: ISO date string
  * - dateTo: ISO date string
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     await connectDB()
 
     const { searchParams } = new URL(req.url)
-    
+
     const dateFrom = searchParams.get("dateFrom")
     const dateTo = searchParams.get("dateTo")
     const ticketType = searchParams.get("ticketType")
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
 
     // Build payment query
     const paymentQuery: any = {}
-    
+
     if (status && status !== "all") {
       paymentQuery.status = status
     }
@@ -134,8 +134,8 @@ export async function GET(req: NextRequest) {
           "Ticket Type",
           "Amount",
           "Status",
-          "Razorpay Order ID",
-          "Razorpay Payment ID",
+          "PG Order ID",
+          "PG Transaction ID",
           "Payment Date",
         ].join(","),
       ]
@@ -151,8 +151,8 @@ export async function GET(req: NextRequest) {
             registration?.ticketType || "N/A",
             payment.amount,
             payment.status,
-            payment.razorpayOrderId,
-            payment.razorpayPaymentId || "N/A",
+            payment.pgOrderId || "N/A",
+            payment.pgTransactionId || "N/A",
             new Date(payment.createdAt).toISOString(),
           ]
             .map((field) => `"${String(field).replace(/"/g, '""')}"`)
@@ -173,8 +173,8 @@ export async function GET(req: NextRequest) {
     const detailedPayments = filteredPayments.map((item) => ({
       id: (item.payment as any)._id.toString(),
       registrationId: item.payment.registrationId,
-      razorpayOrderId: item.payment.razorpayOrderId,
-      razorpayPaymentId: item.payment.razorpayPaymentId || null,
+      pgOrderId: item.payment.pgOrderId || null,
+      pgTransactionId: item.payment.pgTransactionId || null,
       amount: item.payment.amount,
       status: item.payment.status,
       createdAt: item.payment.createdAt,

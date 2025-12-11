@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   publisher: 'BBB Event',
   applicationName: 'BBB Event Registration',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
-  
+
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
       },
     ],
   },
-  
+
   twitter: {
     card: 'summary_large_image',
     title: 'BBB Event 2025 - Registration Open',
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     images: ['/og-image.jpg'],
     creator: '@bbbevent',
   },
-  
+
   robots: {
     index: true,
     follow: true,
@@ -55,21 +55,21 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  
+
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon-16x16.png',
     apple: '/apple-touch-icon.png',
   },
-  
+
   manifest: '/site.webmanifest',
-  
+
   verification: {
     google: 'your-google-verification-code',
     // yandex: 'your-yandex-verification-code',
     // yahoo: 'your-yahoo-verification-code',
   },
-  
+
   category: 'Events',
 }
 

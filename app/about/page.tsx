@@ -1,5 +1,3 @@
-"use client"
-
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { Target, Heart, Users, Globe, Sparkles, ExternalLink } from "lucide-react"
@@ -84,9 +82,9 @@ export default function AboutPage() {
           <div className="bg-linear-to-r from-primary/10 to-secondary/10 rounded-2xl p-8 md:p-12 border-2 border-primary/20 shadow-xl">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 text-center">Our Mission</h2>
             <p className="text-lg text-muted-foreground text-center leading-relaxed">
-              BBB-India stands as a beacon of spiritual wisdom, cultural preservation, and selfless service (seva). 
-              With a rich history and a widespread network across the country, the organization is dedicated to the 
-              holistic development of individuals and communities, guided by timeless principles and the vision of 
+              BBB-India stands as a beacon of spiritual wisdom, cultural preservation, and selfless service (seva).
+              With a rich history and a widespread network across the country, the organization is dedicated to the
+              holistic development of individuals and communities, guided by timeless principles and the vision of
               its esteemed leadership.
             </p>
           </div>
@@ -136,7 +134,7 @@ export default function AboutPage() {
               Shree Parashurama Chapter
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              An official chapter of BBB-India, dedicated to spiritual growth and selfless service, 
+              An official chapter of BBB-India, dedicated to spiritual growth and selfless service,
               guiding all our initiatives through networking with like-minded entrepreneurs.
             </p>
           </div>
@@ -169,8 +167,8 @@ export default function AboutPage() {
                 <h3 className="text-xl font-bold text-foreground">EC Team</h3>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                The Executive Committee (EC) Team provides strategic leadership and coordination, 
-                ensuring seamless execution of chapter activities, member engagement, and alignment 
+                The Executive Committee (EC) Team provides strategic leadership and coordination,
+                ensuring seamless execution of chapter activities, member engagement, and alignment
                 with BBB-India's core values and objectives.
               </p>
             </div>
@@ -184,8 +182,8 @@ export default function AboutPage() {
                 <h3 className="text-xl font-bold text-foreground">Chaturanga Manthana Co-chair</h3>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                The Co-chair team oversees the planning and execution of Chaturanga Manthana events, 
-                fostering collaboration among members, managing logistics, and ensuring the event 
+                The Co-chair team oversees the planning and execution of Chaturanga Manthana events,
+                fostering collaboration among members, managing logistics, and ensuring the event
                 reflects the chapter's vision of excellence and strategic growth.
               </p>
             </div>

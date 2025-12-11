@@ -46,7 +46,7 @@ export default function BecomeSponsorPage() {
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
-      
+
       <div className="py-20 px-4 md:px-6">
         <div className="max-w-6xl mx-auto">
           {/* Hero Section */}
@@ -55,7 +55,7 @@ export default function BecomeSponsorPage() {
               Become a Sponsor
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Partner with us to make this event a grand success. Choose from our sponsorship categories 
+              Partner with us to make this event a grand success. Choose from our sponsorship categories
               and gain valuable exposure for your brand.
             </p>
           </div>
@@ -85,7 +85,7 @@ export default function BecomeSponsorPage() {
             </div>
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                <strong>Note:</strong> Final sponsorship category will be assigned by our team based on your 
+                <strong>Note:</strong> Final sponsorship category will be assigned by our team based on your
                 requested amount and availability. All sponsors receive prominent brand placement and recognition.
               </p>
             </div>
@@ -99,7 +99,7 @@ export default function BecomeSponsorPage() {
             <div className="grid md:grid-cols-2 gap-8">
               <Card className="p-6 border border-border">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                     <span className="text-2xl">🎯</span>
                   </div>
                   <div>
@@ -113,7 +113,7 @@ export default function BecomeSponsorPage() {
 
               <Card className="p-6 border border-border">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                     <span className="text-2xl">🤝</span>
                   </div>
                   <div>
@@ -127,7 +127,7 @@ export default function BecomeSponsorPage() {
 
               <Card className="p-6 border border-border">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                     <span className="text-2xl">📢</span>
                   </div>
                   <div>
@@ -141,7 +141,7 @@ export default function BecomeSponsorPage() {
 
               <Card className="p-6 border border-border">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                     <span className="text-2xl">🏆</span>
                   </div>
                   <div>

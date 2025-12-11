@@ -8,10 +8,10 @@ export const maxDuration = 30
 
 /**
  * GET /api/admin/payments/[id]
- * 
+ *
  * Get full payment details by payment ID
  * Requires admin authentication
- * 
+ *
  * @param id - Payment ID (MongoDB _id)
  */
 export async function GET(
@@ -49,9 +49,7 @@ export async function GET(
       payment: {
         id: (payment as any)._id.toString(),
         registrationId: (payment as any).registrationId,
-        razorpayOrderId: (payment as any).razorpayOrderId,
-        razorpayPaymentId: (payment as any).razorpayPaymentId || null,
-        razorpaySignature: (payment as any).razorpaySignature || null,
+
         amount: (payment as any).amount,
         status: (payment as any).status,
         createdAt: (payment as any).createdAt,

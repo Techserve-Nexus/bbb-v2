@@ -1,7 +1,7 @@
 "use client"
 
-import { Suspense, useEffect, useState } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { CheckCircle2, Download, Mail, ArrowRight } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
@@ -9,26 +9,8 @@ import Link from "next/link"
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const registrationId = searchParams.get("registration_id")
   const orderId = searchParams.get("order_id")
-  const [countdown, setCountdown] = useState(60)
-
-  useEffect(() => {
-    // Auto-redirect to home page after 1 minute
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer)
-          router.push("/")
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [router])
 
   return (
     <main className="bg-background min-h-screen flex flex-col">
@@ -62,7 +44,7 @@ function PaymentSuccessContent() {
             {/* Information Box */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
               <div className="flex items-start gap-3">
-                <Mail className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <Mail className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
                 <div className="text-left">
                   <p className="text-sm font-medium text-blue-900 mb-1">
                     Check Your Email
@@ -77,20 +59,13 @@ function PaymentSuccessContent() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {registrationId && (
-                <>
-                  <Link
-                    href={`/ticket/${registrationId}`}
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
-                  >
-                    <Download className="w-5 h-5" />
-                    View Ticket
-                  </Link>
-                  {countdown > 0 && (
-                    <p className="text-sm text-gray-500 self-center">
-                      Redirecting to home in {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}...
-                    </p>
-                  )}
-                </>
+                <Link
+                  href={`/ticket/${registrationId}`}
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                >
+                  <Download className="w-5 h-5" />
+                  View Ticket
+                </Link>
               )}
               <Link
                 href="/"
@@ -138,4 +113,3 @@ export default function PaymentSuccessPage() {
     </Suspense>
   )
 }
-

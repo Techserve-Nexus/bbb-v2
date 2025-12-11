@@ -13,7 +13,7 @@ export default function Step2Tickets({ formData, setFormData, errors }: Step2Pro
   const handleTicketToggle = (ticketTier: string) => {
     const currentTickets = formData.ticketTypes || []
     const isSelected = currentTickets.includes(ticketTier)
-    
+
     let newTickets
     if (isSelected) {
       // Remove ticket if already selected
@@ -22,7 +22,7 @@ export default function Step2Tickets({ formData, setFormData, errors }: Step2Pro
       // Add ticket if not selected
       newTickets = [...currentTickets, ticketTier]
     }
-    
+
     setFormData({ ...formData, ticketTypes: newTickets })
   }
 
@@ -43,7 +43,7 @@ export default function Step2Tickets({ formData, setFormData, errors }: Step2Pro
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
         {TICKET_OPTIONS.filter(t => t.tier !== "Both").map((ticket) => {
           const isSelected = (formData.ticketTypes || []).includes(ticket.tier)
-          
+
           return (
             <div
               key={ticket.tier}

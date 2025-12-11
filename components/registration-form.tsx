@@ -5,7 +5,6 @@ import { ChevronRight, ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Step1BasicAndFamily from "./registration-steps/step1-basic-and-family"
 import Step2PerPersonTickets from "./registration-steps/step2-per-person-tickets"
-import { loadRazorpayScript } from "@/lib/razorpay"
 import { createPaymentRequest, submitPaymentForm } from "@/lib/payment-gateway-client"
 import { useRouter, useSearchParams } from "next/navigation"
 
@@ -61,128 +60,6 @@ export default function RegistrationForm() {
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState("")
   const [registrationId, setRegistrationId] = useState("")
-  const [checkingPaymentStatus, setCheckingPaymentStatus] = useState(false)
-
-  // Check for payment redirect query parameters and verify payment status
-  useEffect(() => {
-    const checkPaymentRedirect = async () => {
-      try {
-        const urlParams = new URLSearchParams(window.location.search)
-        const regId = urlParams.get("registration_id")
-        const orderId = urlParams.get("order_id")
-
-        if (regId && orderId) {
-          setCheckingPaymentStatus(true)
-          console.log("Payment redirect detected, verifying payment status...", { regId, orderId })
-
-          try {
-            // Wait a moment for payment processing to complete
-            await new Promise(resolve => setTimeout(resolve, 1000))
-            
-            // Verify payment status by fetching ticket data
-            const response = await fetch(`/api/tickets/verify/${regId}`)
-            
-            // Check if response is OK
-            if (!response.ok) {
-              // Try to get error message from response
-              let errorMessage = `HTTP ${response.status}: ${response.statusText}`
-              try {
-                const contentType = response.headers.get("content-type")
-                if (contentType && contentType.includes("application/json")) {
-                  const errorData = await response.json()
-                  errorMessage = errorData.error || errorMessage
-                }
-              } catch (parseError) {
-                // If we can't parse JSON, use the status text
-                console.warn("Could not parse error response as JSON:", parseError)
-              }
-              
-              console.error("Failed to verify payment - API error:", {
-                status: response.status,
-                statusText: response.statusText,
-                error: errorMessage,
-                registrationId: regId,
-              })
-              
-              // If it's a 404, the ticket might not exist yet - wait a bit and try again
-              if (response.status === 404) {
-                console.log("Ticket not found yet, waiting 2 seconds and retrying...")
-                await new Promise(resolve => setTimeout(resolve, 2000))
-                
-                // Retry once
-                const retryResponse = await fetch(`/api/tickets/verify/${regId}`)
-                if (retryResponse.ok) {
-                  const retryData = await retryResponse.json()
-                  const retryTicket = retryData.ticket
-                  
-                  if (retryTicket && retryTicket.paymentStatus === "success") {
-                    console.log("Payment verified on retry, redirecting to ticket page")
-                    router.push(`/ticket/${regId}`)
-                    return
-                  }
-                }
-              }
-              
-              setSubmitError(`Unable to verify payment status (${errorMessage}). Please check your email or contact support.`)
-              // Clear query parameters from URL
-              window.history.replaceState({}, "", "/register")
-              return
-            }
-
-            // Parse response JSON
-            let data
-            try {
-              data = await response.json()
-            } catch (jsonError) {
-              console.error("Failed to parse response as JSON:", jsonError)
-              setSubmitError("Invalid response from server. Please contact support.")
-              window.history.replaceState({}, "", "/register")
-              return
-            }
-
-            const ticket = data?.ticket
-
-            if (!ticket) {
-              console.error("Ticket data not found in response:", data)
-              setSubmitError("Ticket information not found. Please contact support.")
-              window.history.replaceState({}, "", "/register")
-              return
-            }
-
-            if (ticket.paymentStatus === "success") {
-              // Payment successful - redirect to ticket page
-              console.log("Payment verified successfully, redirecting to ticket page")
-              router.push(`/ticket/${regId}`)
-              return
-            } else if (ticket.paymentStatus === "failed") {
-              // Payment failed - show error
-              setSubmitError("Payment verification failed. Please contact support or try again.")
-              // Clear query parameters from URL
-              window.history.replaceState({}, "", "/register")
-            } else {
-              // Payment pending
-              setSubmitError("Payment verification is pending. Please wait for confirmation or check your email.")
-              // Clear query parameters from URL
-              window.history.replaceState({}, "", "/register")
-            }
-          } catch (fetchError) {
-            console.error("Network error while verifying payment:", fetchError)
-            setSubmitError("Network error while verifying payment. Please check your connection and try again.")
-            window.history.replaceState({}, "", "/register")
-          }
-        }
-      } catch (error) {
-        console.error("Error checking payment redirect:", error)
-        setSubmitError("Error verifying payment status. Please contact support.")
-        // Clear query parameters from URL
-        window.history.replaceState({}, "", "/register")
-      } finally {
-        setCheckingPaymentStatus(false)
-      }
-    }
-
-    checkPaymentRedirect()
-  }, [router])
 
   // Check registration status on mount
   useEffect(() => {
@@ -202,25 +79,7 @@ export default function RegistrationForm() {
     checkRegistrationStatus()
   }, [])
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("registrationForm")
-    if (saved) {
-      try {
-        setFormData(JSON.parse(saved))
-      } catch (e) {
-        console.error("Failed to load saved form data")
-      }
-    }
-  }, [])
 
-  // Save to localStorage whenever formData changes (but don't save empty initial state)
-  useEffect(() => {
-    // Only save if user has entered some data (check if name or email is filled)
-    if (formData.name || formData.email) {
-      localStorage.setItem("registrationForm", JSON.stringify(formData))
-    }
-  }, [formData])
 
   const validateStep1 = () => {
     const newErrors: Record<string, string> = {}
@@ -386,7 +245,7 @@ export default function RegistrationForm() {
 
     setIsSubmitting(true)
     setSubmitError("")
-    
+
     try {
       // Prepare data for submission
       const submissionData = {
@@ -421,15 +280,12 @@ export default function RegistrationForm() {
       // Save registration ID
       const regId = data.registrationId
       setRegistrationId(regId)
-      
+
       console.log("Registration successful:", data)
-      console.log("Redirecting to payment gateway with amount:", data.amount || calculateTotalAmount(formData.personTickets))
-      
-      // Clear localStorage after successful registration submission
-      localStorage.removeItem("registrationForm")
-      
+      console.log("Redirecting to payment gateway with amount:", data.amount)
+
       // Directly redirect to payment gateway
-      await handlePaymentGatewayPayment(regId, data.amount || calculateTotalAmount(formData.personTickets))
+      await handlePaymentGatewayPayment(regId, data.amount)
     } catch (error) {
       console.error("Registration error:", error)
       setSubmitError(error instanceof Error ? error.message : "Failed to submit registration")
@@ -438,37 +294,15 @@ export default function RegistrationForm() {
     }
   }
 
-  const calculateTotalAmount = (personTickets: any[]) => {
-    const prices: Record<string, number> = {
-      Business_Conclave: 1000,
-      Chess: 500,
-    }
-    let total = 0
-    personTickets?.forEach((person: any) => {
-      const { personType, age, tickets } = person
-      
-      tickets?.forEach((ticket: string) => {
-        // For Members: Children under 12 don't pay
-        // For Guests: Everyone pays (including children under 12)
-        const isFreeChild = !formData.isGuest && personType === "child" && age === "<12"
-        
-        if (!isFreeChild) {
-          total += prices[ticket] || 0
-        }
-      })
-    })
-    return total
-  }
-
   const handlePaymentGatewayPayment = async (regId: string, amount: number) => {
     try {
       console.log("🔄 Starting payment gateway flow...")
       console.log("Registration ID:", regId)
       console.log("Amount:", amount)
-      
+
       // Create payment request
       const paymentData = await createPaymentRequest(amount, regId)
-      
+
       console.log("✅ Payment request created successfully")
       console.log("Payment URL:", paymentData.paymentUrl)
 
@@ -477,7 +311,7 @@ export default function RegistrationForm() {
       }
 
       console.log("🚀 Submitting payment form and redirecting to payment gateway...")
-      
+
       // Submit payment form to redirect to payment gateway
       submitPaymentForm(paymentData.paymentParams, paymentData.paymentUrl)
 
@@ -491,106 +325,15 @@ export default function RegistrationForm() {
     }
   }
 
-  const handleRazorpayPayment = async (regId: string, amount: number) => {
-    try {
-      // Load Razorpay script
-      const scriptLoaded = await loadRazorpayScript()
-      if (!scriptLoaded) {
-        throw new Error("Failed to load Razorpay. Please check your internet connection.")
-      }
-
-      // Create order
-      const orderResponse = await fetch("/api/payments/create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount, registrationId: regId }),
-      })
-
-      if (!orderResponse.ok) {
-        const errorData = await orderResponse.json()
-        throw new Error(errorData.error || "Failed to create payment order")
-      }
-
-      const orderData = await orderResponse.json()
-
-      // Razorpay checkout options
-      const options = {
-        key: orderData.keyId,
-        order_id: orderData.orderId,
-        amount: amount * 100,
-        currency: "INR",
-        name: "Chaturanga Manthana 2025",
-        description: `Event Tickets - ${regId}`,
-        image: "/logo.png", // Add your logo
-        prefill: {
-          name: formData.name,
-          email: formData.email,
-          contact: formData.contactNo,
-        },
-        handler: async (response: any) => {
-          // Payment successful, verify on backend
-          try {
-            const verifyResponse = await fetch("/api/payments/verify", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                razorpayOrderId: response.razorpay_order_id,
-                razorpayPaymentId: response.razorpay_payment_id,
-                razorpaySignature: response.razorpay_signature,
-              }),
-            })
-
-            const verifyData = await verifyResponse.json()
-
-            if (!verifyResponse.ok) {
-              throw new Error(verifyData.error || "Payment verification failed")
-            }
-
-            // Success!
-            // console.log("✅ Payment verified successfully:", verifyData)
-            setSubmitSuccess(true)
-            setIsSubmitting(false)
-            localStorage.removeItem("registrationForm")
-
-            // Redirect to ticket page after 2 seconds
-            setTimeout(() => {
-              router.push(`/ticket/${regId}`)
-            }, 2000)
-          } catch (verifyError) {
-            // console.error("Payment verification error:", verifyError)
-            setSubmitError(verifyError instanceof Error ? verifyError.message : "Payment verification failed")
-            setIsSubmitting(false)
-          }
-        },
-        modal: {
-          ondismiss: () => {
-            setIsSubmitting(false)
-            setSubmitError("Payment cancelled. You can retry payment from your registration email.")
-          },
-        },
-        theme: {
-          color: "#4F46E5", // Primary color
-        },
-      }
-
-      const razorpay = new (window as any).Razorpay(options)
-      razorpay.open()
-    } catch (error) {
-      console.error("Razorpay payment error:", error)
-      setSubmitError(error instanceof Error ? error.message : "Payment initiation failed")
-      setIsSubmitting(false)
-    }
-  }
-
   return (
     <div className="max-w-3xl mx-auto">
       {/* Loading State */}
-      {checkingStatus || checkingPaymentStatus ? (
+      {checkingStatus ? (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-muted-foreground">
-              {checkingPaymentStatus ? "Verifying payment status..." : "Checking registration status..."}
+              {isSubmitting ? "Processing your registration and redirecting to payment..." : "Checking registration status..."}
             </p>
           </div>
         </div>
@@ -608,7 +351,7 @@ export default function RegistrationForm() {
           <p className="text-red-700 dark:text-red-300 mb-6">
             We're sorry, but registration for this event is currently closed. Please check back later or contact the event organizers for more information.
           </p>
-          <Button 
+          <Button
             onClick={() => router.push("/")}
             className="bg-red-600 hover:bg-red-700 text-white"
           >
@@ -628,7 +371,7 @@ export default function RegistrationForm() {
           <p className="text-sm text-muted-foreground mb-6">
             Please save this ID for future reference. You will receive a confirmation email shortly.
           </p>
-          <Button 
+          <Button
             onClick={() => {
               setSubmitSuccess(false)
               setCurrentStep(1)
@@ -715,8 +458,8 @@ export default function RegistrationForm() {
             <div className="text-sm text-muted-foreground self-center">Step {currentStep} of 2</div>
 
             {currentStep < 2 ? (
-              <Button 
-                onClick={handleNext} 
+              <Button
+                onClick={handleNext}
                 disabled={isSubmitting}
                 className="bg-primary hover:bg-secondary text-primary-foreground"
               >
@@ -724,8 +467,8 @@ export default function RegistrationForm() {
                 <ChevronRight size={18} className="ml-2" />
               </Button>
             ) : (
-              <Button 
-                onClick={handleSubmit} 
+              <Button
+                onClick={handleSubmit}
                 disabled={isSubmitting}
                 className="bg-primary hover:bg-secondary text-primary-foreground"
               >

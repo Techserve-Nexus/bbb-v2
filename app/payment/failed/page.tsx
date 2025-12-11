@@ -69,7 +69,7 @@ function PaymentFailedContent() {
             {/* Common Reasons */}
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 shrink-0" />
                 <div className="text-left">
                   <p className="text-sm font-medium text-yellow-900 mb-2">
                     Common reasons for payment failure:
@@ -106,7 +106,7 @@ function PaymentFailedContent() {
             {/* Help Section */}
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex items-start gap-3 justify-center">
-                <HelpCircle className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <HelpCircle className="w-5 h-5 text-gray-400 mt-0.5 shrink-0" />
                 <div className="text-left">
                   <p className="text-sm font-medium text-gray-900 mb-1">
                     Need Help?
@@ -160,5 +160,3 @@ export default function PaymentFailedPage() {
     </Suspense>
   )
 }
-
-

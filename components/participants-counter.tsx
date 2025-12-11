@@ -60,13 +60,13 @@ export default function ParticipantsCounter() {
   return (
     <section
       id="counter-section"
-      className="py-20 px-4 md:px-6 bg-gradient-to-r from-primary/10 via-background to-secondary/10"
+      className="py-20 px-4 md:px-6 bg-linear-to-r from-primary/10 via-background to-secondary/10"
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center">
           <p className="text-primary font-semibold mb-4">Live Update</p>
           <div className="mb-8">
-            <p className="text-7xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent animate-fade-in">
+            <p className="text-7xl md:text-8xl font-bold text-transparent bg-clip-text bg-linear-to-r from-primary via-secondary to-accent animate-fade-in">
               {count.toLocaleString()}
             </p>
             <p className="text-2xl md:text-3xl text-foreground font-semibold mt-4">Participants Registered</p>

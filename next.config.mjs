@@ -3,6 +3,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  output: 'standalone', // Required for Docker
   images: {
     remotePatterns: [
       {
@@ -19,7 +20,7 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   generateEtags: true,
-  
+
   headers: async () => {
     return [
       {

@@ -18,13 +18,13 @@ export async function POST(req: NextRequest) {
         { status: 403 }
       )
     }
-    
+
     const body = await req.json()
-    let { 
-      name, 
-      chapterName, 
-      category, 
-      contactNo, 
+    let {
+      name,
+      chapterName,
+      category,
+      contactNo,
       email,
       referredBy,
       isGuest = false,
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       ticketType = ticketType.replace(/\s+/g, "_")
       ticketTypes = [ticketType]
     }
-    
+
     console.log("Person Tickets:", personTickets)
 
     // Validate required fields
@@ -61,32 +61,31 @@ export async function POST(req: NextRequest) {
       Business_Conclave: 1000,
       Chess: 500,
     }
-    
     console.log("🔍 Calculating amount for registration...")
     console.log("  - isGuest:", isGuest)
     console.log("  - personTickets:", JSON.stringify(personTickets, null, 2))
-    
+
     let totalAmount = 0
     if (personTickets.length > 0) {
       personTickets.forEach((person: any, index: number) => {
         const { personType, age, tickets } = person
         console.log(`  - Person ${index + 1}: ${person.name} (${personType}, age: ${age})`)
-        
+
         tickets?.forEach((ticket: string) => {
           // For Members: Children under 12 don't pay
           // For Guests: Everyone pays (including children under 12)
           const isFreeChild = !isGuest && personType === "child" && age === "<12"
           const ticketPrice = TICKET_PRICES[ticket] || 0
-          
+
           console.log(`    - Ticket: ${ticket}, Price: ₹${ticketPrice}, Free: ${isFreeChild}`)
-          
+
           if (!isFreeChild) {
             totalAmount += ticketPrice
           }
         })
       })
     }
-    
+
     console.log("💰 Total amount calculated:", totalAmount)
 
     const registrationId = generateRegistrationId()
@@ -104,7 +103,7 @@ export async function POST(req: NextRequest) {
       spouseName,
       children,
       personTickets,
-      ticketTypes: personTickets.length > 0 
+      ticketTypes: personTickets.length > 0
         ? personTickets.flatMap((p: any) => p.tickets || [])
         : ticketTypes,
       ticketType: personTickets.length > 0 && personTickets[0].tickets?.length > 0
@@ -137,7 +136,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     await connectDB()
-    
+
     const searchParams = req.nextUrl.searchParams
     const email = searchParams.get("email")
 

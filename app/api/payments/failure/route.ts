@@ -23,7 +23,7 @@ async function processPaymentFailure(params: {
     // Find and update payment record. Try multiple possible order id fields
     let payment = await PaymentModel.findOne({ pgOrderId: orderId })
     if (!payment) {
-      payment = await PaymentModel.findOne({ razorpayOrderId: orderId })
+      payment = await PaymentModel.findOne({ pgOrderId: orderId })
     }
 
     if (payment) {
@@ -164,4 +164,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(new URL("/payment/failed?error=processing_error", baseUrl))
   }
 }
-

@@ -55,14 +55,14 @@ export default function RegistrationsList() {
   const [registrations, setRegistrations] = useState<Registration[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  
+
   // Filters
   const [searchTerm, setSearchTerm] = useState("")
   const [filterPaymentStatus, setFilterPaymentStatus] = useState("all")
   const [filterTicketType, setFilterTicketType] = useState("all")
   const [filterTicketStatus, setFilterTicketStatus] = useState("all")
   const [filterGuest, setFilterGuest] = useState("all")
-  
+
   // Pagination
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -94,7 +94,7 @@ export default function RegistrationsList() {
     transactionId: "",
     verificationNotes: "",
   })
-  
+
   // Screenshot Modal
   const [showScreenshot, setShowScreenshot] = useState(false)
   const [screenshotUrl, setScreenshotUrl] = useState("")
@@ -112,28 +112,28 @@ export default function RegistrationsList() {
       setOpenActionMenu(null)
       return
     }
-    
+
     // Calculate menu position relative to viewport
     const button = event.currentTarget
     const rect = button.getBoundingClientRect()
     const spaceBelow = window.innerHeight - rect.bottom
     const spaceAbove = rect.top
-    
+
     // Position menu based on available space
     if (spaceBelow < 400 && spaceAbove > spaceBelow) {
       // Open upward
-      setMenuPosition({ 
+      setMenuPosition({
         bottom: window.innerHeight - rect.top,
         right: window.innerWidth - rect.right
       })
     } else {
       // Open downward
-      setMenuPosition({ 
+      setMenuPosition({
         top: rect.bottom,
         right: window.innerWidth - rect.right
       })
     }
-    
+
     setOpenActionMenu(regId)
   }
 
@@ -749,13 +749,13 @@ export default function RegistrationsList() {
                           {openActionMenu === reg.id && (
                             <>
                               {/* Backdrop to close menu */}
-                              <div 
-                                className="fixed inset-0 z-10" 
+                              <div
+                                className="fixed inset-0 z-10"
                                 onClick={() => setOpenActionMenu(null)}
                               />
-                              
+
                               {/* Menu - Fixed positioning */}
-                              <div 
+                              <div
                                 className="fixed w-56 bg-white rounded-lg shadow-lg border border-border z-20 max-h-[400px] overflow-y-auto"
                                 style={{
                                   top: menuPosition.top !== undefined ? `${menuPosition.top}px` : 'auto',
@@ -888,23 +888,23 @@ export default function RegistrationsList() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-auto">
             <h2 className="text-2xl font-bold mb-4">Verify Payment</h2>
-            
+
             <div className="space-y-4 mb-6">
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Registration ID</p>
                 <p className="font-semibold font-mono">{selectedRegistration.registrationId}</p>
               </div>
-              
+
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Name</p>
                 <p className="font-semibold">{selectedRegistration.name}</p>
               </div>
-              
+
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Email</p>
                 <p className="font-semibold">{selectedRegistration.email}</p>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Ticket Type</p>
@@ -950,15 +950,15 @@ export default function RegistrationsList() {
               {selectedRegistration.paymentScreenshotUrl && (
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600 mb-2">Payment Screenshot</p>
-                  <img 
-                    src={selectedRegistration.paymentScreenshotUrl} 
-                    alt="Payment Screenshot" 
+                  <img
+                    src={selectedRegistration.paymentScreenshotUrl}
+                    alt="Payment Screenshot"
                     className="w-full h-auto rounded border cursor-pointer hover:opacity-90"
                     onClick={() => openScreenshot(selectedRegistration.paymentScreenshotUrl!)}
                   />
                 </div>
               )}
-              
+
               <div>
                 <label className="block text-sm font-medium mb-2">UPI ID (Optional)</label>
                 <input
@@ -969,7 +969,7 @@ export default function RegistrationsList() {
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-2">Transaction ID (Optional)</label>
                 <input
@@ -980,7 +980,7 @@ export default function RegistrationsList() {
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-2">Verification Notes (Optional)</label>
                 <textarea
@@ -992,7 +992,7 @@ export default function RegistrationsList() {
                 />
               </div>
             </div>
-            
+
             <div className="flex gap-3">
               <Button
                 onClick={() => handleVerifyPayment("approve")}
@@ -1030,7 +1030,7 @@ export default function RegistrationsList() {
 
       {/* Screenshot Modal */}
       {showScreenshot && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-60 p-4"
           onClick={() => setShowScreenshot(false)}
         >
@@ -1043,9 +1043,9 @@ export default function RegistrationsList() {
             >
               <XCircle className="w-6 h-6" />
             </Button>
-            <img 
-              src={screenshotUrl} 
-              alt="Payment Screenshot" 
+            <img
+              src={screenshotUrl}
+              alt="Payment Screenshot"
               className="w-full h-auto rounded-lg"
               onClick={(e) => e.stopPropagation()}
             />
@@ -1055,11 +1055,11 @@ export default function RegistrationsList() {
 
       {/* Details Modal */}
       {showDetailsModal && detailsRegistration && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
           onClick={() => setShowDetailsModal(false)}
         >
-          <div 
+          <div
             className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
@@ -1240,12 +1240,12 @@ export default function RegistrationsList() {
                         if (detailsRegistration.personTickets && detailsRegistration.personTickets.length > 0) {
                           detailsRegistration.personTickets.forEach((person: any) => {
                             const { personType, age, tickets } = person
-                            
+
                             tickets?.forEach((ticket: string) => {
                               // For Members: Children under 12 don't pay
                               // For Guests: Everyone pays (including children under 12)
                               const isFreeChild = !detailsRegistration.isGuest && personType === "child" && age === "<12"
-                              
+
                               if (!isFreeChild) {
                                 total += prices[ticket] || 0
                               }
@@ -1259,8 +1259,8 @@ export default function RegistrationsList() {
                   <div>
                     <p className="text-sm text-gray-500">Payment Method</p>
                     <p className="font-medium text-gray-900 capitalize">
-                      {detailsRegistration.paymentMethod === "razorpay" ? "Razorpay" : 
-                       detailsRegistration.paymentMethod === "manual" ? "Manual" : 
+                      {detailsRegistration.paymentMethod === "razorpay" ? "Razorpay" :
+                       detailsRegistration.paymentMethod === "manual" ? "Manual" :
                        detailsRegistration.paymentScreenshotUrl ? "Manual" : "Razorpay"}
                     </p>
                   </div>
@@ -1341,11 +1341,11 @@ export default function RegistrationsList() {
                   QR Code
                 </h3>
                 <div className="bg-gray-50 p-4 rounded-lg flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     {detailsRegistration.qrCode ? (
-                      <img 
-                        src={detailsRegistration.qrCode} 
-                        alt="QR Code" 
+                      <img
+                        src={detailsRegistration.qrCode}
+                        alt="QR Code"
                         className="w-48 h-48 border-2 border-gray-300 rounded-lg"
                       />
                     ) : (

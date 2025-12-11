@@ -27,7 +27,7 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
   return (
     <div className="space-y-8">
       {/* Payment Gateway Section */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-lg text-center">
+      <div className="bg-linear-to-r from-blue-50 to-purple-50 p-8 rounded-lg text-center">
           <CreditCard className="w-16 h-16 mx-auto mb-4 text-primary" />
           <h3 className="text-2xl font-bold mb-3">Online Payment</h3>
           <p className="text-muted-foreground mb-6">
@@ -41,7 +41,7 @@ export default function Step4Payment({ formData, setFormData }: Step4PaymentProp
 
             {/* Favourite Payment Option - Netbanking Coming Soon */}
             <div
-              className="w-full max-w-sm flex flex-col items-center gap-2 p-6 rounded-lg border-2 border-orange-400 bg-gradient-to-r from-orange-100 via-yellow-100 to-pink-100 animate-gradient"
+              className="w-full max-w-sm flex flex-col items-center gap-2 p-6 rounded-lg border-2 border-orange-400 bg-linear-to-r from-orange-100 via-yellow-100 to-pink-100 animate-gradient"
               style={{
                 backgroundSize: '200% 200%',
                 animation: 'gradientMove 3s ease-in-out infinite',

@@ -8,15 +8,15 @@ export const maxDuration = 30
 
 /**
  * GET /api/admin/payments
- * 
+ *
  * Get all payments with filtering and pagination
  * Requires admin authentication
- * 
+ *
  * Query params:
  * - status: success | pending | failed
  * - dateFrom: ISO date string
  * - dateTo: ISO date string
- * - search: search in registrationId, razorpayOrderId
+ * - search: search in registrationId, pgOrderId
  * - page: page number (default: 1)
  * - limit: items per page (default: 20)
  * - sortBy: field to sort by (default: createdAt)
@@ -33,12 +33,12 @@ export async function GET(req: NextRequest) {
     await connectDB()
 
     const { searchParams } = new URL(req.url)
-    
+
     // Pagination
     const page = parseInt(searchParams.get("page") || "1")
     const limit = parseInt(searchParams.get("limit") || "20")
     const skip = (page - 1) * limit
-    
+
     // Filters
     const status = searchParams.get("status")
     const dateFrom = searchParams.get("dateFrom")
@@ -63,8 +63,8 @@ export async function GET(req: NextRequest) {
     if (search) {
       query.$or = [
         { registrationId: { $regex: search, $options: "i" } },
-        { razorpayOrderId: { $regex: search, $options: "i" } },
-        { razorpayPaymentId: { $regex: search, $options: "i" } },
+        { pgOrderId: { $regex: search, $options: "i" } },
+        { pgTransactionId: { $regex: search, $options: "i" } },
       ]
     }
 
@@ -88,10 +88,9 @@ export async function GET(req: NextRequest) {
         return {
           id: payment._id.toString(),
           registrationId: payment.registrationId,
-          paymentMethod: payment.paymentMethod || "razorpay", // Add payment method
-          razorpayOrderId: payment.razorpayOrderId,
-          razorpayPaymentId: payment.razorpayPaymentId || null,
-          razorpaySignature: payment.razorpaySignature || null,
+          paymentMethod: payment.paymentMethod || "payment_gateway", // Add payment method
+          pgOrderId: payment.pgOrderId || null,
+          pgTransactionId: payment.pgTransactionId || null,
           // Manual payment fields
           upiId: payment.upiId || null,
           transactionId: payment.transactionId || null,
