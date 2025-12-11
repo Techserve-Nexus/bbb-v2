@@ -1,2 +1,2 @@
 # Chaturanga Manthana website
-#omkar 
+#vercel
